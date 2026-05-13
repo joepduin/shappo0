@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using shappo0.Repositories;
+
 namespace shappo0
 {
     public class Program
@@ -5,9 +8,19 @@ namespace shappo0
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddTransient<IUsersRepository, DbUsersRepository>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            //Authentication
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                });
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
@@ -24,6 +37,7 @@ namespace shappo0
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
