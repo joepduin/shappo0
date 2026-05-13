@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using shappo0.Repositories;
 
+using shappo0.Repositories;
+using shappo0.Services;
+
 namespace shappo0
 {
     public class Program
@@ -11,6 +14,8 @@ namespace shappo0
             builder.Services.AddTransient<IUsersRepository, DbUsersRepository>();
 
             // Add services to the container.
+            builder.Services.AddSingleton<IMenuRepository, DbMenuRepository>();
+            builder.Services.AddSingleton<IMenuService, MenuService>();
             builder.Services.AddControllersWithViews();
 
             //Authentication
