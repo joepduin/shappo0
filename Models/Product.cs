@@ -4,8 +4,8 @@
     {
         public int ProductId { get; set; }
         public string Name { get; set; }
-        public int Price { get; set; }
-        public int VATPercentage { get; set; }
+        public decimal Price { get; set; }
+        public decimal VATPercentage { get; set; }
         public int Stock {  get; set; }
         public string ProductType { get; set; }
         public string MenuType { get; set; }
@@ -16,7 +16,7 @@
 
         }
 
-        public Product(string name, int price, int vatPercentage, int stock, string productType, string menuType, bool onMenu)
+        public Product(string name, decimal price, decimal vatPercentage, int stock, string productType, string menuType, bool onMenu)
         {
             Name = name;
             Price = price;
@@ -27,7 +27,7 @@
             OnMenu = onMenu;
         }
 
-        public Product(int productId, string name, int price, int vatPercentage, int stock, string productType, string menuType, bool onMenu)
+        public Product(int productId, string name, decimal price, decimal vatPercentage, int stock, string productType, string menuType, bool onMenu)
         {
             ProductId = productId;
             Name = name;
