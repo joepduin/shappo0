@@ -1,5 +1,61 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using shappo0.Models
+@model List<shappo0.Models.Product>
+
 @{
+	ViewData["Title"] = "Products";
+
+	// Displays a banner with a confirm message if redirected to this page from either add or edit
+	if (TempData["ConfirmMessage"] != null)
+	{
+		<div class="alert alert-success" role="alert">@TempData["ConfirmMessage"]</div>
+	}
 }
+
+<h1>Products</h1>
+
+<a href="/Menu/AddDrink" class="btn btn-info">Add new drink</a>
+<a href="/Menu/AddFoodItem" class="btn btn-info">Add new food item</a>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Product ID</th>
+			<th>Name</th>
+			<th>Price</th>
+			<th>Stock</th>
+			<th>Product type</th>
+			<th>Time of day</th>
+			<th>On menu?</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		@{
+			foreach (Product product in Model)
+			{
+				decimal vat = product.VATPercentage / 100;
+				decimal price = product.Price * vat;
+
+				<tr>
+					<td>@product.ProductId</td>
+					<td>@product.Name</td>
+					<td>@price</td>
+					<td>@product.Stock</td>
+					<td>@product.ProductType</td>
+					<td>@product.MenuType</td>
+					@if (product.OnMenu)
+					{
+						<td class="bg-success">True</td>
+					}
+					else
+					{
+						<td class="bg-danger">False</td>
+					}
+					<td>
+						<a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-outline-dark">Edit</a>
+					</td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>
