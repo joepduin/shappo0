@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Data.SqlClient;
 using shappo0.Models;
 using System.Security.Cryptography;
 using System.Text;

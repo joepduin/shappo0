@@ -14,7 +14,6 @@
 
         public User()
         {
-            
         }
 
         public User(int userId, string userName, string? phoneNumber, Sexe? sex, Roles role, string password, bool isEmployed)

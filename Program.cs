@@ -12,6 +12,7 @@ namespace shappo0
 
             // Add services to the container.
             builder.Services.AddSingleton<IUsersRepository, DbUsersRepository>();
+            builder.Services.AddSingleton<ITablesRepository, DbTablesRepository>();
             builder.Services.AddSingleton<IMenuRepository, DbMenuRepository>();
             builder.Services.AddSingleton<IMenuService, MenuService>();
             builder.Services.AddControllersWithViews();
