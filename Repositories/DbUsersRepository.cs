@@ -51,8 +51,8 @@ namespace shappo0.Repositories
             user.UserId = reader.GetInt32(0);
             user.UserName = reader.GetString(1);
             user.PhoneNumber = reader.IsDBNull(2) ? null : reader.GetString(2);
-            user.Sex = reader.IsDBNull(3) ? null : Enum.Parse<Sexe>(reader.GetString(3));
-            user.Role = Enum.Parse<Roles>(reader.GetString(4));
+            user.Sex = reader.IsDBNull(3) ? null : Enum.Parse<SexType>(reader.GetString(3));
+            user.Role = Enum.Parse<RoleType>(reader.GetString(4));
             user.Password = reader.GetString(5);
             user.IsEmployed = reader.GetBoolean(6);
             return user;

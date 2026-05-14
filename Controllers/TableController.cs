@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using shappo0.Models;
-using shappo0.Repositories;
+using shappo0.Services;
 
 namespace shappo0.Controllers
 {
     public class TableController : Controller
     {
-        private readonly ITablesRepository _tablesRepository;
+        private readonly ITableService _tableService;
 
-        public TableController(ITablesRepository tablesRepository)
+        public TableController(ITableService tableService)
         {
-            _tablesRepository = tablesRepository;
+            _tableService = tableService;
         }
 
         //je moet ingelogd zijn. tafels woorden doorgegeven aan de view.
@@ -19,7 +19,7 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            List<Table> tables = _tablesRepository.GetAllTables();
+            List<Table> tables = _tableService.GetAllTables();
             return View(tables);
         }
     }

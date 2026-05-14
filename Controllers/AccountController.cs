@@ -3,34 +3,35 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using shappo0.Models;
-using shappo0.Repositories;
+using shappo0.Services;
 using System.Security.Claims;
 
 namespace shappo0.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUsersRepository _usersRepository;
+        private readonly IAccountService _accountService;
 
-        public AccountController(IUsersRepository usersRepository)
+        public AccountController(IAccountService accountService)
         {
-            _usersRepository = usersRepository;
+            _accountService = accountService;
         }
 
-        //Test pagina waar je komt na inloggen
-        [Authorize]
+        //Stuurt door naar de inlog pagina
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Login", "Account");
         }
 
         //Test om te kijken of de permissies werken.
+        //naar de table pagina = werkend
+        //naar accesdenied page = niet werkend
         [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult Test()
         {
-            return RedirectToAction("Index", "Account");
+            return RedirectToAction("Index", "Table");
         }
         
         //de inlog pagina
@@ -61,7 +62,7 @@ namespace shappo0.Controllers
         [HttpPost]
         public ActionResult Login(LoginModel loginModel)
         {
-            User user = _usersRepository.GetUserByCredentials(loginModel);
+            User user = _accountService.GetUserByCredentials(loginModel);
 
             if (user == null)
             {
@@ -71,8 +72,8 @@ namespace shappo0.Controllers
             else
             {
                 SignInUser(user);
-
-                return RedirectToAction("Index", "Account");
+                //je gaat nu gelijk naar de table page. later ga je naar de pagina waarvoor je rol geschikt is.
+                return RedirectToAction("Index", "Table");
             }
         }
 
