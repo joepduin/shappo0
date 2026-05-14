@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Endpoints;
 using shappo0.Models;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace shappo0.Repositories
 {
@@ -16,21 +16,21 @@ namespace shappo0.Repositories
         public List<Product> GetProducts()
         {
             List<Product> products = new List<Product>();
+            string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu " +
+                "FROM product";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT name, price, vatPercentage, stock, productType, menuType, onMenu FROM product";
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    Product product = ReadProduct(reader);
-                    products.Add(product);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            products.Add(ReadProduct(reader));
+                    }
                 }
-                reader.Close();
             }
             return products;
         }
@@ -38,22 +38,21 @@ namespace shappo0.Repositories
         public Product GetByProductId(int productId)
         {
             Product product = null;
+
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu " +
-                    "FROM product " +
-                    "WHERE productId = @productId";
-                SqlCommand command = new SqlCommand(query);
-
-                command.Parameters.AddWithValue("@productId", productId);
+                string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu FROM product WHERE productId = @productId";
                 
-                connection.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-                if(reader.Read())
-                    product = ReadProduct(reader);
-
-                reader.Close();
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@productId", productId);
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                            product = ReadProduct(reader);
+                    }
+                }
             }
 
             return product;
@@ -114,8 +113,8 @@ namespace shappo0.Repositories
         {
             int productId = (int)reader["productId"];
             string name = (string)reader["name"];
-            int price = (int)reader["price"];
-            int vatPercentage = (int)reader["vatPercentage"];
+            decimal price = (decimal)reader["price"];
+            decimal vatPercentage = (decimal)reader["vatPercentage"];
             int stock = (int)reader["stock"];
             string productType = (string)reader["productType"];
             string menuType = (string)reader["menuType"];
