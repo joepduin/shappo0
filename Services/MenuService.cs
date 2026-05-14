@@ -21,6 +21,12 @@ namespace shappo0.Services
         {
             return _menuRepository.GetByProductId(id);
         }
+
+        public List<Product> GetFilteredProducts(string? productType, string? menuType, string? onMenu)
+        {
+            return _menuRepository.GetFilteredProducts(productType, menuType, onMenu);
+        }
+
         public void AddMenuItem(Product product)
         {
             _menuRepository.AddMenuItem(product);

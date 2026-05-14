@@ -13,12 +13,13 @@ namespace shappo0.Controllers
             _menuService = menuService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string? productType, string? menuType, string? onMenu)
         {
-            List<Product> products = _menuService.GetProducts();
+            List<Product> products = _menuService.GetFilteredProducts(productType, menuType, onMenu);
             return View(products);
         }
 
+        // The add methods for both food and drink items are separated, but both call the same AddItem method
         [HttpGet]
         public IActionResult AddFoodItem()
         {
@@ -28,18 +29,7 @@ namespace shappo0.Controllers
         [HttpPost]
         public ActionResult AddFoodItem(Product product)
         {
-            try
-            {
-                _menuService.AddMenuItem(product);
-
-                TempData["ConfirmMessage"] = "User has been succesfully created";
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                ViewBag.ErrorMessage = @"Exception occured: product could not be added";
-                return View(product);
-            }
+            return AddItem(product);
         }
 
         [HttpGet]
@@ -51,11 +41,20 @@ namespace shappo0.Controllers
         [HttpPost]
         public ActionResult AddDrink(Product product)
         {
+            return AddItem(product);
+        }
+
+        // Overarching method for adding an item (either drink or food), preventing double code
+        public ActionResult AddItem(Product product)
+        {
             try
             {
+                // The price is divided by 1 + VAT percentage to get the price without VAT, which is what is stored in the database
+                product.Price = product.Price / (1 + product.VATPercentage / 100);
+
                 _menuService.AddMenuItem(product);
 
-                TempData["ConfirmMessage"] = "User has been succesfully created";
+                TempData["ConfirmMessage"] = "Product has been succesfully created";
                 return RedirectToAction("Index");
             }
             catch
@@ -65,6 +64,7 @@ namespace shappo0.Controllers
             }
         }
 
+        // Editing an item is done through the same view for both food and drink items. This gives the user full freedom to edit properties, including illegal combinations
         [HttpGet]
         public IActionResult Edit(int? id)
         {
@@ -75,8 +75,6 @@ namespace shappo0.Controllers
 
             Product? product = _menuService.GetByProductId((int)id);
             
-            
-
             return View(product);
         }
 
