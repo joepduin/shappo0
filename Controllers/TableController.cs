@@ -16,6 +16,7 @@ namespace shappo0.Controllers
 
         //je moet ingelogd zijn. tafels woorden doorgegeven aan de view.
         [Authorize]
+        [HttpGet]
         public IActionResult Index()
         {
             List<Table> tables = _tablesRepository.GetAllTables();

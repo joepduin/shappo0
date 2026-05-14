@@ -19,6 +19,7 @@ namespace shappo0.Controllers
 
         //Test pagina waar je komt na inloggen
         [Authorize]
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
@@ -26,18 +27,21 @@ namespace shappo0.Controllers
 
         //Test om te kijken of de permissies werken.
         [Authorize(Roles = "Manager")]
+        [HttpGet]
         public IActionResult Test()
         {
             return RedirectToAction("Index", "Account");
         }
         
         //de inlog pagina
+        [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
         //view als de gebruiker geen permissies heeft voor een pagina
+        [HttpGet]
         public IActionResult AccessDenied()
         {
             return View();
@@ -46,6 +50,7 @@ namespace shappo0.Controllers
 
         //Logt de gebruiker uit, moet wel eerst ingelogged zijn.
         [Authorize]
+        [HttpGet]
         public IActionResult LogOff()
         {
             HttpContext.SignOutAsync();
@@ -54,7 +59,7 @@ namespace shappo0.Controllers
 
         //zoekt via userreportie naar de gebruikt. krijgt een lege user bij een fout.
         [HttpPost]
-        public IActionResult Login(LoginModel loginModel)
+        public ActionResult Login(LoginModel loginModel)
         {
             User user = _usersRepository.GetUserByCredentials(loginModel);
 

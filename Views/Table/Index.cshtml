@@ -22,7 +22,7 @@
     @foreach (Table table in Model)
     {
         string bg;
-        if (table.Bezet)
+        if (table.Status)
         {
             bg = "#d9534f"; //rood
         }
@@ -32,7 +32,7 @@
         }
         
         <div class="table-square" style="background-color:@bg">
-            Table @table.TableNummer
+            Table @table.TableNumber
         </div>
     }
 </div>
