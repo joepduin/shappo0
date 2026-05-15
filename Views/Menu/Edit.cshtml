@@ -4,43 +4,47 @@
 }
 
 <div class="container mt-4">
+	<a href="/Menu/Index" class="btn btn-secondary mb-3">Back to Menu</a>
     <h1>Edit Product</h1>
 
-    <form action="/Menu/AddFoodItem" method="POST">
-        <input type="hidden" name="productId" value="0" />
-        <input type="hidden" name="vatPercentage" value="9" />
+    <form action="/Menu/Edit" method="POST">
+        <input type="hidden" name="productId" value="@Model?.ProductId" />
+        <input type="hidden" name="vatPercentage" value="@Model?.VATPercentage" />
 
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="name" class="form-label">Name:</label>
-                <input type="text" id="name" name="name" class="form-control" required value="@Model.Name" />
+                <input type="text" id="name" name="name" class="form-control" required value="@Model?.Name" />
             </div>
             <div class="col-md-3">
-                <label for="price" class="form-label">Price (€):</label>
-                <input type="number" step="0.01" lang="en-us" id="price" name="price" class="form-control" required value="@Model.Price" />
+                <label for="price" class="form-label">Price excluding VAT (€):</label>
+                <input type="number" step="0.01" id="price" name="price" class="form-control" required value="@Model?.Price" />
             </div>
             <div class="col-md-3">
                 <label for="stock" class="form-label">Stock:</label>
-                <input type="number" id="stock" name="stock" class="form-control" required value="@Model.Stock" />
+                <input type="number" id="stock" name="stock" class="form-control" required value="@Model?.Stock" />
             </div>
         </div>
 
+        <!-- Below, 2 dropdowns are shown for the product type and the menu type -->
+        <!-- The 'selected' attribute is set based on the current model's values, checking whether the model's value matches the option's value, otherwise it is not set -->
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="productType" class="form-label">Food Category:</label>
                 <select id="productType" name="productType" class="form-select" required>
-                    <option value="starter">Starter</option>
-                    <option value="main course">Main Course</option>
-                    <option value="dessert">Dessert</option>
-                    <option value="intermediary course">Intermediary Course</option>
+                    <option value="@ProductType.Starter" selected="@(Model?.ProductType == ProductType.Starter ? "selected" : null)">Starter</option>
+                    <option value="@ProductType.Main" selected="@(Model?.ProductType == ProductType.Main ? "selected" : null)">Main Course</option>
+                    <option value="@ProductType.Dessert" selected="@(Model?.ProductType == ProductType.Dessert ? "selected" : null)">Dessert</option>
+                    <option value="@ProductType.Intermediary" selected="@(Model?.ProductType == ProductType.Intermediary ? "selected" : null)">Intermediary Course</option>
+                    <option value="@ProductType.Drink" selected="@(Model?.ProductType == ProductType.Drink ? "selected" : null)">Drink</option>
                 </select>
             </div>
             <div class="col-md-6">
                 <label for="menuType" class="form-label">Menu Type:</label>
                 <select id="menuType" name="menuType" class="form-select" required>
-                    <option value="lunch">Lunch</option>
-                    <option value="dinner">Dinner</option>
-                    <option value="all">All</option>
+                    <option value="@MenuType.Lunch" selected="@(Model?.MenuType == MenuType.Lunch ? "selected" : null)">Lunch</option>
+                    <option value="@MenuType.Dinner" selected="@(Model?.MenuType == MenuType.Dinner ? "selected" : null)">Dinner</option>
+                    <option value="@MenuType.All" selected="@(Model?.MenuType == MenuType.All ? "selected" : null)">All</option>
                 </select>
             </div>
         </div>
@@ -56,6 +60,6 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Save Food Item</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
     </form>
 </div>

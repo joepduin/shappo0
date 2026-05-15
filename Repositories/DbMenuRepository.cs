@@ -13,11 +13,13 @@ namespace shappo0.Repositories
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
+        // Regular GetProducts method, but with an ORDER BY clause to sort the products by onMenu (descending) and then by name (ascending)
         public List<Product> GetProducts()
         {
             List<Product> products = new List<Product>();
             string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu " +
-                "FROM product";
+                "FROM product " +
+                "ORDER BY onMenu DESC, menuType, productType, name";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -56,6 +58,70 @@ namespace shappo0.Repositories
             }
 
             return product;
+        }
+
+        public List<Product> GetFilteredProducts(string? productType, string? menuType, string? onMenu)
+        {
+            string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu " +
+                "FROM product";
+
+            if (!string.IsNullOrEmpty(productType) && !string.IsNullOrEmpty(menuType) && !string.IsNullOrEmpty(onMenu))
+            {
+                query = query + $" WHERE productType = @productType AND menuType = @menuType AND onMenu = @onMenu";
+            }
+            else if (!string.IsNullOrEmpty(menuType) && !string.IsNullOrEmpty(onMenu))
+            {
+                query = query + $" WHERE menuType = @menuType AND onMenu = @onMenu";
+            }
+            else if (!string.IsNullOrEmpty(productType) && !string.IsNullOrEmpty(onMenu))
+            {
+                query = query + $" WHERE productType = @productType AND onMenu = @onMenu";
+            }
+            else if (!string.IsNullOrEmpty(productType) && !string.IsNullOrEmpty(menuType))
+            {
+                query = query + $" WHERE productType = @productType AND menuType = @menuType";
+            }
+            else if (!string.IsNullOrEmpty(productType))
+            {
+                query = query + $" WHERE productType = @productType";
+            }
+            else if(!string.IsNullOrEmpty(menuType))
+            {
+                query = query + $" WHERE menuType = @menuType";
+            }
+            else if (!string.IsNullOrEmpty(onMenu))
+            {
+                query = query + $" WHERE onMenu = @onMenu";
+            }
+
+            query = query + " ORDER BY onMenu DESC, menuType, productType, name";
+
+            List<Product> products = new List<Product>();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    // Makes sure to introduce the parameters within the written query AS strings, not as enums!
+                    if (!string.IsNullOrEmpty(productType))
+                        command.Parameters.AddWithValue("@productType", Enum.Parse<ProductType>(productType.ToString(), true));
+                    if (!string.IsNullOrEmpty(menuType))
+                        command.Parameters.AddWithValue("@menuType", Enum.Parse<MenuType>(menuType.ToString(), true));
+                    // Since onMenu is a boolean, we need to convert the string value to a boolean before adding it as a parameter
+                    if (!string.IsNullOrEmpty(onMenu))
+                    {
+                        bool isOnMenu = onMenu.ToLower() == "true";
+                        command.Parameters.AddWithValue("@onMenu", isOnMenu);
+                    }
+                        
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            products.Add(ReadProduct(reader));
+                    }
+                }
+            }
+            return products;
         }
 
         public void AddMenuItem(Product product)

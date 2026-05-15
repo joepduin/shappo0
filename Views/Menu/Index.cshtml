@@ -16,6 +16,46 @@
 <a href="/Menu/AddDrink" class="btn btn-info">Add new drink</a>
 <a href="/Menu/AddFoodItem" class="btn btn-info">Add new food item</a>
 
+<form method="GET" action="/Menu/Index" class="row g-3 mb-4 p-3 bg-light border rounded">
+	<h5>Filter Menu Items</h5>
+
+	<div class="col-md-3">
+		<label class="form-label">Product Type</label>
+		<select name="productType" class="form-select">
+			<option value="">All Types</option>
+			<option value="Drink">Drink</option>
+			<option value="Starter">Starter</option>
+			<option value="Intermediary">Intermediary</option>
+			<option value="Main">Main Course</option>
+			<option value="Dessert">Dessert</option>
+		</select>
+	</div>
+
+	<div class="col-md-3">
+		<label class="form-label">Menu Type</label>
+		<select name="menuType" class="form-select">
+			<option value="">All Menus</option>
+			<option value="Lunch">Lunch</option>
+			<option value="Dinner">Dinner</option>
+		</select>
+	</div>
+
+	<div class="col-md-3">
+		<label class="form-label">On menu?</label>
+		<select name="onMenu" class="form-select">
+			<option value="">Any status</option>
+			<option value="True">On menu</option>
+			<option value="False">Off menu</option>
+		</select>
+	</div>
+
+	@* Submit and Reset *@
+	<div class="col-md-3 d-flex align-items-end gap-2">
+		<button type="submit" class="btn btn-primary w-100">Filter</button>
+		<a href="/Menu/Index" class="btn btn-outline-secondary w-100">Clear</a>
+	</div>
+</form>
+
 <table class="table">
 	<thead>
 		<tr>
@@ -33,8 +73,9 @@
 		@{
 			foreach (Product product in Model)
 			{
-				decimal vat = product.VATPercentage / 100;
-				decimal price = product.Price * vat;
+				decimal vat = (product.VATPercentage + 100) / 100;
+				// decimal price = product.Price * vat;
+				decimal price = Math.Round((product.Price * vat), 2);
 
 				<tr>
 					<td>@product.ProductId</td>

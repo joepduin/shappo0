@@ -10,7 +10,7 @@ namespace shappo0
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Add services and repositories to the container.
             builder.Services.AddSingleton<IUsersRepository, DbUsersRepository>();
             builder.Services.AddSingleton<ITablesRepository, DbTablesRepository>();
             builder.Services.AddSingleton<IMenuRepository, DbMenuRepository>();
@@ -49,6 +49,14 @@ namespace shappo0
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            var supportedCultures = new[] { "en-US" };
+            var localizationOptions = new RequestLocalizationOptions()
+                .SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+
+            app.UseRequestLocalization(localizationOptions);
 
             app.Run();
         }
