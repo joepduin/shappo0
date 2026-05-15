@@ -10,5 +10,7 @@ namespace shappo0.Repositories
         void AddMenuItem(Product product);
         void EditMenuItem(Product product);
         List<Product> GetFilteredProducts(string? productType, string? menuType, string? onMenu);
+
+        void AdjustStock(int productId, int newStock);
     }
 }

@@ -44,7 +44,7 @@ namespace shappo0.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu FROM product WHERE productId = @productId";
-                
+
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@productId", productId);
@@ -85,7 +85,7 @@ namespace shappo0.Repositories
             {
                 query = query + $" WHERE productType = @productType";
             }
-            else if(!string.IsNullOrEmpty(menuType))
+            else if (!string.IsNullOrEmpty(menuType))
             {
                 query = query + $" WHERE menuType = @menuType";
             }
@@ -113,7 +113,7 @@ namespace shappo0.Repositories
                         bool isOnMenu = onMenu.ToLower() == "true";
                         command.Parameters.AddWithValue("@onMenu", isOnMenu);
                     }
-                        
+
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -175,6 +175,25 @@ namespace shappo0.Repositories
             }
         }
 
+        public void AdjustStock(int productId, int newStock)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = $"UPDATE product " +
+                    $"SET stock = @stock " +
+                    $"WHERE productId = @productId";
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@productId", productId);
+                command.Parameters.AddWithValue("@stock", newStock);
+
+                command.Connection.Open();
+
+                int nrOfRowsAffected = command.ExecuteNonQuery();
+                if (nrOfRowsAffected == 0)
+                    throw new Exception("No records updated..");
+            }
+        }
         private Product ReadProduct(SqlDataReader reader)
         {
             int productId = (int)reader["productId"];

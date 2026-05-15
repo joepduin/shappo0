@@ -35,5 +35,9 @@ namespace shappo0.Services
         {
             _menuRepository.EditMenuItem(product);
         }
+        public void AdjustStock(int productId, int newStock)
+        {
+            _menuRepository.AdjustStock(productId, newStock);
+        }
     }
 }

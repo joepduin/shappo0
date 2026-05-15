@@ -78,7 +78,7 @@ namespace shappo0.Controllers
             }
 
             Product? product = _menuService.GetByProductId((int)id);
-            
+
             return View(product);
         }
 
@@ -97,6 +97,42 @@ namespace shappo0.Controllers
             {
                 ViewBag.ErrorMessage = @"Exception occured: product could not be edited.";
                 return View(product);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult AdjustStock()
+        {
+            List<Product> products = _menuService.GetProducts();
+            return View(products);
+        }
+
+        [HttpPost]
+        public ActionResult AdjustStock(List<Product> adjustedProducts)
+        {
+            // First checks if there were any products selected, if not, it returns an error message
+            if (adjustedProducts == null)
+            {
+                List<Product> products = _menuService.GetProducts();
+                ViewBag.ErrorMessage = @"Exception occured: no products were selected.";
+                return View(products);
+            }
+            try
+            {
+                foreach (Product product in adjustedProducts)
+                {
+                    _menuService.AdjustStock(product.ProductId, product.Stock);
+                }
+                return RedirectToAction("Index");
+
+            }
+            catch
+            {
+                // Annoyingly some double code, but catch method
+                List<Product> products = _menuService.GetProducts();
+                ViewBag.ErrorMessage = @"Exception occured: no products were selected.";
+                return View(products);
+
             }
         }
     }
