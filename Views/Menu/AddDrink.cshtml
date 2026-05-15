@@ -1,6 +1,11 @@
 ﻿@model shappo0.Models.Product
 @{
     ViewData["Title"] = "Add Drink";
+
+    if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
+    }
 }
 
 <div class="container mt-4">

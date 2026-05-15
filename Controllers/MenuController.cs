@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using shappo0.Models;
 using shappo0.Services;
 
@@ -20,6 +21,7 @@ namespace shappo0.Controllers
         }
 
         // The add methods for both food and drink items are separated, but both call the same AddItem method
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult AddFoodItem()
         {
@@ -32,6 +34,7 @@ namespace shappo0.Controllers
             return AddItem(product);
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult AddDrink()
         {
@@ -65,6 +68,7 @@ namespace shappo0.Controllers
         }
 
         // Editing an item is done through the same view for both food and drink items. This gives the user full freedom to edit properties, including illegal combinations
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult Edit(int? id)
         {
