@@ -1,0 +1,77 @@
+﻿@using shappo0.Models
+@model List<shappo0.Models.User>
+
+@{
+	ViewData["Title"] = "Users";
+
+	if (TempData["ConfirmMessage"] != null)
+	{
+		<div class="alert alert-success" role="alert">@TempData["ConfirmMessage"]</div>
+	}
+}
+
+<h1 class="d-flex align-items-center justify-content-center">Users</h1>
+
+<a href="/User/AddUser" class="btn btn-info">Create new user</a>
+
+<h2>Active employees</h2>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Phone number</th>
+			<th>Role</th>
+			<th>Is employed?</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		@foreach (var user in Model)
+		{
+			if (user.IsEmployed)
+			{
+				<tr>
+					<td>@user.UserId</td>
+					<td>@user.UserName</td>
+					<td>@user.PhoneNumber</td>
+					<td>@user.Role</td>
+					<td class="bg-success">@user.IsEmployed</td>
+					<td><a href="/User/EditUser/@user.UserId" class="btn btn-dark">Edit</a></td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>
+
+<h2>Inactive employees</h2>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Phone number</th>
+			<th>Role</th>
+			<th>Is employed?</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		@foreach (var user in Model)
+		{
+			if (user.IsEmployed == false)
+			{
+				<tr>
+					<td>@user.UserId</td>
+					<td>@user.UserName</td>
+					<td>@user.PhoneNumber</td>
+					<td>@user.Role</td>
+					<td class="bg-danger">@user.IsEmployed</td>
+					<td><a href="/User/EditUser/@user.UserId" class="btn btn-dark">Edit</a></td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using shappo0.Models;
 using shappo0.Services;
 
@@ -20,6 +21,7 @@ namespace shappo0.Controllers
         }
 
         // The add methods for both food and drink items are separated, but both call the same AddItem method
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult AddFoodItem()
         {
@@ -32,6 +34,7 @@ namespace shappo0.Controllers
             return AddItem(product);
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult AddDrink()
         {
@@ -65,6 +68,7 @@ namespace shappo0.Controllers
         }
 
         // Editing an item is done through the same view for both food and drink items. This gives the user full freedom to edit properties, including illegal combinations
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult Edit(int? id)
         {
@@ -74,7 +78,7 @@ namespace shappo0.Controllers
             }
 
             Product? product = _menuService.GetByProductId((int)id);
-            
+
             return View(product);
         }
 
@@ -93,6 +97,42 @@ namespace shappo0.Controllers
             {
                 ViewBag.ErrorMessage = @"Exception occured: product could not be edited.";
                 return View(product);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult AdjustStock()
+        {
+            List<Product> products = _menuService.GetProducts();
+            return View(products);
+        }
+
+        [HttpPost]
+        public ActionResult AdjustStock(List<Product> adjustedProducts)
+        {
+            // First checks if there were any products selected, if not, it returns an error message
+            if (adjustedProducts == null)
+            {
+                List<Product> products = _menuService.GetProducts();
+                ViewBag.ErrorMessage = @"Exception occured: no products were selected.";
+                return View(products);
+            }
+            try
+            {
+                foreach (Product product in adjustedProducts)
+                {
+                    _menuService.AdjustStock(product.ProductId, product.Stock);
+                }
+                return RedirectToAction("Index");
+
+            }
+            catch
+            {
+                // Annoyingly some double code, but catch method
+                List<Product> products = _menuService.GetProducts();
+                ViewBag.ErrorMessage = @"Exception occured: no products were selected.";
+                return View(products);
+
             }
         }
     }

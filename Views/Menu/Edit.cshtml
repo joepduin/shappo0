@@ -1,6 +1,11 @@
 ﻿@model shappo0.Models.Product
 @{
     ViewData["Title"] = "Edit Product";
+
+    if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
+    }
 }
 
 <div class="container mt-4">
@@ -30,7 +35,7 @@
         <!-- The 'selected' attribute is set based on the current model's values, checking whether the model's value matches the option's value, otherwise it is not set -->
         <div class="row mb-3">
             <div class="col-md-6">
-                <label for="productType" class="form-label">Food Category:</label>
+                <label for="productType" class="form-label">Category:</label>
                 <select id="productType" name="productType" class="form-select" required>
                     <option value="@ProductType.Starter" selected="@(Model?.ProductType == ProductType.Starter ? "selected" : null)">Starter</option>
                     <option value="@ProductType.Main" selected="@(Model?.ProductType == ProductType.Main ? "selected" : null)">Main Course</option>
