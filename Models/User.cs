@@ -14,6 +14,17 @@
         {
         }
 
+        public User (User user)
+        {
+            UserId = user.UserId;
+            UserName = user.UserName;
+            PhoneNumber = user.PhoneNumber;
+            Sex = user.Sex;
+            Role = user.Role;
+            Password = user.Password;
+            IsEmployed = user.IsEmployed;
+        }
+
         public User(int userId, string userName, string? phoneNumber, SexType? sex, RoleType role, string password, bool isEmployed)
         {
             UserId = userId;

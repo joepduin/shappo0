@@ -40,5 +40,12 @@
             MenuType = Enum.Parse<MenuType>(menuType.ToString(), true);
             OnMenu = onMenu;
         }
+
+        // Constructor for updating the stock of a product, which only requires the ProductId and the new stock value
+        public Product(int productId, int stock)
+        {
+            ProductId = productId;
+            Stock = stock;
+        }
     }
 }

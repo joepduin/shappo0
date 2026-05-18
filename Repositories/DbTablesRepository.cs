@@ -1,11 +1,11 @@
 ﻿using shappo0.Models;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace shappo0.Repositories
 {
     public class DbTablesRepository : ITablesRepository
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
         public DbTablesRepository(IConfiguration configuration)
         {
