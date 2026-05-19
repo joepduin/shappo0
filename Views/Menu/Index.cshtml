@@ -1,5 +1,144 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using shappo0.Models
+@model List<shappo0.Models.Product>
+
 @{
+	ViewData["Title"] = "Products";
+
+	// Displays a banner with a confirm message if redirected to this page from either add or edit
+	if (TempData["ConfirmMessage"] != null)
+	{
+		<div class="alert alert-success" role="alert">@TempData["ConfirmMessage"]</div>
+	}
 }
+
+<h1>Products</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<div class="d-flex gap-2">
+		<a href="/Menu/AddDrink" class="btn btn-info">Add new drink</a>
+		<a href="/Menu/AddFoodItem" class="btn btn-info">Add new food item</a>
+	</div>
+	<div>
+		<a href="/Menu/AdjustStock" class="btn btn-secondary">Adjust Stock</a>
+	</div>
+</div>
+
+<form method="GET" action="/Menu/Index" class="row g-3 mb-4 p-3 bg-light border rounded">
+	<h5>Filter Menu Items</h5>
+
+	<div class="col-md-3">
+		<label class="form-label">Product Type</label>
+		<select name="productType" class="form-select">
+			<option value="">All Types</option>
+			<option value="Drink">Drink</option>
+			<option value="Starter">Starter</option>
+			<option value="Intermediary">Intermediary</option>
+			<option value="Main">Main Course</option>
+			<option value="Dessert">Dessert</option>
+		</select>
+	</div>
+
+	<div class="col-md-3">
+		<label class="form-label">Menu Type</label>
+		<select name="menuType" class="form-select">
+			<option value="">All Menus</option>
+			<option value="Lunch">Lunch</option>
+			<option value="Dinner">Dinner</option>
+		</select>
+	</div>
+
+	<div class="col-md-3">
+		<label class="form-label">On menu?</label>
+		<select name="onMenu" class="form-select">
+			<option value="">Any status</option>
+			<option value="True">On menu</option>
+			<option value="False">Off menu</option>
+		</select>
+	</div>
+
+	@* Submit and Reset *@
+	<div class="col-md-3 d-flex align-items-end gap-2">
+		<button type="submit" class="btn btn-primary w-100">Filter</button>
+		<a href="/Menu/Index" class="btn btn-outline-secondary w-100">Clear</a>
+	</div>
+</form>
+
+@if (Model.Any(p => p.Stock < 10 && p.OnMenu))
+{
+	<div class="alert alert-danger" role="alert">
+		<h3>⚠️ Low Stock Warning</h3>
+		<p>The following items have less than 10 units remaining:</p>
+
+		<table class="table table-bordered bg-white">
+			<thead>
+				<tr>
+					<th>Product ID</th>
+					<th>Name</th>
+					<th>Stock</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (Product product in Model)
+				{
+					if (product.Stock < 10 && product.OnMenu)
+					{
+						<tr>
+							<td>@product.ProductId</td>
+							<td>@product.Name</td>
+							<td><strong>@product.Stock</strong></td>
+							<td>
+								<a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-sm btn-danger">Edit</a>
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Product ID</th>
+			<th>Name</th>
+			<th>Price</th>
+			<th>Stock</th>
+			<th>Product type</th>
+			<th>Time of day</th>
+			<th>On menu?</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		@{
+			foreach (Product product in Model)
+			{
+				decimal vat = (product.VATPercentage + 100) / 100;
+				// decimal price = product.Price * vat;
+				decimal price = Math.Round((product.Price * vat), 2);
+
+				<tr>
+					<td>@product.ProductId</td>
+					<td>@product.Name</td>
+					<td>@price</td>
+					<td>@product.Stock</td>
+					<td>@product.ProductType</td>
+					<td>@product.MenuType</td>
+					@if (product.OnMenu)
+					{
+						<td class="bg-success">True</td>
+					}
+					else
+					{
+						<td class="bg-danger">False</td>
+					}
+					<td>
+						<a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-outline-dark">Edit</a>
+					</td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>

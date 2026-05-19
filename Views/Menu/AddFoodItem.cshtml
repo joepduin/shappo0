@@ -1,0 +1,66 @@
+﻿@model shappo0.Models.Product
+@{
+	ViewData["Title"] = "Add Food Item";
+
+	if (ViewBag.ErrorMessage != null)
+	{
+		<div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
+	}
+}
+
+<div class="container mt-4">
+	<h1>Add Food Item</h1>
+
+	<form action="/Menu/AddFoodItem" method="POST">
+		<input type="hidden" name="productId" value="0" />
+		<input type="hidden" name="vatPercentage" value="9" />
+
+		<div class="row mb-3">
+			<div class="col-md-6">
+				<label for="name" class="form-label">Name:</label>
+				<input type="text" id="name" name="name" class="form-control" required value="@Model?.Name" />
+			</div>
+			<div class="col-md-3">
+				<label for="price" class="form-label">Price including VAT (€):</label>
+				<input type="number" step="0.01" id="price" name="price" class="form-control" required value="@Model?.Price" />
+			</div>
+			<div class="col-md-3">
+				<label for="stock" class="form-label">Stock:</label>
+				<input type="number" id="stock" name="stock" class="form-control" required value="@Model?.Stock" />
+			</div>
+		</div>
+
+		<div class="row mb-3">
+			<div class="col-md-6">
+				<label for="productType" class="form-label">Food Category:</label>
+				<select id="productType" name="productType" class="form-select" required>
+					<option value="@ProductType.Starter" selected="@(Model?.ProductType == ProductType.Starter ? "selected" : null)">Starter</option>
+					<option value="@ProductType.Main" selected="@(Model?.ProductType == ProductType.Main ? "selected" : null)">Main Course</option>
+					<option value="@ProductType.Dessert" selected="@(Model?.ProductType == ProductType.Dessert ? "selected" : null)">Dessert</option>
+					<option value="@ProductType.Intermediary" selected="@(Model?.ProductType == ProductType.Intermediary ? "selected" : null)">Intermediary Course</option>
+				</select>
+			</div>
+			<div class="col-md-6">
+				<label for="menuType" class="form-label">Menu Type:</label>
+				<select id="menuType" name="menuType" class="form-select" required>
+					<option value="@MenuType.Lunch" selected="@(Model?.MenuType == MenuType.Lunch ? "selected" : null)">Lunch</option>
+					<option value="@MenuType.Dinner" selected="@(Model?.MenuType == MenuType.Dinner ? "selected" : null)">Dinner</option>
+					<option value="@MenuType.All" selected="@(Model?.MenuType == MenuType.All ? "selected" : null)">All</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="mb-4">
+			<label class="form-label d-block">On Menu?</label>
+			<div class="btn-group" role="group">
+				<input type="radio" class="btn-check" name="onMenu" id="foodTrue" value="true" checked autocomplete="off">
+				<label class="btn btn-outline-success" for="foodTrue">True</label>
+
+				<input type="radio" class="btn-check" name="onMenu" id="foodFalse" value="false" autocomplete="off">
+				<label class="btn btn-outline-danger" for="foodFalse">False</label>
+			</div>
+		</div>
+
+		<button type="submit" class="btn btn-primary">Save Food Item</button>
+	</form>
+</div>

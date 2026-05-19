@@ -1,0 +1,61 @@
+﻿@model shappo0.Models.Product
+@{
+    ViewData["Title"] = "Add Drink";
+
+    if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
+    }
+}
+
+<div class="container mt-4">
+    <h1>Add Drink</h1>
+
+    <form action="/Menu/AddDrink" method="POST">
+        @* Hidden Fields *@
+        <input type="hidden" name="productId" value="0" />
+        <input type="hidden" name="productType" value="Drink" />
+        <input type="hidden" name="menuType" value="All" />
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Drink Name:</label>
+                <input type="text" id="name" name="name" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+                <label for="price" class="form-label">Price including VAT (€):</label>
+                <input type="number" step="0.01" id="price" name="price" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+                <label for="stock" class="form-label">Stock:</label>
+                <input type="number" id="stock" name="stock" class="form-control" required />
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label d-block">Drink Type (VAT Selection):</label>
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="vatPercentage" id="vat9" value="9" checked autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="vat9">Non-Alcoholic (9%)</label>
+
+                    <input type="radio" class="btn-check" name="vatPercentage" id="vat21" value="21" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="vat21">Alcoholic (21%)</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label d-block">On Menu?</label>
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="onMenu" id="drinkTrue" value="true" checked autocomplete="off">
+                <label class="btn btn-outline-success" for="drinkTrue">True</label>
+
+                <input type="radio" class="btn-check" name="onMenu" id="drinkFalse" value="false" autocomplete="off">
+                <label class="btn btn-outline-danger" for="drinkFalse">False</label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Drink</button>
+    </form>
+</div>
