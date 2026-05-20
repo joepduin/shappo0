@@ -2,7 +2,6 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using shappo0.Models;
-using shappo0.Repositories.Chapeau.Repositories;
 
 namespace shappo0.Repositories
 {

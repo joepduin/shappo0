@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using shappo0.Services;
 using shappo0.ViewModels;
 
@@ -12,7 +13,8 @@ namespace shappo0.Controllers
         {
             _paymentService = paymentService;
         }
-
+        [Authorize]
+        [HttpGet]
         public IActionResult Index(int tableId)
         {
             PaymentViewModel model = _paymentService.GetPaymentOverview(tableId);

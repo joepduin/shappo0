@@ -2,11 +2,8 @@
 
 namespace shappo0.Repositories
 {
-    namespace Chapeau.Repositories
+    public interface IOrderRepository
     {
-        public interface IOrderRepository
-        {
-            Order GetOrderForTable(int tableId);
-        }
+        Order GetOrderForTable(int tableId);
     }
 }

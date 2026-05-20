@@ -1,5 +1,5 @@
 ﻿using shappo0.Models;
-using shappo0.Repositories.Chapeau.Repositories;
+using shappo0.Repositories;
 using shappo0.ViewModels;
 
 namespace shappo0.Services
