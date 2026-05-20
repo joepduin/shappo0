@@ -14,12 +14,13 @@ namespace shappo0.Repositories
         public static Kitchen ReadKitchen(SqlDataReader reader)
         {
             int id = (int)reader["orderNumber"];
+            int tableNumber = (int)reader["tableNumber"];
             List<OrderLine> orderLines = (List<OrderLine>)reader["OrderLine"];
-            string status = (string)reader["status"];
+            OrderStatus status = (OrderStatus)reader["status"];
             DateTime timeCreated = (DateTime)reader["timeCreated"];
             DateTime waitingTime = (DateTime)reader["waitingTime"];
 
-            return new Kitchen(id,orderLines, status, timeCreated, waitingTime);
+            return new Kitchen(id,tableNumber, orderLines, status, timeCreated, waitingTime);
         }
 
         public List<Kitchen> GetAll()
@@ -29,10 +30,12 @@ namespace shappo0.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             { //double join order - visit - table
               //another join on order - orderline - product where menutype lunch/dinner
-                string query = "SELECT orderNumber,staffId, tableNumber, status, timeCreated, waitingTime FROM ORDER AS o " +
-                    " INNER JOIN VISIT AS v ON o.visitId = v.visitId INNER JOIN TABLE AS t ON v.tableNumber ON t.tableNumber " +
+              // o.status --> shows only the running orders
+              //Ordered by timeCreated
+                string query = "SELECT o.orderNumber, o.staffId, t.tableNumber, o.status, o.timeCreated, o.waitingTime FROM [ORDER] AS o " +
+                    " INNER JOIN VISIT AS v ON o.visitId = v.visitId INNER JOIN [TABLE] AS t ON v.tableNumber = t.tableNumber " +
                     "INNER JOIN ORDER_LINE AS ol ON ol.orderNumber = o.orderNumber INNER JOIN PRODUCT AS p ON ol.productId = p.productId" +
-                    "WHERE menuType != 'Drink' AND status = 'running' " +
+                    " WHERE p.menuType != 'Drink' AND o.status = 'running' " +
                     "ORDER BY timeCreated";
 
                 SqlCommand command = new SqlCommand(query, connection);

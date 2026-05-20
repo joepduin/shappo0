@@ -2,3 +2,33 @@
 @{
 	ViewData["Title"] = "Bar";
 }
+<h1>Bar</h1>
+<h2>Running orders</h2>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Order number</th>
+			<th>Table number</th>
+			<th>Status</th>
+			<th>Time created</th>
+			<th>Waiting time</th>
+		</tr>
+	</thead>
+	<tbody>
+		@{
+			foreach (Bar bar in Model)
+			{
+				var rowStyle = "";
+
+				<tr @rowStyle>
+					<td>@bar.OrderNumber</td>
+					<td>@bar.Tablenumber</td>
+					<td>@bar.Status</td>
+					<td>@bar.TimeCreated</td>
+					<td>@bar.WaitingTime</td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>

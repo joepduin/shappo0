@@ -5,7 +5,7 @@ namespace shappo0.Repositories
     public interface IBarRepository
     {
         List<Bar> GetAll();
-        Bar? GetById(int OrderId);
+        Bar? GetById(int OrderNumber);
 
 
     }
