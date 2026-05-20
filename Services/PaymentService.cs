@@ -16,16 +16,19 @@ namespace shappo0.Services
 
         public PaymentViewModel GetPaymentOverview(int tableId)
         {
+            // Haal de order op uit de database voor deze tafel
+            // Dit roept de repository aan die ADO.NET gebruikt
             Order currentOrder = _orderRepository.GetOrderForTable(tableId);
             PaymentViewModel viewModel = new PaymentViewModel();
 
             viewModel.TableId = tableId;
 
             
+            // Als er geen order is, geef een leeg overzicht terug
             if (currentOrder == null)
             {
-               
-                viewModel.Items = new List<OrderItem>();
+                // Zet lege lijst en nulwaarden zodat de view netjes blijft
+                viewModel.Items = new List<OrderLine>();
                 viewModel.TotalAmount = 0;
                 viewModel.VatLow = 0;
                 viewModel.VatHigh = 0;
@@ -33,27 +36,73 @@ namespace shappo0.Services
             }
 
            
-            viewModel.Items = currentOrder.OrderItems;
-
-            double total = 0;
-            double vatLow = 0;
-            double vatHigh = 0;
-
-            foreach (OrderItem item in currentOrder.OrderItems)
+            if (currentOrder.OrderItems == null || currentOrder.OrderItems.Count == 0)
             {
-                double lineTotal = item.MenuItem.Price * item.Count;
-                total += lineTotal;
+                viewModel.Items = new List<OrderLine>();
+                viewModel.TotalAmount = 0;
+                viewModel.VatLow = 0;
+                viewModel.VatHigh = 0;
+                return viewModel;
+            }
 
-                if (item.MenuItem.IsAlcoholic)
+            // Groepeer orderregels op product zodat dubbele regels worden samengevoegd
+            List<OrderLine> groupedItems = new List<OrderLine>();
+            foreach (OrderLine item in currentOrder.OrderItems)
+            {
+                OrderLine existingItem = null;
+                foreach (OrderLine groupedItem in groupedItems)
                 {
-                    vatHigh += (lineTotal / 121) * 21;
+                    if (groupedItem.Product.ProductId == item.Product.ProductId)
+                    {
+                        existingItem = groupedItem;
+                        break;
+                    }
+                }
+
+                // Als product nog niet in gegroepeerde lijst staat, toevoegen
+                if (existingItem == null)
+                {
+                    groupedItems.Add(new OrderLine
+                    {
+                        OrderLineId = item.OrderLineId,
+                        Quantity = item.Quantity,
+                        Product = item.Product
+                    });
                 }
                 else
                 {
-                    vatLow += (lineTotal / 109) * 9;
+                    // Anders tel de hoeveelheden op
+                    existingItem.Quantity += item.Quantity;
                 }
             }
 
+            viewModel.Items = groupedItems;
+
+            // Bereken totaal en BTW per groep
+            decimal total = 0;
+            decimal vatLow = 0;
+            decimal vatHigh = 0;
+
+            foreach (OrderLine item in groupedItems)
+            {
+                // Basisprijs per regel = prijs (excl. BTW) * aantal
+                decimal lineBase = item.Product.Price * item.Quantity;
+
+                // Bereken BTW als simpele vermenigvuldiging: basis * (VAT% / 100)
+                // Dit volgt de manier waarop producten worden opgeslagen in Product.Price (excl. BTW)
+                decimal vatAmount = lineBase * (item.Product.VATPercentage / 100m);
+
+                // Tel BTW en basis op bij de totalen
+                total += lineBase + vatAmount;
+
+                // Voeg BTW toe aan hoge of lage categorie
+                if (item.Product.VATPercentage == 21)
+                    vatHigh += vatAmount;
+                else
+                    vatLow += vatAmount;
+            }
+
+            // Sla uitkomsten op in het viewmodel
             viewModel.TotalAmount = total;
             viewModel.VatLow = vatLow;
             viewModel.VatHigh = vatHigh;
