@@ -18,7 +18,6 @@ namespace shappo0.Repositories
         {
             Order order = null;
 
-           
             string query = @"
                 SELECT o.orderNumber, v.tableNumber, 
                        ol.orderLineId, ol.quantity, 
@@ -34,43 +33,17 @@ namespace shappo0.Repositories
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                   
                     command.Parameters.AddWithValue("@tableId", tableId);
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            
                             if (order == null)
-                            {
-                                order = new Order
-                                {
-                                    Id = (int)reader["orderNumber"],
-                                    TableId = (int)reader["tableNumber"],
-                                    OrderItems = new List<OrderLine>()
-                                };
-                            }
+                                order = ReadOrderHeader(reader);
 
-                           
-                            decimal vat = (decimal)reader["VATPercentage"];
-                            Product product = new Product
-                            {
-                                ProductId = (int)reader["productId"],
-                                Name = (string)reader["name"],
-                                Price = (decimal)reader["price"],
-                                VATPercentage = vat
-                            };
-
-                            
-                            OrderLine item = new OrderLine
-                            {
-                                OrderLineId = (int)reader["orderLineId"],
-                                Quantity = (int)reader["quantity"],
-                                // attach product to the order line
-                                // OrderLine class was extended to include a Product property
-                                Product = product
-                            };
+                            Product product = ReadProductFromReader(reader);
+                            OrderLine item = ReadOrderLineFromReader(reader, product);
 
                             order.OrderItems.Add(item);
                         }
@@ -79,6 +52,41 @@ namespace shappo0.Repositories
             }
 
             return order;
+        }
+
+        // Lees order header (ordernummer en tafelnummer) uit de reader
+        private Order ReadOrderHeader(SqlDataReader reader)
+        {
+            return new Order
+            {
+                Id = (int)reader["orderNumber"],
+                TableId = (int)reader["tableNumber"],
+                OrderItems = new List<OrderLine>()
+            };
+        }
+
+        // Maak een Product object van de huidige reader-rij
+        private Product ReadProductFromReader(SqlDataReader reader)
+        {
+            decimal vat = (decimal)reader["VATPercentage"];
+            return new Product
+            {
+                ProductId = (int)reader["productId"],
+                Name = (string)reader["name"],
+                Price = (decimal)reader["price"],
+                VATPercentage = vat
+            };
+        }
+
+        // Maak een OrderLine object van de huidige reader-rij en koppel het product
+        private OrderLine ReadOrderLineFromReader(SqlDataReader reader, Product product)
+        {
+            return new OrderLine
+            {
+                OrderLineId = (int)reader["orderLineId"],
+                Quantity = (int)reader["quantity"],
+                Product = product
+            };
         }
     }
 }
