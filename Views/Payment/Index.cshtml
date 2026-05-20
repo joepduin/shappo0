@@ -1,0 +1,21 @@
+﻿@model shappo0.ViewModels.PaymentViewModel
+
+<h2>Afrekenen Tafel @Model.TableId</h2>
+
+@if (Model.Items == null || Model.Items.Count == 0)
+{
+    <div class="alert alert-warning" role="alert">
+        Er is geen openstaande bestelling gevonden voor deze tafel. Zorg dat er producten zijn toegevoegd aan deze tafel.
+    </div>
+}
+else
+{
+    <partial name="_OrderItemsPartial" model="Model.Items" />
+
+    <hr />
+    <div>
+        <p>BTW 9% (Eten/Fris): € @Model.VatLow.ToString("0.00")</p>
+        <p>BTW 21% (Alcohol): € @Model.VatHigh.ToString("0.00")</p>
+        <h3>Te betalen: € @Model.TotalAmount.ToString("0.00")</h3>
+    </div>
+}
