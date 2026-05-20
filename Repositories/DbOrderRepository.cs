@@ -14,79 +14,97 @@ namespace shappo0.Repositories
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        public Order GetOrderForTable(int tableId)
+        public List<Order> GetAllOrders()
         {
-            Order order = null;
-
-            string query = @"
-                SELECT o.orderNumber, v.tableNumber, 
-                       ol.orderLineId, ol.quantity, 
-                       p.productId, p.name, p.price, p.VATPercentage 
-                FROM [ORDER] o
-                JOIN VISIT v ON o.visitId = v.visitId
-                JOIN ORDER_LINE ol ON o.orderNumber = ol.orderNumber
-                JOIN [PRODUCT] p ON ol.productId = p.productId
-                WHERE v.tableNumber = @tableId";
+            List<Order> orders = new List<Order>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(query, connection))
+                string query = "SELECT orderNumber, timeCreated, waitingTimeMinutes, status, visitId, staffId FROM [Order]";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
                 {
-                    command.Parameters.AddWithValue("@tableId", tableId);
-
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            if (order == null)
-                                order = ReadOrderHeader(reader);
-
-                            Product product = ReadProductFromReader(reader);
-                            OrderLine item = ReadOrderLineFromReader(reader, product);
-
-                            order.OrderItems.Add(item);
-                        }
-                    }
+                    Order order = ReadOrder(reader);
+                    orders.Add(order);
                 }
+                reader.Close();
             }
-
-            return order;
+            return orders;
         }
 
-        // Lees order header (ordernummer en tafelnummer) uit de reader
-        private Order ReadOrderHeader(SqlDataReader reader)
+        public List<Order> GetRunningOrders()
         {
-            return new Order
+            List<Order> orders = new List<Order>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                Id = (int)reader["orderNumber"],
-                TableId = (int)reader["tableNumber"],
-                OrderItems = new List<OrderLine>()
-            };
+                string query = "SELECT orderNumber, timeCreated, waitingTimeMinutes, status, visitId, staffId FROM [Order] " +
+                    "WHERE [status] = 'running'";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Order order = ReadOrder(reader);
+                    orders.Add(order);
+                }
+                reader.Close();
+            }
+            return orders;
         }
 
-        // Maak een Product object van de huidige reader-rij
-        private Product ReadProductFromReader(SqlDataReader reader)
+        private Order ReadOrder(SqlDataReader reader)
         {
-            decimal vat = (decimal)reader["VATPercentage"];
-            return new Product
-            {
-                ProductId = (int)reader["productId"],
-                Name = (string)reader["name"],
-                Price = (decimal)reader["price"],
-                VATPercentage = vat
-            };
+            int orderNumber = (int)reader["orderNumber"];
+            DateTime timeCreated = (DateTime)reader["timeCreated"];
+            int waitingTimeMinutes = (int)reader["waitingTimeMinutes"];
+
+            string statusString = (string)reader["status"];
+            OrderStatus status = Enum.Parse<OrderStatus>(statusString, true);
+
+            int visitId = (int)reader["visitId"];
+            int staffId = (int)reader["staffId"];
+
+            return new Order(orderNumber, timeCreated, waitingTimeMinutes, status, visitId, staffId);
         }
 
-        // Maak een OrderLine object van de huidige reader-rij en koppel het product
-        private OrderLine ReadOrderLineFromReader(SqlDataReader reader, Product product)
+        public List<Order> GetOrdersByVisitId(int visitId)
         {
-            return new OrderLine
+            List<Order> orders = new List<Order>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                OrderLineId = (int)reader["orderLineId"],
-                Quantity = (int)reader["quantity"],
-                Product = product
-            };
+                string query = "SELECT orderNumber, timeCreated, waitingTimeMinutes, O.[status], O.visitId, O.staffId " +
+                    "FROM[Order] AS O " +
+                    "JOIN Visit AS V ON V.visitId = O.visitId " +
+                    "WHERE V.visitId = @visitId";
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@visitId", visitId);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Order order = ReadOrder(reader);
+                    orders.Add(order);
+                }
+
+                reader.Close();
+            }
+            return orders;
         }
+
+
+        
     }
 }
