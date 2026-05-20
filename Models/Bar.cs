@@ -3,25 +3,32 @@
     public class Bar
     {
         public int OrderNumber { get; set; }
-        public int Tablenumber { get; set; } //add tableNumber to order database
-        List<OrderLine> Orderlines { get; set; }
+        public int Tablenumber { get; set; } 
+        
         public OrderStatus Status { get; set; } // running, completed (2)
         public DateTime TimeCreated { get; set; }
 
-        public DateTime WaitingTime { get; set; }
+        public int WaitingTime { get; set; }
 
-        public Bar(int orderNumber,int tableNumber, List<OrderLine> orderlines, OrderStatus status, DateTime timeCreated, DateTime waitingTime)
+        public Bar(int orderNumber,int tableNumber, OrderStatus status, DateTime timeCreated, int waitingTime)
         {
             OrderNumber = orderNumber;
-            Tablenumber = tableNumber;
-            Orderlines = orderlines;
-            Status = status;
+            Status = Enum.Parse<OrderStatus>(status.ToString(), true); 
             TimeCreated = timeCreated;
             WaitingTime = waitingTime;
 
         }
 
         public Bar() { }
+
+        public Bar(int orderNumber, int tableNumber, string status, DateTime timeCreated, int waitingTime)
+        {
+            OrderNumber = orderNumber;
+            Tablenumber = tableNumber;
+            Status = Enum.Parse<OrderStatus>(status, true);
+            TimeCreated = timeCreated;
+            WaitingTime = waitingTime;
+        }
 
     }
 }
