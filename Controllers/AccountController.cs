@@ -62,7 +62,8 @@ namespace shappo0.Controllers
         [HttpPost]
         public ActionResult Login(LoginModel loginModel)
         {
-            User user = _accountService.GetUserByCredentials(loginModel);
+            LoginModel CopyLoginModel = new LoginModel(loginModel.UserName, loginModel.Password);
+            User user = _accountService.GetUserByCredentials(CopyLoginModel);
 
             if (user == null)
             {
