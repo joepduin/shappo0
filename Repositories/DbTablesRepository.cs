@@ -22,7 +22,7 @@ namespace shappo0.Repositories
                 connection.Open();
 
                 string query = @"SELECT tableNumber, [status]
-                                 FROM [TABLE]
+                                 FROM [TABLE]";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
