@@ -1,4 +1,4 @@
-﻿@model IEnumerable<shappo0.Models.OrderItem>
+﻿@model IEnumerable<shappo0.Models.OrderLine>
 
 <table class="table">
     <thead>
@@ -13,10 +13,10 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Count x</td>
-                <td>@item.MenuItem.Name</td>
-                <td>€ @item.MenuItem.Price.ToString("0.00")</td>
-                <td>€ @((item.MenuItem.Price * item.Count).ToString("0.00"))</td>
+                <td>@item.Quantity x</td>
+                <td>@item.Product.Name</td>
+                <td>€ @(item.Product.Price.ToString("0.00"))</td>
+                <td>€ @((item.Product.Price * item.Quantity).ToString("0.00"))</td>
             </tr>
         }
     </tbody>

@@ -48,29 +48,30 @@ namespace shappo0.Repositories
                                 {
                                     Id = (int)reader["orderNumber"],
                                     TableId = (int)reader["tableNumber"],
-                                    OrderItems = new List<OrderItem>()
+                                    OrderItems = new List<OrderLine>()
                                 };
                             }
 
                            
                             decimal vat = (decimal)reader["VATPercentage"];
-                            MenuItem menuItem = new MenuItem
+                            Product product = new Product
                             {
-                                Id = (int)reader["productId"],
+                                ProductId = (int)reader["productId"],
                                 Name = (string)reader["name"],
-                                Price = (double)(decimal)reader["price"],
-                                IsAlcoholic = (vat == 21)
-                            };
-
-                           
-                            OrderItem item = new OrderItem
-                            {
-                                Id = (int)reader["orderLineId"],
-                                Count = (int)reader["quantity"],
-                                MenuItem = menuItem
+                                Price = (decimal)reader["price"],
+                                VATPercentage = vat
                             };
 
                             
+                            OrderLine item = new OrderLine
+                            {
+                                OrderLineId = (int)reader["orderLineId"],
+                                Quantity = (int)reader["quantity"],
+                                // attach product to the order line
+                                // OrderLine class was extended to include a Product property
+                                Product = product
+                            };
+
                             order.OrderItems.Add(item);
                         }
                     }

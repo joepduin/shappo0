@@ -4,13 +4,13 @@
     {
         public int Id { get; set; }
         public int TableId { get; set; }
-        public List<OrderItem> OrderItems { get; set; }
+        public List<OrderLine> OrderItems { get; set; }
 
         public Order()
         {
         }
 
-        public Order(int id, int tableId, List<OrderItem> orderItems)
+        public Order(int id, int tableId, List<OrderLine> orderItems)
         {
             Id = id;
             TableId = tableId;

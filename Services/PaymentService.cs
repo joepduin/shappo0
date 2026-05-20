@@ -16,16 +16,19 @@ namespace shappo0.Services
 
         public PaymentViewModel GetPaymentOverview(int tableId)
         {
+            // Haal de order op uit de database voor deze tafel
+            // Dit roept de repository aan die ADO.NET gebruikt
             Order currentOrder = _orderRepository.GetOrderForTable(tableId);
             PaymentViewModel viewModel = new PaymentViewModel();
 
             viewModel.TableId = tableId;
 
             
+            // Als er geen order is, geef een leeg overzicht terug
             if (currentOrder == null)
             {
-               
-                viewModel.Items = new List<OrderItem>();
+                // Zet lege lijst en nulwaarden zodat de view netjes blijft
+                viewModel.Items = new List<OrderLine>();
                 viewModel.TotalAmount = 0;
                 viewModel.VatLow = 0;
                 viewModel.VatHigh = 0;
@@ -35,62 +38,71 @@ namespace shappo0.Services
            
             if (currentOrder.OrderItems == null || currentOrder.OrderItems.Count == 0)
             {
-                viewModel.Items = new List<OrderItem>();
+                viewModel.Items = new List<OrderLine>();
                 viewModel.TotalAmount = 0;
                 viewModel.VatLow = 0;
                 viewModel.VatHigh = 0;
                 return viewModel;
             }
 
-            List<OrderItem> groupedItems = new List<OrderItem>();
-            foreach (OrderItem item in currentOrder.OrderItems)
+            // Groepeer orderregels op product zodat dubbele regels worden samengevoegd
+            List<OrderLine> groupedItems = new List<OrderLine>();
+            foreach (OrderLine item in currentOrder.OrderItems)
             {
-                OrderItem existingItem = null;
-                foreach (OrderItem groupedItem in groupedItems)
+                OrderLine existingItem = null;
+                foreach (OrderLine groupedItem in groupedItems)
                 {
-                    if (groupedItem.MenuItem.Id == item.MenuItem.Id)
+                    if (groupedItem.Product.ProductId == item.Product.ProductId)
                     {
                         existingItem = groupedItem;
                         break;
                     }
                 }
 
+                // Als product nog niet in gegroepeerde lijst staat, toevoegen
                 if (existingItem == null)
                 {
-                    groupedItems.Add(new OrderItem
+                    groupedItems.Add(new OrderLine
                     {
-                        Id = item.Id,
-                        Count = item.Count,
-                        MenuItem = item.MenuItem
+                        OrderLineId = item.OrderLineId,
+                        Quantity = item.Quantity,
+                        Product = item.Product
                     });
                 }
                 else
                 {
-                    existingItem.Count += item.Count;
+                    // Anders tel de hoeveelheden op
+                    existingItem.Quantity += item.Quantity;
                 }
             }
 
             viewModel.Items = groupedItems;
 
-            double total = 0;
-            double vatLow = 0;
-            double vatHigh = 0;
+            // Bereken totaal en BTW per groep
+            decimal total = 0;
+            decimal vatLow = 0;
+            decimal vatHigh = 0;
 
-            foreach (OrderItem item in groupedItems)
+            foreach (OrderLine item in groupedItems)
             {
-                double lineTotal = item.MenuItem.Price * item.Count;
+                // Prijs per regel = prijs product * aantal
+                decimal lineTotal = item.Product.Price * item.Quantity;
                 total += lineTotal;
 
-                if (item.MenuItem.IsAlcoholic)
+                // Bepaal of dit product 21% of 9% BTW heeft
+                if (item.Product.VATPercentage == 21)
                 {
+                    // Bereken hoog BTW deel uit een prijs die inclusief BTW is
                     vatHigh += (lineTotal / 121) * 21;
                 }
                 else
                 {
+                    // Bereken laag BTW deel uit een prijs die inclusief BTW is
                     vatLow += (lineTotal / 109) * 9;
                 }
             }
 
+            // Sla uitkomsten op in het viewmodel
             viewModel.TotalAmount = total;
             viewModel.VatLow = vatLow;
             viewModel.VatHigh = vatHigh;
