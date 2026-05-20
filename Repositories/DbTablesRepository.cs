@@ -44,8 +44,13 @@ namespace shappo0.Repositories
         private Table ReadTable(SqlDataReader reader)
         {
             Table table = new Table();
-            table.TableNumber = reader.GetInt32(0);
-            table.Status = reader.GetBoolean(1);
+            table.TableNumber = (int)reader["tableNumber"];
+
+            if ((bool)reader["status"])
+                table.Status = TableStatusType.Available;
+            else
+                table.Status = TableStatusType.Occupied;
+
             return table;
         }
     }

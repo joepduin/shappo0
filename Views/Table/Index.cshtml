@@ -22,7 +22,7 @@
     @foreach (Table table in Model)
     {
         string bg;
-        if (table.Status)
+        if (table.Status == TableStatusType.Occupied)
         {
             bg = "#d9534f"; //rood
         }

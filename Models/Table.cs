@@ -3,13 +3,17 @@
     public class Table
     {
         public int TableNumber { get; set; }
-        public bool Status { get; set; } //true is bezet false is vrij
+        public TableStatusType Status { get; set; }
+
+        public OrderStatus DrinkStatus { get; set; }
+
+        public OrderStatus FoodStatus { get; set; }
 
         public Table()
         {
         }
 
-        public Table(int tableNumber, bool status)
+        public Table(int tableNumber, TableStatusType status, OrderStatus drinkstatus, OrderStatus foodStatus)
         {
             TableNumber = tableNumber;
             Status = status;
