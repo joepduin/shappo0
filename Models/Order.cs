@@ -6,7 +6,7 @@ namespace shappo0.Models
     {
         public int OrderNumber { get; set; }
         public DateTime TimeCreated { get; set; }
-        public DateTime waitingTime { get; set; }
+        public DateTime WaitingTimeMinutes { get; set; }
         public OrderStatus Status { get; set; }
         public int VisitId { get; set; }
         public int StaffId { get; set; }
@@ -15,11 +15,11 @@ namespace shappo0.Models
         {
         }
 
-        public Order(int orderNumber, DateTime timeCreated, DateTime waitingTime, OrderStatus status, int visitId, int staffId)
+        public Order(int orderNumber, DateTime timeCreated, DateTime waitingTimeMinutes, OrderStatus status, int visitId, int staffId)
         {
             OrderNumber = orderNumber;
             TimeCreated = timeCreated;
-            this.waitingTime = waitingTime;
+            WaitingTimeMinutes = waitingTimeMinutes;
             Status = status;
             VisitId = visitId;
             StaffId = staffId;
