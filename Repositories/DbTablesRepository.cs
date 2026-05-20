@@ -21,8 +21,24 @@ namespace shappo0.Repositories
             {
                 connection.Open();
 
-                string query = @"SELECT tableNumber, [status]
-                                 FROM [TABLE]";
+                string query = @"SELECT TA.tableNumber, TA.[status] AS 'tableStatus',
+
+                                (SELECT OD.[status]
+                                FROM ORDER_LINE AS OL
+                                JOIN [PRODUCT] AS PR ON OL.productId = PR.productId
+                                JOIN [ORDER] AS OD ON OL.orderNumber = OD.orderNumber
+                                JOIN VISIT AS VI ON OD.visitId = VI.visitId
+                                WHERE PR.menuType = 'Drink' AND VI.tableNumber = TA.tableNumber) AS 'foodStatus',
+
+                                (SELECT OD.[status]
+                                FROM ORDER_LINE AS OL
+                                JOIN [PRODUCT] AS PR ON OL.productId = PR.productId
+                                JOIN [ORDER] AS OD ON OL.orderNumber = OD.orderNumber
+                                JOIN VISIT AS VI ON OD.visitId = VI.visitId
+                                WHERE PR.menuType != 'Drink' AND VI.tableNumber = TA.tableNumber) AS 'drinkStatus' 
+
+                                FROM [TABLE] AS TA
+                                ORDER BY tableNumber;";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -46,10 +62,14 @@ namespace shappo0.Repositories
             Table table = new Table();
             table.TableNumber = (int)reader["tableNumber"];
 
-            if ((bool)reader["status"])
-                table.Status = TableStatusType.Available;
-            else
-                table.Status = TableStatusType.Occupied;
+            if ((bool)reader["tableStatus"]) table.Status = TableStatusType.Available;
+            else table.Status = TableStatusType.Occupied;
+
+            if (reader["foodStatus"] != DBNull.Value) table.FoodStatus = Enum.Parse<OrderStatus>((string)reader["foodStatus"]);
+            else table.FoodStatus = OrderStatus.None;
+
+            if (reader["drinkStatus"] != DBNull.Value) table.DrinkStatus = Enum.Parse<OrderStatus>((string)reader["drinkStatus"]);
+            else table.DrinkStatus = OrderStatus.None;
 
             return table;
         }
