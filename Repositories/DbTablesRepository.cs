@@ -62,8 +62,8 @@ namespace shappo0.Repositories
             Table table = new Table();
             table.TableNumber = (int)reader["tableNumber"];
 
-            if ((bool)reader["tableStatus"]) table.Status = TableStatusType.Available;
-            else table.Status = TableStatusType.Occupied;
+            if ((bool)reader["tableStatus"]) table.Status = TableStatusType.Occupied;
+            else table.Status = TableStatusType.Available;
 
             if (reader["foodStatus"] != DBNull.Value) table.FoodStatus = Enum.Parse<OrderStatus>((string)reader["foodStatus"]);
             else table.FoodStatus = OrderStatus.None;
