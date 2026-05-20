@@ -85,21 +85,21 @@ namespace shappo0.Services
 
             foreach (OrderLine item in groupedItems)
             {
-                // Prijs per regel = prijs product * aantal
-                decimal lineTotal = item.Product.Price * item.Quantity;
-                total += lineTotal;
+                // Basisprijs per regel = prijs (excl. BTW) * aantal
+                decimal lineBase = item.Product.Price * item.Quantity;
 
-                // Bepaal of dit product 21% of 9% BTW heeft
+                // Bereken BTW als simpele vermenigvuldiging: basis * (VAT% / 100)
+                // Dit volgt de manier waarop producten worden opgeslagen in Product.Price (excl. BTW)
+                decimal vatAmount = lineBase * (item.Product.VATPercentage / 100m);
+
+                // Tel BTW en basis op bij de totalen
+                total += lineBase + vatAmount;
+
+                // Voeg BTW toe aan hoge of lage categorie
                 if (item.Product.VATPercentage == 21)
-                {
-                    // Bereken hoog BTW deel uit een prijs die inclusief BTW is
-                    vatHigh += (lineTotal / 121) * 21;
-                }
+                    vatHigh += vatAmount;
                 else
-                {
-                    // Bereken laag BTW deel uit een prijs die inclusief BTW is
-                    vatLow += (lineTotal / 109) * 9;
-                }
+                    vatLow += vatAmount;
             }
 
             // Sla uitkomsten op in het viewmodel
