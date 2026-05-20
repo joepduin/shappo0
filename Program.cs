@@ -19,6 +19,10 @@ namespace shappo0
             builder.Services.AddSingleton<IMenuService, MenuService>();
             builder.Services.AddSingleton<IAccountService, AccountService>();
             builder.Services.AddSingleton<ITableService, TableService>();
+            builder.Services.AddSingleton<IKitchenRepository, DbKitchenRepository>();
+            builder.Services.AddSingleton<IKitchenService, KitchenService>();
+            builder.Services.AddSingleton<IBarRepository, DbBarRepository>();
+            builder.Services.AddSingleton<IBarService, BarService>();
             builder.Services.AddControllersWithViews();
 
             //Authentication
