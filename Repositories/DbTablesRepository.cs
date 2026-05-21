@@ -21,24 +21,8 @@ namespace shappo0.Repositories
             {
                 connection.Open();
 
-                string query = @"SELECT TA.tableNumber, TA.[status] AS 'tableStatus',
-
-                                (SELECT OD.[status]
-                                FROM ORDER_LINE AS OL
-                                JOIN [PRODUCT] AS PR ON OL.productId = PR.productId
-                                JOIN [ORDER] AS OD ON OL.orderNumber = OD.orderNumber
-                                JOIN VISIT AS VI ON OD.visitId = VI.visitId
-                                WHERE PR.menuType = 'Drink' AND VI.tableNumber = TA.tableNumber) AS 'foodStatus',
-
-                                (SELECT OD.[status]
-                                FROM ORDER_LINE AS OL
-                                JOIN [PRODUCT] AS PR ON OL.productId = PR.productId
-                                JOIN [ORDER] AS OD ON OL.orderNumber = OD.orderNumber
-                                JOIN VISIT AS VI ON OD.visitId = VI.visitId
-                                WHERE PR.menuType != 'Drink' AND VI.tableNumber = TA.tableNumber) AS 'drinkStatus' 
-
-                                FROM [TABLE] AS TA
-                                ORDER BY tableNumber;";
+                string query = @"SELECT tableNumber, [status]
+                                 FROM [TABLE]";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
