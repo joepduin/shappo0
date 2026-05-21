@@ -23,21 +23,21 @@
             Price = price;
             VATPercentage = vatPercentage;
             Stock = stock;
-            ProductType = Enum.Parse<ProductType>(productType.ToString(), true);
-            MenuType = Enum.Parse<MenuType>(menuType.ToString(), true);
+            ProductType = productType;
+            MenuType = menuType;
             OnMenu = onMenu;
         }
 
         // Regular constructor
-        public Product(int productId, string name, decimal price, decimal vatPercentage, int stock, string productType, string menuType, bool onMenu)
+        public Product(int productId, string name, decimal price, decimal vatPercentage, int stock, ProductType productType, MenuType menuType, bool onMenu)
         {
             ProductId = productId;
             Name = name;
             Price = price;
             VATPercentage = vatPercentage;
             Stock = stock;
-            ProductType = Enum.Parse<ProductType>(productType.ToString(), true);
-            MenuType = Enum.Parse<MenuType>(menuType.ToString(), true);
+            ProductType = productType;
+            MenuType = menuType;
             OnMenu = onMenu;
         }
 
