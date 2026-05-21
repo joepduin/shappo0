@@ -46,7 +46,7 @@ namespace shappo0.Repositories
             Table table = new Table();
             table.TableNumber = (int)reader["tableNumber"];
 
-            if ((bool)reader["tableStatus"]) table.Status = TableStatusType.Occupied;
+            if ((bool)reader["status"]) table.Status = TableStatusType.Occupied;
             else table.Status = TableStatusType.Available;
 
             return table;
