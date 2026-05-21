@@ -7,7 +7,7 @@
 <style>
     .tables-grid {
         display: grid;
-        grid-template-columns: repeat(2, 180px);
+        grid-template-columns: repeat(2, 120px);
     }
 
     .table-square {
@@ -31,10 +31,10 @@
             bg = "#5cb85c"; //groen
         }
 
-        <div class="table-square" style="background-color:@bg">
-            <strong>Table @table.TableNumber</strong> <br />
-            Drink: @table.DrinkStatus <br/>
-            Food: @table.FoodStatus
-        </div>
+        <a href="Table/Table?tableNumber=@table.TableNumber">
+            <div class="table-square" style="background-color:@bg">
+                <strong>Table @table.TableNumber</strong>
+            </div>
+        </a>
     }
 </div>

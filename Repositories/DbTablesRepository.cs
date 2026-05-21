@@ -65,12 +65,6 @@ namespace shappo0.Repositories
             if ((bool)reader["tableStatus"]) table.Status = TableStatusType.Occupied;
             else table.Status = TableStatusType.Available;
 
-            if (reader["foodStatus"] != DBNull.Value) table.FoodStatus = Enum.Parse<OrderStatus>((string)reader["foodStatus"]);
-            else table.FoodStatus = OrderStatus.None;
-
-            if (reader["drinkStatus"] != DBNull.Value) table.DrinkStatus = Enum.Parse<OrderStatus>((string)reader["drinkStatus"]);
-            else table.DrinkStatus = OrderStatus.None;
-
             return table;
         }
     }
