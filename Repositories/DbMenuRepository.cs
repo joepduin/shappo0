@@ -132,8 +132,8 @@ namespace shappo0.Repositories
                 command.Parameters.AddWithValue("@price", product.Price);
                 command.Parameters.AddWithValue("@vatPercentage", product.VATPercentage);
                 command.Parameters.AddWithValue("@stock", product.Stock);
-                command.Parameters.AddWithValue("@productType", product.ProductType);
-                command.Parameters.AddWithValue("@menuType", product.MenuType);
+                command.Parameters.AddWithValue("@productType", product.ProductType.ToString());
+                command.Parameters.AddWithValue("@menuType", product.MenuType.ToString());
                 command.Parameters.AddWithValue("@onMenu", product.OnMenu);
 
                 command.Connection.Open();
@@ -195,8 +195,12 @@ namespace shappo0.Repositories
             decimal price = (decimal)reader["price"];
             decimal vatPercentage = (decimal)reader["vatPercentage"];
             int stock = (int)reader["stock"];
-            string productType = (string)reader["productType"];
-            string menuType = (string)reader["menuType"];
+            string productTypeString = (string)reader["productType"];
+            string menuTypeString = (string)reader["menuType"];
+
+            ProductType productType = Enum.Parse<ProductType>(productTypeString, true);
+            MenuType menuType = Enum.Parse<MenuType>(menuTypeString, true);
+
             bool onMenu = (bool)reader["onMenu"];
 
             return new Product(productId, name, price, vatPercentage, stock, productType, menuType, onMenu);

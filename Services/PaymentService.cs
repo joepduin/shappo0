@@ -7,72 +7,83 @@ namespace shappo0.Services
     public class PaymentService : IPaymentService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IOrderLineRepository _orderLineRepository;
+        private readonly IVisitRepository _visitRepository;
 
         
-        public PaymentService(IOrderRepository orderRepository)
+        public PaymentService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository)
         {
             _orderRepository = orderRepository;
+            _orderLineRepository = orderLineRepository;
+            _visitRepository = visitRepository;
         }
 
         public PaymentViewModel GetPaymentOverview(int tableId)
         {
-            // Haal de order op uit de database voor deze tafel
-            // Dit roept de repository aan die ADO.NET gebruikt
-            Order currentOrder = _orderRepository.GetOrderForTable(tableId);
-            PaymentViewModel viewModel = new PaymentViewModel();
+            //Creates a mostly empty view model to be filled in later
+            PaymentViewModel viewModel = new PaymentViewModel
+            {
+                TableId = tableId,
+                Items = new List<OrderLine>(),
+                TotalAmount = 0,
+                VatLow = 0,
+                VatHigh = 0
+            };
 
-            viewModel.TableId = tableId;
+            //Fetch the active visit for the selected table
+            Visit activeVisit = _visitRepository.GetActiveVisitForTable(tableId);
+
+            if (activeVisit == null)
+            {
+                return viewModel;
+            }
+
+            List<Order> visitOrders = _orderRepository.GetOrdersByVisitId(activeVisit.VisitId);
 
             
-            // Als er geen order is, geef een leeg overzicht terug
-            if (currentOrder == null)
-            {
-                // Zet lege lijst en nulwaarden zodat de view netjes blijft
-                viewModel.Items = new List<OrderLine>();
-                viewModel.TotalAmount = 0;
-                viewModel.VatLow = 0;
-                viewModel.VatHigh = 0;
-                return viewModel;
-            }
-
-           
-            if (currentOrder.OrderItems == null || currentOrder.OrderItems.Count == 0)
-            {
-                viewModel.Items = new List<OrderLine>();
-                viewModel.TotalAmount = 0;
-                viewModel.VatLow = 0;
-                viewModel.VatHigh = 0;
-                return viewModel;
-            }
+            //If there aren't any orders for this visit, return empty view
+            if (visitOrders == null || visitOrders.Count == 0) return viewModel;
+            
 
             // Groepeer orderregels op product zodat dubbele regels worden samengevoegd
             List<OrderLine> groupedItems = new List<OrderLine>();
-            foreach (OrderLine item in currentOrder.OrderItems)
-            {
-                OrderLine existingItem = null;
-                foreach (OrderLine groupedItem in groupedItems)
-                {
-                    if (groupedItem.Product.ProductId == item.Product.ProductId)
-                    {
-                        existingItem = groupedItem;
-                        break;
-                    }
-                }
 
-                // Als product nog niet in gegroepeerde lijst staat, toevoegen
-                if (existingItem == null)
+            foreach (Order order in visitOrders)
+            {
+                //Haal de werkelijke orderregels voor deze specifieke order uit de database!
+                order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
+
+                // Zorg ervoor dat er daadwerkelijk items zijn voordat we er doorheen loopen
+                if (order.OrderLines != null)
                 {
-                    groupedItems.Add(new OrderLine
+                    foreach (OrderLine item in order.OrderLines)
                     {
-                        OrderLineId = item.OrderLineId,
-                        Quantity = item.Quantity,
-                        Product = item.Product
-                    });
-                }
-                else
-                {
-                    // Anders tel de hoeveelheden op
-                    existingItem.Quantity += item.Quantity;
+                        OrderLine existingItem = null;
+                        foreach (OrderLine groupedItem in groupedItems)
+                        {
+                            if (groupedItem.Product.ProductId == item.Product.ProductId)
+                            {
+                                existingItem = groupedItem;
+                                break;
+                            }
+                        }
+
+                        // Als product nog niet in gegroepeerde lijst staat, toevoegen
+                        if (existingItem == null)
+                        {
+                            groupedItems.Add(new OrderLine
+                            {
+                                OrderLineId = item.OrderLineId,
+                                Quantity = item.Quantity,
+                                Product = item.Product
+                            });
+                        }
+                        else
+                        {
+                            // Anders tel de hoeveelheden op (samenvoegen van bijv. 2 cola en nog eens 3 cola)
+                            existingItem.Quantity += item.Quantity;
+                        }
+                    }
                 }
             }
 
