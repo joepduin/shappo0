@@ -9,18 +9,24 @@ namespace shappo0.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderLineRepository _orderLineRepository;
         private readonly IVisitRepository _visitRepository;
+        private readonly IPaymentRepository _paymentRepository;
 
         
-        public PaymentService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository)
+        public PaymentService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository, IPaymentRepository paymentRepository)
         {
+            // Constructor injection: de benodigde repositories worden door het framework geplaatst.
+            // Dit volgt de projectstijl en maakt de service testbaar en los gekoppeld.
             _orderRepository = orderRepository;
             _orderLineRepository = orderLineRepository;
             _visitRepository = visitRepository;
+            _paymentRepository = paymentRepository;
         }
 
         public PaymentViewModel GetPaymentOverview(int tableId)
         {
             //Creates a mostly empty view model to be filled in later
+            // Uitleg: Deze service bouwt het viewmodel dat de controller aan de view geeft.
+            // De service bevat de business logic: ophalen van visit, orders en groeperen van orderregels.
             PaymentViewModel viewModel = new PaymentViewModel
             {
                 TableId = tableId,
@@ -37,6 +43,10 @@ namespace shappo0.Services
             {
                 return viewModel;
             }
+
+            // Leg het visitId vast in het viewmodel zodat de view het kan opnemen
+            // Dit is nodig om later bij het opslaan van de bill de juiste visit te koppelen.
+            viewModel.VisitId = activeVisit.VisitId;
 
             List<Order> visitOrders = _orderRepository.GetOrdersByVisitId(activeVisit.VisitId);
 
@@ -119,6 +129,83 @@ namespace shappo0.Services
             viewModel.VatHigh = vatHigh;
 
             return viewModel;
+        }
+
+        public void ProcessPayment(int tableId, int visitId, decimal subTotal, decimal vatLow, decimal vatHigh, decimal tipAmount, decimal paymentAmount, string paymentMethod, string feedbackType, string feedbackDescription)
+        {
+            // Uitleg: Business flow
+            // 1) Bereken de bill total en sla de Bill op
+            // 2) Bepaal het werkelijke betaalde bedrag en de fooi
+            // 3) Sla de Payment op en koppel Feedback indien aanwezig
+            // 4) Zet de tafel vrij
+            // Deze stappen volgen de Sprint 2 vereisten en gebruiken de repository voor DB-toegang.
+            // Bereken totaal van de bill
+            decimal total = subTotal + vatLow + vatHigh;
+
+            // Maak bill object en zet isPaid = true
+            Bill bill = new Bill
+            {
+                SubTotal = subTotal,
+                Total = total,
+                VatLow = vatLow,
+                VatHigh = vatHigh,
+                IsPaid = true,
+                VisitId = visitId
+            };
+
+            // Sla bill op en krijg billId terug
+            int billId = _paymentRepository.SaveBill(bill);
+
+            // Zorg dat de betaalmethode geldig is, anders default naar cash
+            string method = paymentMethod?.ToLower() ?? "cash";
+            if (method != "credit card" && method != "debit card" && method != "cash")
+            {
+                method = "cash";
+            }
+
+            // Bepaal payment amount en tip. Als paymentAmount > 0 is gebruikt de gast dit bedrag.
+            decimal finalPaymentAmount;
+            decimal finalTip;
+
+            if (paymentAmount > 0)
+            {
+                finalPaymentAmount = paymentAmount;
+                decimal calcTip = paymentAmount - total;
+                finalTip = calcTip > 0 ? calcTip : 0;
+            }
+            else
+            {
+                finalTip = tipAmount;
+                finalPaymentAmount = total + tipAmount;
+            }
+
+            // Maak payment object
+            Payment payment = new Payment
+            {
+                PaymentMethod = method,
+                PaymentAmount = finalPaymentAmount,
+                BillId = billId,
+                PaymentTip = finalTip
+            };
+
+            // Sla payment op en krijg paymentId
+            int paymentId = _paymentRepository.SavePayment(payment);
+
+            // Voeg feedback toe indien aanwezig
+            if (!string.IsNullOrEmpty(feedbackDescription))
+            {
+                Feedback feedback = new Feedback
+                {
+                    Type = feedbackType,
+                    Description = feedbackDescription,
+                    PaymentId = paymentId
+                };
+
+                _paymentRepository.SaveFeedback(feedback);
+            }
+
+            // Zet tafel vrij
+            _paymentRepository.FreeTable(tableId);
         }
     }
 }

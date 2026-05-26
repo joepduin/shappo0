@@ -38,4 +38,57 @@ else
         <p>BTW 21% (Eten/Alcohol): € @Model.VatHigh.ToString("0.00")</p>
         <h3>Te betalen: € @Model.TotalAmount.ToString("0.00")</h3>
     </div>
+
+    <hr />
+
+    @*
+        Formulier om betaling te verwerken.
+        De 'name' attributen moeten exact overeenkomen met de parameters in de controller
+        zodat model binding correct werkt (ASP.NET koppelt form velden aan methode-parameters).
+    *@
+    <form method="post" asp-action="ProcessPayment">
+        <input type="hidden" name="tableId" value="@Model.TableId" />
+        <input type="hidden" name="visitId" value="@Model.VisitId" />
+        <input type="hidden" name="subTotal" value="@Model.TotalAmount - (Model.VatLow + Model.VatHigh)" />
+        <input type="hidden" name="vatLow" value="@Model.VatLow" />
+        <input type="hidden" name="vatHigh" value="@Model.VatHigh" />
+
+        @* Optioneel: gasten kunnen direct het betaalde totaal invullen. 
+           Als dit veld > 0 is, gebruiken we dat als betaald bedrag en berekenen de fooi automatisch. *@
+        <div class="mb-3">
+            <label for="paymentAmount" class="form-label">Totaal betaald door gasten (€) (optioneel)</label>
+            <input type="number" step="0.01" id="paymentAmount" name="paymentAmount" class="form-control" value="0" />
+            <small class="form-text text-muted">Vul dit in als gasten het totaal zelf betalen. Laat 0 om fooi te gebruiken.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="tipAmount" class="form-label">Fooi (€)</label>
+            <input type="number" step="0.01" id="tipAmount" name="tipAmount" class="form-control" value="0" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Betaalmethode</label>
+            <div>
+                <input type="radio" id="credit" name="paymentMethod" value="credit card" checked /> <label for="credit">Credit card</label>
+                <input type="radio" id="debit" name="paymentMethod" value="debit card" /> <label for="debit">Debit card</label>
+                <input type="radio" id="cash" name="paymentMethod" value="cash" /> <label for="cash">Cash</label>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Feedback type</label>
+            <select name="feedbackType" class="form-select">
+                <option value="Compliment">Compliment</option>
+                <option value="Klacht">Klacht</option>
+                <option value="Opmerking">Opmerking</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="feedbackDescription" class="form-label">Feedback</label>
+            <textarea id="feedbackDescription" name="feedbackDescription" class="form-control" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Afrekenen</button>
+    </form>
 }

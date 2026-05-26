@@ -6,6 +6,7 @@ namespace shappo0.ViewModels
         public class PaymentViewModel
         {
             public int TableId { get; set; }
+            public int VisitId { get; set; }
             public List<OrderLine> Items { get; set; }
             public decimal TotalAmount { get; set; }
             public decimal VatLow { get; set; }
