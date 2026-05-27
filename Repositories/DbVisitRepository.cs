@@ -116,5 +116,32 @@ namespace shappo0.Repositories
                 }
             }
         }
+
+        //deze methode word nu nog niet gebruikt, want ik vond een andere handiger, maar ik laat hem er voor nu in. misschien heeft iemand anders het nodig.
+        public List<Visit> GetActiveVisits()
+        {
+            List<Visit> visits = new List<Visit>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"SELECT visitId, tableNumber, staffId, isActive
+                                 FROM [Visit] 
+                                 WHERE isActive = 1";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Visit visit = ReadVisit(reader);
+                    visits.Add(visit);
+                }
+
+                reader.Close();
+            }
+            return visits;
+        }
     }
 }

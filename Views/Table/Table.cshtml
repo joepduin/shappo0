@@ -1,5 +1,6 @@
 ﻿@using shappo0.ViewModels
 @using shappo0.Models
+@using shappo0.Extensions
 @model List<shappo0.ViewModels.TableViewModel>
 @{
     ViewData["Title"] = "Table Status";
@@ -18,7 +19,7 @@
 {
     @foreach (TableViewModel order in Model)
     {
-        <h3>Order: @order.OrderNumber, @order.Status</h3>
+        <h3>Order: @order.OrderNumber, @order.ToTableStatus()</h3>
 
         <table class="table table-sm">
             <thead>
@@ -37,7 +38,7 @@
                         <td>@orderLine.Product.Name</td>
                         <td>@orderLine.Quantity</td>
                         <td>@orderLine.Note</td>
-                        <td>@orderLine.Status</td>
+                        <td>@orderLine.ToTableStatus()</td>
                     </tr>
                 }
             </tbody>

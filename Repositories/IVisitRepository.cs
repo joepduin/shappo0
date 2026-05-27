@@ -9,6 +9,6 @@ namespace shappo0.Repositories
         public Visit GetActiveVisitForTable(int tableNumber);
         public int StartNewVisit(Visit newVisit);
         public void CloseVisit(int visitId);
-
+        public List<Visit> GetActiveVisits();
     }
 }

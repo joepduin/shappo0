@@ -5,7 +5,7 @@ namespace shappo0.Services
 {
     public interface ITableService
     {
-        List<Table> GetAllTables();
+        List<TableStatusViewModel> GetAllTables();
         List<TableViewModel> GetOrdersForTable(int tableNummer);
     }
 }
