@@ -11,12 +11,20 @@ namespace shappo0
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services and repositories to the container.
+            builder.Services.AddSingleton<IOrderRepository, DbOrderRepository>();
+            builder.Services.AddSingleton<IOrderLineRepository, DbOrderLineRepository>();
+            builder.Services.AddSingleton<IVisitRepository, DbVisitRepository>();
+            builder.Services.AddSingleton<IPaymentService, PaymentService>();
             builder.Services.AddSingleton<IUsersRepository, DbUsersRepository>();
             builder.Services.AddSingleton<ITablesRepository, DbTablesRepository>();
             builder.Services.AddSingleton<IMenuRepository, DbMenuRepository>();
             builder.Services.AddSingleton<IMenuService, MenuService>();
             builder.Services.AddSingleton<IAccountService, AccountService>();
             builder.Services.AddSingleton<ITableService, TableService>();
+            builder.Services.AddSingleton<IKitchenRepository, DbKitchenRepository>();
+            builder.Services.AddSingleton<IKitchenService, KitchenService>();
+            builder.Services.AddSingleton<IBarRepository, DbBarRepository>();
+            builder.Services.AddSingleton<IBarService, BarService>();
             builder.Services.AddControllersWithViews();
 
             //Authentication

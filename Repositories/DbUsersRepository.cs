@@ -105,8 +105,8 @@ namespace shappo0.Repositories
 
                 command.Parameters.AddWithValue("@name", user.UserName);
                 command.Parameters.AddWithValue("@phoneNumber", user.PhoneNumber);
-                command.Parameters.AddWithValue("@sex", user.Sex);
-                command.Parameters.AddWithValue("@role", user.Role);
+                command.Parameters.AddWithValue("@sex", user.Sex.ToString());
+                command.Parameters.AddWithValue("@role", user.Role.ToString());
                 command.Parameters.AddWithValue("@password", user.Password);
                 command.Parameters.AddWithValue("@isEmployed", user.IsEmployed);
 
@@ -146,13 +146,23 @@ namespace shappo0.Repositories
         private User ReadUser(SqlDataReader reader)
         {
             User user = new User();
-            user.UserId = reader.GetInt32(0);
-            user.UserName = reader.GetString(1);
-            user.PhoneNumber = reader.IsDBNull(2) ? null : reader.GetString(2);
-            user.Sex = reader.IsDBNull(3) ? null : Enum.Parse<SexType>(reader.GetString(3));
-            user.Role = Enum.Parse<RoleType>(reader.GetString(4));
-            user.Password = reader.GetString(5);
-            user.IsEmployed = reader.GetBoolean(6);
+            user.UserId = (int)reader["staffId"];
+            user.UserName = (string)reader["Name"];
+            user.PhoneNumber = reader["phoneNumber"] != DBNull.Value ? (string)reader["phoneNumber"] : null;
+            if (reader["sex"] != DBNull.Value)
+            {
+                string sexString = (string)reader["sex"];
+                user.Sex = Enum.Parse<SexType>(sexString);
+            }
+            else
+            {
+                user.Sex = null;
+            }
+            string roleString = (string)reader["role"];
+            user.Role = Enum.Parse<RoleType>(roleString);
+
+            user.Password = (string)reader["password"];
+            user.IsEmployed = (bool)reader["isEmployed"];
 
             return user;
         }

@@ -8,18 +8,20 @@
 	<partial name="_SuccessMessage" />
 }
 
-<h1>Products</h1>
+<h1 class="mb-4">Products</h1>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-	<div class="d-flex gap-2">
-		<a href="/Menu/AddDrink" class="btn btn-info">Add new drink</a>
-		<a href="/Menu/AddFoodItem" class="btn btn-info">Add new food item</a>
+@if (User.IsInRole("Manager"))
+{
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<div class="d-flex gap-2">
+			<a href="/Menu/AddDrink" class="btn btn-info">Add new drink</a>
+			<a href="/Menu/AddFoodItem" class="btn btn-info">Add new food item</a>
+		</div>
+		<div>
+			<a href="/Menu/AdjustStock" class="btn btn-secondary">Adjust Stock</a>
+		</div>
 	</div>
-	<div>
-		<a href="/Menu/AdjustStock" class="btn btn-secondary">Adjust Stock</a>
-	</div>
-</div>
-
+}
 <form method="GET" action="/Menu/Index" class="row g-3 mb-4 p-3 bg-light border rounded">
 	<h5>Filter Menu Items</h5>
 
@@ -72,7 +74,10 @@
 					<th>Product ID</th>
 					<th>Name</th>
 					<th>Stock</th>
-					<th>Action</th>
+					@if (User.IsInRole("Manager"))
+					{
+						<th>Action</th>
+					}
 				</tr>
 			</thead>
 			<tbody>
@@ -85,7 +90,10 @@
 							<td>@product.Name</td>
 							<td><strong>@product.Stock</strong></td>
 							<td>
-								<a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-sm btn-danger">Edit</a>
+								@if (User.IsInRole("Manager"))
+								{
+									<a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-sm btn-danger">Edit</a>
+								}
 							</td>
 						</tr>
 					}
@@ -105,6 +113,10 @@
 			<th>Product type</th>
 			<th>Time of day</th>
 			<th>On menu?</th>
+			@if (User.IsInRole("Manager"))
+			{
+				<th>Actions</th>
+			}
 		</tr>
 	</thead>
 
@@ -131,9 +143,12 @@
 					{
 						<td class="bg-danger">False</td>
 					}
-					<td>
-						<a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-outline-dark">Edit</a>
-					</td>
+					@if (User.IsInRole("Manager"))
+					{
+						<td>
+							<a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-outline-dark">Edit</a>
+						</td>
+					}
 				</tr>
 			}
 		}

@@ -65,38 +65,32 @@ namespace shappo0.Repositories
             string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu " +
                 "FROM product";
 
-            if (!string.IsNullOrEmpty(productType) && !string.IsNullOrEmpty(menuType) && !string.IsNullOrEmpty(onMenu))
+            List<string> conditions = new List<string>();
+
+
+            if (!string.IsNullOrEmpty(productType)) 
             {
-                query = query + $" WHERE productType = @productType AND menuType = @menuType AND onMenu = @onMenu";
-            }
-            else if (!string.IsNullOrEmpty(menuType) && !string.IsNullOrEmpty(onMenu))
-            {
-                query = query + $" WHERE menuType = @menuType AND onMenu = @onMenu";
-            }
-            else if (!string.IsNullOrEmpty(productType) && !string.IsNullOrEmpty(onMenu))
-            {
-                query = query + $" WHERE productType = @productType AND onMenu = @onMenu";
-            }
-            else if (!string.IsNullOrEmpty(productType) && !string.IsNullOrEmpty(menuType))
-            {
-                query = query + $" WHERE productType = @productType AND menuType = @menuType";
-            }
-            else if (!string.IsNullOrEmpty(productType))
-            {
-                query = query + $" WHERE productType = @productType";
-            }
-            else if (!string.IsNullOrEmpty(menuType))
-            {
-                query = query + $" WHERE menuType = @menuType";
-            }
-            else if (!string.IsNullOrEmpty(onMenu))
-            {
-                query = query + $" WHERE onMenu = @onMenu";
+                conditions.Add("productType = @productType");
             }
 
-            query = query + " ORDER BY onMenu DESC, menuType, productType, name";
+            if (!string.IsNullOrEmpty(menuType))
+            {
+                conditions.Add("menuType = @menuType");
+            }
 
-            List<Product> products = new List<Product>();
+            if (!string.IsNullOrEmpty(onMenu))
+            {
+                conditions.Add("onMenu = @onMenu");
+            }
+
+            if (conditions.Count > 0)
+            {
+                query += " WHERE " + string.Join(" AND ", conditions);
+            }
+
+            query += " ORDER BY onMenu DESC, menuType, productType, name";
+
+                List<Product> products = new List<Product>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
@@ -138,8 +132,8 @@ namespace shappo0.Repositories
                 command.Parameters.AddWithValue("@price", product.Price);
                 command.Parameters.AddWithValue("@vatPercentage", product.VATPercentage);
                 command.Parameters.AddWithValue("@stock", product.Stock);
-                command.Parameters.AddWithValue("@productType", product.ProductType);
-                command.Parameters.AddWithValue("@menuType", product.MenuType);
+                command.Parameters.AddWithValue("@productType", product.ProductType.ToString());
+                command.Parameters.AddWithValue("@menuType", product.MenuType.ToString());
                 command.Parameters.AddWithValue("@onMenu", product.OnMenu);
 
                 command.Connection.Open();
@@ -201,8 +195,12 @@ namespace shappo0.Repositories
             decimal price = (decimal)reader["price"];
             decimal vatPercentage = (decimal)reader["vatPercentage"];
             int stock = (int)reader["stock"];
-            string productType = (string)reader["productType"];
-            string menuType = (string)reader["menuType"];
+            string productTypeString = (string)reader["productType"];
+            string menuTypeString = (string)reader["menuType"];
+
+            ProductType productType = Enum.Parse<ProductType>(productTypeString, true);
+            MenuType menuType = Enum.Parse<MenuType>(menuTypeString, true);
+
             bool onMenu = (bool)reader["onMenu"];
 
             return new Product(productId, name, price, vatPercentage, stock, productType, menuType, onMenu);
