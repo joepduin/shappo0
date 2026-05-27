@@ -6,6 +6,6 @@ namespace shappo0.Repositories
     public interface IFinanceRepository
     {
         List<Bill> GetFinances();
-        List<Bill> GetFinancesByDate();
+        List<Bill> GetFinancesByDate(DateTime date);
     }
 }
