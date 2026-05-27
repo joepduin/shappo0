@@ -5,10 +5,7 @@
 	ViewData["Title"] = "Products";
 
 	// Displays a banner with a confirm message if redirected to this page from either add or edit
-	if (TempData["ConfirmMessage"] != null)
-	{
-		<div class="alert alert-success" role="alert">@TempData["ConfirmMessage"]</div>
-	}
+	<partial name="_SuccessMessage" />
 }
 
 <h1>Products</h1>

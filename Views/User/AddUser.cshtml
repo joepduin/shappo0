@@ -2,10 +2,7 @@
 @{
 	ViewData["Title"] = "Add Staff";
 
-	if (ViewBag.ErrorMessage != null)
-	{
-		<div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
-	}
+	<partial name="_ErrorMessage" />
 }
 
 <div class="container mt-4">
@@ -21,7 +18,7 @@
 			</div>
 			<div class="col-md-6">
 				<label for="phoneNumber" class="form-label">Phone Number:</label>
-				<input type="text" id="phoneNumber" name="phoneNumber" class="form-control" required value="@Model?.PhoneNumber" />
+				<input type="text" id="phoneNumber" name="phoneNumber" class="form-control" value="@Model?.PhoneNumber" />
 			</div>
 		</div>
 
