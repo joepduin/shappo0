@@ -1,4 +1,4 @@
-﻿using shappo0.Models;
+using shappo0.Models;
 using System.Collections.Generic;
 
 namespace shappo0.Repositories

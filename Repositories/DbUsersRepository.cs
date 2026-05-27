@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using shappo0.Enums;
 using shappo0.Models;
 using System.Security.Cryptography;
 using System.Text;

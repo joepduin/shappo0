@@ -1,4 +1,4 @@
-namespace shappo0.Models
+namespace shappo0.Enums
 {
     public enum RoleType { Waiter, Bar, Kitchen, Manager }
 }

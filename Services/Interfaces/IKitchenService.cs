@@ -1,4 +1,4 @@
-﻿using shappo0.Models;
+using shappo0.Models;
 
 namespace shappo0.Services
 {

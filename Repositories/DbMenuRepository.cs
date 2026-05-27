@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Endpoints;
+using shappo0.Enums;
 using shappo0.Models;
 using Microsoft.Data.SqlClient;
 

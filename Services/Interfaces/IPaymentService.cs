@@ -1,4 +1,4 @@
-﻿using shappo0.ViewModels;
+using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
