@@ -47,29 +47,69 @@ namespace shappo0.Repositories
             line.OrderLineId = (int)reader["orderLineId"];
             line.ProductId = (int)reader["productId"];
             line.OrderNumber = (int)reader["orderNumber"];
-            line.Note = (string)reader["note"];
+            //Saves the note as a C# string, otherwise it crashes if it finds a NULL value
+            line.Note = reader["note"] as string;
             line.Quantity = (int)reader["quantity"];
   
             string statusString = (string)reader["status"];
             line.Status = Enum.Parse<OrderStatus>(statusString, true);
 
-            Product attachedProduct = new Product();
-            attachedProduct.ProductId = (int)reader["productId"];
-            attachedProduct.Name = (string)reader["Name"];
-            attachedProduct.Price = (decimal)reader["Price"];
-            attachedProduct.VATPercentage = (decimal)reader["VATPercentage"];
-            attachedProduct.Stock = (int)reader["Stock"];
-
-            string productTypeString = (string)reader["productType"];
-            string menuTypeString = (string)reader["menuType"];
-
-            attachedProduct.ProductType = Enum.Parse<ProductType>(productTypeString, true);
-            attachedProduct.MenuType = Enum.Parse<MenuType>(menuTypeString, true);
-            attachedProduct.OnMenu = (bool)reader["OnMenu"];
-
-
+            Product attachedProduct = DbMenuRepository.ReadProduct(reader);
             line.Product = attachedProduct;
             return line;
         }
+
+        public void CreateOrderLine(OrderLine orderLine)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"INSERT INTO [ORDER_LINE] (productId, orderNumber, note, quantity, status) 
+                         VALUES (@productId, @orderNumber, @note, @quantity, @status);";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@productId", orderLine.Product.ProductId);
+                command.Parameters.AddWithValue("@orderNumber", orderLine.OrderNumber);
+                command.Parameters.AddWithValue("@note", string.IsNullOrEmpty(orderLine.Note) ? DBNull.Value : orderLine.Note);
+
+                command.Parameters.AddWithValue("@quantity", orderLine.Quantity);
+                command.Parameters.AddWithValue("@status", orderLine.Status.ToString());
+
+                command.Connection.Open();
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void CreateOrderLines(List<OrderLine> orderLines)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"INSERT INTO [ORDER_LINE] (productId, orderNumber, note, quantity, status) 
+                         VALUES (@productId, @orderNumber, @note, @quantity, @status);";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Connection.Open();
+
+                    foreach (OrderLine orderLine in orderLines)
+                    {
+                        //Clear the parameters from previous loop
+                        command.Parameters.Clear();
+
+                        command.Parameters.AddWithValue("@productId", orderLine.Product.ProductId);
+                        command.Parameters.AddWithValue("@orderNumber", orderLine.OrderNumber);
+                        command.Parameters.AddWithValue("@note", string.IsNullOrEmpty(orderLine.Note) ? DBNull.Value : orderLine.Note);
+                        command.Parameters.AddWithValue("@quantity", orderLine.Quantity);
+                        command.Parameters.AddWithValue("@status", orderLine.Status.ToString());
+
+                        command.ExecuteNonQuery();
+                    }
+                    
+                }
+            }
+        }
+
+
     }
 }

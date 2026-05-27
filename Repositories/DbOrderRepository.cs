@@ -104,7 +104,35 @@ namespace shappo0.Repositories
             return orders;
         }
 
+        public int CreateOrder(Order order)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = $"INSERT INTO [Order](timeCreated, waitingTimeMinutes, status, visitId, staffId) " +
+                                $"VALUES(@timeCreated, @waitingTimeMinutes, @status, @visitId, @staffId); " +
+                                "SELECT SCOPE_IDENTITY();";
 
-        
+                SqlCommand command = new SqlCommand(query, connection);
+
+                //adding as parameters to prevent sql injection
+                command.Parameters.AddWithValue("@timeCreated", order.TimeCreated);
+                command.Parameters.AddWithValue("@waitingTimeMinutes", order.WaitingTimeMinutes);
+
+                //saving it as a string so the database is readable
+                command.Parameters.AddWithValue("@status", order.Status.ToString());
+                command.Parameters.AddWithValue("@visitId", order.VisitId);
+                command.Parameters.AddWithValue("@staffId", order.StaffId);
+
+                command.Connection.Open();
+
+                order.OrderNumber = Convert.ToInt32(command.ExecuteScalar());
+
+                return order.OrderNumber;
+            }
+        }
+
+
+
+
     }
 }
