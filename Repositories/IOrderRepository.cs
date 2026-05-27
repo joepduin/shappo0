@@ -12,5 +12,8 @@ namespace shappo0.Repositories
         // public void SaveCompleteOrder(Order completeOrder);
 
         public List<Order> GetRunningOrders();
+
+        public int CreateOrder(Order order);
     }
+
 }

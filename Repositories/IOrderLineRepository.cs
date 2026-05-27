@@ -6,5 +6,9 @@ namespace shappo0.Repositories
     {
 
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
+
+        public void CreateOrderLine(OrderLine orderLine);
+
+        public void CreateOrderLines(List<OrderLine> orderLines);
     }
 }

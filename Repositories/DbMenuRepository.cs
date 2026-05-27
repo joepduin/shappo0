@@ -73,9 +73,10 @@ namespace shappo0.Repositories
                 conditions.Add("productType = @productType");
             }
 
+            //Add the menutype to the query BUT if the productType is set to 'Drink' then it doesn't matter what the menuType is
             if (!string.IsNullOrEmpty(menuType))
             {
-                conditions.Add("menuType = @menuType");
+                conditions.Add("(menuType = @menuType OR productType = 'Drink')");
             }
 
             if (!string.IsNullOrEmpty(onMenu))
@@ -97,10 +98,15 @@ namespace shappo0.Repositories
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     // Makes sure to introduce the parameters within the written query AS strings, not as enums!
+                    //!!!!!!!!!!!!
+                    //NOTITIE VAN LAURENS: Ik heb hier de Enum.Parse weggehaald omdat het juist het tegenovergestelde deed en de objecten als getallen opsloeg
+                    //hierdoor werkte de filter methode niet meer
+                    //!!!!!!!!!!!!!
+
                     if (!string.IsNullOrEmpty(productType))
-                        command.Parameters.AddWithValue("@productType", Enum.Parse<ProductType>(productType.ToString(), true));
+                        command.Parameters.AddWithValue("@productType", productType);
                     if (!string.IsNullOrEmpty(menuType))
-                        command.Parameters.AddWithValue("@menuType", Enum.Parse<MenuType>(menuType.ToString(), true));
+                        command.Parameters.AddWithValue("@menuType", menuType);
                     // Since onMenu is a boolean, we need to convert the string value to a boolean before adding it as a parameter
                     if (!string.IsNullOrEmpty(onMenu))
                     {
@@ -188,7 +194,7 @@ namespace shappo0.Repositories
                     throw new Exception("No records updated..");
             }
         }
-        private Product ReadProduct(SqlDataReader reader)
+        public static Product ReadProduct(SqlDataReader reader)
         {
             int productId = (int)reader["productId"];
             string name = (string)reader["name"];
@@ -204,6 +210,28 @@ namespace shappo0.Repositories
             bool onMenu = (bool)reader["onMenu"];
 
             return new Product(productId, name, price, vatPercentage, stock, productType, menuType, onMenu);
+        }
+
+        //Method to batch adjust the stock so the connection doesn't need to reopen for as many times as there are orderlines
+        public void BatchAdjustStock(List<OrderLine> orderLines)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = $"UPDATE [PRODUCT] SET stock = stock - @quantity WHERE productId = @productId AND stock >= @quantity";
+
+                using (SqlCommand command = new SqlCommand(query, connection)) 
+                {
+                    command.Connection.Open();
+
+                    foreach(OrderLine line in orderLines)
+                    {
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@quantity", line.Quantity);
+                        command.Parameters.AddWithValue("@productId", line.ProductId);
+                        command.ExecuteNonQuery();
+                    }  
+                }
+            }
         }
     }
 }

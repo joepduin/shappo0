@@ -17,8 +17,10 @@ namespace shappo0
             builder.Services.AddSingleton<IPaymentService, PaymentService>();
             builder.Services.AddSingleton<IUsersRepository, DbUsersRepository>();
             builder.Services.AddSingleton<ITablesRepository, DbTablesRepository>();
+            builder.Services.AddSingleton<IVisitService, VisitService>();
             builder.Services.AddSingleton<IMenuRepository, DbMenuRepository>();
             builder.Services.AddSingleton<IMenuService, MenuService>();
+            builder.Services.AddSingleton<IOrderService, OrderService>();
             builder.Services.AddSingleton<IAccountService, AccountService>();
             builder.Services.AddSingleton<ITableService, TableService>();
             builder.Services.AddSingleton<IKitchenRepository, DbKitchenRepository>();
@@ -38,6 +40,14 @@ namespace shappo0
                 });
             builder.Services.AddAuthorization();
 
+            //Enable Session
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -48,10 +58,13 @@ namespace shappo0
                 app.UseHsts();
             }
 
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();
