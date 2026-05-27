@@ -29,6 +29,8 @@ namespace shappo0
             builder.Services.AddSingleton<IKitchenService, KitchenService>();
             builder.Services.AddSingleton<IBarRepository, DbBarRepository>();
             builder.Services.AddSingleton<IBarService, BarService>();
+            builder.Services.AddSingleton<IFinanceRepository, DbFinanceRepository>();
+            builder.Services.AddSingleton<IFinanceService, FinanceService>();
             builder.Services.AddControllersWithViews();
 
             //Authentication
