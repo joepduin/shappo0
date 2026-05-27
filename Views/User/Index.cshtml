@@ -4,10 +4,7 @@
 @{
 	ViewData["Title"] = "Users";
 
-	if (TempData["ConfirmMessage"] != null)
-	{
-		<div class="alert alert-success" role="alert">@TempData["ConfirmMessage"]</div>
-	}
+	<partial name="_SuccessMessage" />
 }
 
 <h1 class="d-flex align-items-center justify-content-center">Users</h1>

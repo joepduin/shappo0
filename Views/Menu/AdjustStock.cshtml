@@ -4,10 +4,7 @@
 @{
 	ViewData["Title"] = "Adjust Stock";
 
-	if (ViewBag.ErrorMessage != null)
-	{
-		<div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
-	}
+	<partial name="_ErrorMessage" />
 }
 
 <h1>Adjust Product Stock</h1>
@@ -54,6 +51,7 @@
 			<tr>
 				<th>Product ID</th>
 				<th>Name</th>
+				<th>Current stock</th>
 				<th style="width: 150px;">New Stock Level</th>
 			</tr>
 		</thead>
@@ -68,14 +66,10 @@
 						<input type="hidden" name="[@i].ProductId" value="@Model[i].ProductId" />
 					</td>
 					<td>@Model[i].Name</td>
+					<td>@Model[i].Stock</td>
 					<td>
 						<!-- Native browser number field -->
-						<input type="number"
-							   name="[@i].Stock"
-							   class="form-control"
-							   value="@Model[i].Stock"
-							   min="0"
-							   required />
+						<input type="number" name="[@i].Stock" class="form-control" value="@Model[i].Stock" min="0" required />
 					</td>
 				</tr>
 			}

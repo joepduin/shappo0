@@ -6,11 +6,11 @@
         public int ProductId { get; set; }
         public Product Product { get; set; }
         public int OrderNumber { get; set; }
-        public string Note { get; set; }
+        public string? Note { get; set; }
         public int Quantity { get; set; }
         public OrderStatus Status { get; set; }
 
-        public OrderLine(int orderLineId, int productId, int orderNumber, string note, int quantity, OrderStatus status)
+        public OrderLine(int orderLineId, int productId, int orderNumber, string? note, int quantity, OrderStatus status)
         {
             OrderLineId = orderLineId;
             ProductId = productId;

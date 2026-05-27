@@ -37,7 +37,7 @@ namespace shappo0.Services
             };
 
             //Fetch the active visit for the selected table
-            Visit activeVisit = _visitRepository.GetActiveVisitForTable(tableId);
+            Visit? activeVisit = _visitRepository.GetActiveVisitForTable(tableId);
 
             if (activeVisit == null)
             {
