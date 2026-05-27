@@ -1,4 +1,6 @@
-﻿namespace shappo0.Models
+﻿using shappo0.Enums;
+
+namespace shappo0.Models
 {
     public class Product
     {

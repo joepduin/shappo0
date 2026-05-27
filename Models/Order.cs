@@ -1,4 +1,5 @@
 ﻿using System.Reflection.Metadata.Ecma335;
+using shappo0.Enums;
 
 namespace shappo0.Models
 {

@@ -85,10 +85,7 @@ namespace shappo0.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
-                new Claim(ClaimTypes.Gender, user.Sex?.ToString() ?? string.Empty),
-                new Claim(ClaimTypes.Expired, user.IsEmployed ? "1" : "0") //moet een string zijn 1 is true 0 is false
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             ClaimsIdentity identity = new ClaimsIdentity(

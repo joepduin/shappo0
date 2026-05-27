@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using shappo0.Enums;
 using shappo0.Models;
 
 namespace shappo0.Repositories
