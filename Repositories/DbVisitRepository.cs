@@ -49,9 +49,9 @@ namespace shappo0.Repositories
             return visit;
         }
 
-        public Visit GetActiveVisitForTable(int tableNumber)
+        public Visit? GetActiveVisitForTable(int tableNumber)
         {
-            Visit visit = null;
+            Visit? visit = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {

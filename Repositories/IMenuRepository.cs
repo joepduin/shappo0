@@ -12,5 +12,7 @@ namespace shappo0.Repositories
         List<Product> GetFilteredProducts(string? productType, string? menuType, string? onMenu);
 
         void AdjustStock(int productId, int newStock);
+
+        public void BatchAdjustStock(List<OrderLine> orderLines);
     }
 }
