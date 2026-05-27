@@ -9,8 +9,8 @@ namespace shappo0.Models
         public DateTime TimeCreated { get; set; }
         public int WaitingTimeMinutes { get; set; }
         public OrderStatus Status { get; set; }
-        public int VisitId { get; set; }
-        public int StaffId { get; set; }
+        public Visit Visit { get; set; }
+        public Staff Staff { get; set; }
         public List<OrderLine> OrderLines { get; set; }
 
         public Order()
@@ -18,14 +18,14 @@ namespace shappo0.Models
 
         }
 
-        public Order(int orderNumber, DateTime timeCreated, int waitingTimeMinutes, OrderStatus status, int visitId, int staffId)
+        public Order(int orderNumber, DateTime timeCreated, int waitingTimeMinutes, OrderStatus status, Visit visit, Staff staff)
         {
             OrderNumber = orderNumber;
             TimeCreated = timeCreated;
             WaitingTimeMinutes = waitingTimeMinutes;
             Status = status;
-            VisitId = visitId;
-            StaffId = staffId;
+            Visit = visit;
+            Staff = staff;
             OrderLines = new List<OrderLine>();
         }
     }

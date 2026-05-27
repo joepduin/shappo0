@@ -20,10 +20,6 @@ namespace shappo0.Controllers
             _menuService = menuService;
             _orderService = orderService;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
 
         private string GetCartKey(int tableNumber)
         {
@@ -43,7 +39,12 @@ namespace shappo0.Controllers
             TakeOrderViewModel model = new(tableNumber);
 
             List<Product> products = _menuService.GetFilteredProducts(productType, menuType, "true");
-            
+
+            foreach (Product product in products)
+            {
+                product.Price = _orderService.CalculateFinalPrice(product.Price, product.VATPercentage);
+            }
+
             //Grabs the unique cartId for this table so we have the correct orderLines for this table
             string cartId = GetCartKey(tableNumber);
             List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
@@ -51,7 +52,10 @@ namespace shappo0.Controllers
             if (orderLines != null)
             {
                 model.OrderLines = orderLines;
+
             }
+
+            
 
             model.AllProducts = products;
 
@@ -80,7 +84,6 @@ namespace shappo0.Controllers
                 OrderLine newOrderLine = new OrderLine
                 {
                     Product = selectedProduct,
-                    ProductId = productId,
                     Status = OrderStatus.Running,
                     Quantity = 1
                 };

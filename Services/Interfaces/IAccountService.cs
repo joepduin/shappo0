@@ -4,13 +4,13 @@ namespace shappo0.Services
 {
     public interface IAccountService
     {
-        User GetUserByCredentials(LoginModel loginModel);
+        Staff GetStaffByCredentials(LoginModel loginModel);
 
-        User GetUser(int? id);
+        Staff GetStaff(int? id);
 
-        List<User> GetAllUsers();
+        List<Staff> GetAllStaff();
 
-        void AddUser(User user);
-        void EditUser(User user);
+        void AddStaff(Staff staff);
+        void EditStaff(Staff staff);
     }
 }

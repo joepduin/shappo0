@@ -3,16 +3,16 @@
     public class Visit
     {
         public int VisitId { get; set; }
-        public int TableNumber { get; set; }
-        public int StaffId { get; set; }
+        public Table Table { get; set; }
+        public Staff Staff { get; set; }
         public bool IsActive { get; set; }
         public List<Order> Orders { get; set; }
 
-        public Visit(int visitId, int tableNumber, int staffId, bool isActive)
+        public Visit(int visitId, Table table, Staff staff, bool isActive)
         {
             VisitId = visitId; 
-            TableNumber = tableNumber;
-            StaffId = staffId;
+            Table = table;
+            Staff = staff;
             IsActive = isActive;
             Orders = new List<Order>();
         }

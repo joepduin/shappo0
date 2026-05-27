@@ -7,44 +7,44 @@ namespace shappo0.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IUsersRepository _usersRepository;
+        private readonly IStaffRepository _usersRepository;
 
-        public AccountService(IUsersRepository usersRepository)
+        public AccountService(IStaffRepository usersRepository)
         {
             _usersRepository = usersRepository;
         }
 
-        public User GetUserByCredentials(LoginModel loginModel)
+        public Staff GetStaffByCredentials(LoginModel loginModel)
         {
 
             loginModel.Password = HashPassword(loginModel.Password);
-            return _usersRepository.GetUserByCredentials(loginModel);
+            return _usersRepository.GetStaffByCredentials(loginModel);
         }
 
-        public User GetUser(int? id)
+        public Staff GetStaff(int? id)
         {
-            return _usersRepository.GetUser(id);
+            return _usersRepository.GetStaff(id);
         }
 
-        public List<User> GetAllUsers()
+        public List<Staff> GetAllStaff()
         {
-            return _usersRepository.GetAllUsers();
+            return _usersRepository.GetAllStaff();
         }
 
-        public void AddUser(User user)
+        public void AddStaff(Staff staff)
         {
-            User copyUser = new User(user);
-            copyUser.Password = HashPassword(user.Password);
+            Staff copyStaff = new Staff(staff);
+            copyStaff.Password = HashPassword(staff.Password);
 
-            _usersRepository.AddUser(copyUser);
+            _usersRepository.AddStaff(copyStaff);
 
-            if(user.UserId != copyUser.UserId)
-                user.UserId = copyUser.UserId;
+            if(staff.StaffId != copyStaff.StaffId)
+                staff.StaffId = copyStaff.StaffId;
         }
 
-        public void EditUser(User user)
+        public void EditStaff(Staff staff)
         {
-            _usersRepository.EditUser(user);
+            _usersRepository.EditStaff(staff);
         }
 
         //maakt een hash van het wachtwoord
