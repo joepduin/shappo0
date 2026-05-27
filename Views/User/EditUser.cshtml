@@ -2,10 +2,7 @@
 
 @{
 	ViewData["Title"] = "Edit User";
-	if (ViewBag.ErrorMessage != null)
-    {
-        <div class="alert alert-danger" role="alert">@ViewBag.ErrorMessage</div>
-    }
+	<partial name="_ErrorMessage" />
 }
 
 <div class="container mt-4">
