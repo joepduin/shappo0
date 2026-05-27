@@ -28,6 +28,7 @@ namespace shappo0.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public ActionResult AddFoodItem(Product product)
         {
@@ -41,6 +42,7 @@ namespace shappo0.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public ActionResult AddDrink(Product product)
         {
@@ -100,6 +102,7 @@ namespace shappo0.Controllers
             }
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult AdjustStock()
         {
