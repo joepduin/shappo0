@@ -15,10 +15,6 @@ namespace shappo0.Repositories
 
         public int SaveBill(Bill bill)
         {
-            // Uitleg (Nederlands):
-            // We gebruiken parameterized queries (AddWithValue) om SQL-injectie te voorkomen.
-            // ExecuteScalar retourneert de eerste kolom van de eerste rij; bij INSERT met SCOPE_IDENTITY
-            // gebruiken we dit om de nieuw aangemaakte identity (billId) terug te krijgen.
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = "INSERT INTO BILL (subTotal, total, VATLow, VATHigh, isPaid, visitId) VALUES (@subTotal, @total, @vatLow, @vatHigh, @isPaid, @visitId); SELECT SCOPE_IDENTITY();";
@@ -39,14 +35,12 @@ namespace shappo0.Repositories
 
         public int SavePayment(Payment payment)
         {
-            // Uitleg: zelfde reden als SaveBill: we gebruiken parameterized queries
-            // om te beschermen tegen SQL-injectie. ExecuteScalar haalt de nieuwe paymentId op.
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = "INSERT INTO PAYMENT (paymentMethod, paymentAmount, billId, paymentTip) VALUES (@paymentMethod, @paymentAmount, @billId, @paymentTip); SELECT SCOPE_IDENTITY();";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@paymentMethod", payment.PaymentMethod);
+                    command.Parameters.AddWithValue("@paymentMethod", payment.PaymentMethod.ToString());
                     command.Parameters.AddWithValue("@paymentAmount", payment.PaymentAmount);
                     command.Parameters.AddWithValue("@billId", payment.BillId);
                     command.Parameters.AddWithValue("@paymentTip", payment.PaymentTip);
@@ -59,13 +53,12 @@ namespace shappo0.Repositories
 
         public void SaveFeedback(Feedback feedback)
         {
-            // Uitleg: feedback bevat tekst van gasten. Ook hier parameterized query om veiligheid te garanderen.
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = "INSERT INTO FEEDBACK ([type], description, paymentId) VALUES (@type, @description, @paymentId);";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@type", feedback.Type);
+                    command.Parameters.AddWithValue("@type", feedback.Type.ToString());
                     command.Parameters.AddWithValue("@description", feedback.Description);
                     command.Parameters.AddWithValue("@paymentId", feedback.PaymentId);
 
@@ -75,21 +68,5 @@ namespace shappo0.Repositories
             }
         }
 
-        public void FreeTable(int tableNumber)
-        {
-            // Uitleg: we werken direct op de [TABLE] tabel en zetten status op 0 (vrij)
-            // Parameterized query voorkomt SQL-injectie.
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = "UPDATE [TABLE] SET [status] = 0 WHERE tableNumber = @tableNumber";
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@tableNumber", tableNumber);
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
     }
 }
