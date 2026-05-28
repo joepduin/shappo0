@@ -10,16 +10,22 @@ namespace shappo0.Services
         private IOrderLineRepository _orderLineRepository;
         private IMenuRepository _menuRepository;
         private IVisitRepository _visitRepository;
+        private IStaffRepository _staffRepository;
         
 
-        public OrderService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository, IMenuRepository menuRepository)
+        public OrderService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository, IMenuRepository menuRepository, IStaffRepository staffRepository)
         {
             _orderRepository = orderRepository;
             _orderLineRepository = orderLineRepository;
             _visitRepository = visitRepository;
             _menuRepository = menuRepository;
+            _staffRepository = staffRepository;
         }
 
+        public decimal CalculateFinalPrice(decimal price, decimal VATPercentage)
+        {
+            return price + (price * VATPercentage/100);
+        }
         public List<Order> GetOrdersByVisitId(int visitId)
         {
             return _orderRepository.GetOrdersByVisitId(visitId);
@@ -44,35 +50,32 @@ namespace shappo0.Services
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines)
         {
             Visit activeVisit = _visitRepository.GetActiveVisitForTable(tableNumber);
-
-            int activeVisitId;
+            Staff currentStaff = _staffRepository.GetStaff(staffId);
 
             //Create a new visit if this is the first order for this table
             if (activeVisit == null)
             {
-                Visit newVisit = new Visit { TableNumber = tableNumber, StaffId = staffId, IsActive = true };
-                activeVisitId = _visitRepository.StartNewVisit(newVisit);
-            }
-            //Else assign the id of the current visit to activeVisitId
-            else
-            {
-                activeVisitId = activeVisit.VisitId;
-            }
+                Visit newVisit = new Visit { Table = new Table{ TableNumber = tableNumber }, Staff = currentStaff, IsActive = true };
+                
+                int newVisitId = _visitRepository.StartNewVisit(newVisit);
 
+                newVisit.VisitId = newVisitId;
+            }
+ 
             Order newOrder = new Order
             {
                 WaitingTimeMinutes = 0,
                 TimeCreated = DateTime.Now,
                 Status = OrderStatus.Running,
-                VisitId = activeVisitId,
-                StaffId = staffId
+                Visit = activeVisit,
+                Staff = currentStaff
             };
 
-            int newOrderId = _orderRepository.CreateOrder(newOrder);
+            _orderRepository.CreateOrder(newOrder);
 
             foreach(OrderLine line in orderLines)
             {
-                line.OrderNumber = newOrderId;   
+                line.Order = newOrder;   
             }
  
             _orderLineRepository.CreateOrderLines(orderLines);

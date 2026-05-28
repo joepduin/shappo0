@@ -9,6 +9,7 @@ namespace shappo0.Services
         public List<Order> GetRunningOrders();
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines);
+        public decimal CalculateFinalPrice(decimal price, decimal VATPercentage);
 
     }
 }

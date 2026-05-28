@@ -6,44 +6,44 @@ using System.Text;
 
 namespace shappo0.Repositories
 {
-    public class DbUsersRepository : IUsersRepository
+    public class DbStaffRepository : IStaffRepository
     {
         private readonly string? _connectionString;
 
-        public DbUsersRepository(IConfiguration configuration)
+        public DbStaffRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        // Method for getting a user by id, rather than by login credentials
-        public User GetUser(int? id)
+        // Method for getting a staff member by id, rather than by login credentials
+        public Staff GetStaff(int? id)
         {
-            User user = null;
+            Staff staff = null;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
                 string query = @"SELECT staffId, [name], phoneNumber, sex, [role], [password], isEmployed
                                  FROM Staff
-                                 WHERE staffId = @UserId";
+                                 WHERE staffId = @StaffId";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@UserId", id);
+                    command.Parameters.AddWithValue("@StaffId", id);
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            user = ReadUser(reader);
+                            staff = ReadStaff(reader);
                         }
                     }
                 }
-                return user;
+                return staff;
             }
         }
 
-        //checkt of een gebruiker bestaat, retourneert de gebruiker bij true en fals een lege user
-        public User GetUserByCredentials(LoginModel loginModel)
+        //checkt of een stafflid bestaat, retourneert de staff bij true en false een lege staff
+        public Staff GetStaffByCredentials(LoginModel loginModel)
         {
-            User user = null;
+            Staff staff = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -51,28 +51,28 @@ namespace shappo0.Repositories
 
                 string query = @"SELECT staffId, [name], phoneNumber, sex, [role], [password], isEmployed
                                  FROM Staff
-                                 WHERE [password] = @Password AND [name] = @UserName";
+                                 WHERE [password] = @Password AND [name] = @Name";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Password", loginModel.Password);
-                    command.Parameters.AddWithValue("@UserName", loginModel.UserName);
+                    command.Parameters.AddWithValue("@Name", loginModel.Name);
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            user = ReadUser(reader);
+                            staff = ReadStaff(reader);
                         }
                     }
                 }
             }
-            return user;
+            return staff;
         }
 
-        public List<User> GetAllUsers()
+        public List<Staff> GetAllStaff()
         {
-            List<User> users = new List<User>();
+            List<Staff> staffList = new List<Staff>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
@@ -85,16 +85,16 @@ namespace shappo0.Repositories
                     {
                         while (reader.Read())
                         {
-                            User user = ReadUser(reader);
-                            users.Add(user);
+                            Staff staff = ReadStaff(reader);
+                            staffList.Add(staff);
                         }
                     }
                 }
             }
-            return users;
+            return staffList;
         }
 
-        public void AddUser(User user)
+        public void AddStaff(Staff staff)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -104,20 +104,20 @@ namespace shappo0.Repositories
 
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.AddWithValue("@name", user.UserName);
-                command.Parameters.AddWithValue("@phoneNumber", user.PhoneNumber);
-                command.Parameters.AddWithValue("@sex", user.Sex.ToString());
-                command.Parameters.AddWithValue("@role", user.Role.ToString());
-                command.Parameters.AddWithValue("@password", user.Password);
-                command.Parameters.AddWithValue("@isEmployed", user.IsEmployed);
+                command.Parameters.AddWithValue("@name", staff.Name);
+                command.Parameters.AddWithValue("@phoneNumber", staff.PhoneNumber);
+                command.Parameters.AddWithValue("@sex", staff.Sex.ToString());
+                command.Parameters.AddWithValue("@role", staff.Role.ToString());
+                command.Parameters.AddWithValue("@password", staff.Password);
+                command.Parameters.AddWithValue("@isEmployed", staff.IsEmployed);
 
                 command.Connection.Open();
 
-                user.UserId= Convert.ToInt32(command.ExecuteScalar());
+                staff.StaffId = Convert.ToInt32(command.ExecuteScalar());
             }
         }
 
-        public void EditUser(User user)
+        public void EditStaff(Staff staff)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -127,13 +127,13 @@ namespace shappo0.Repositories
 
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.AddWithValue("@staffId", user.UserId);
-                command.Parameters.AddWithValue("@name", user.UserName);
-                command.Parameters.AddWithValue("@phoneNumber", user.PhoneNumber);
-                command.Parameters.AddWithValue("@sex", user.Sex);
-                command.Parameters.AddWithValue("@role", user.Role);
-                command.Parameters.AddWithValue("@password", user.Password);
-                command.Parameters.AddWithValue("@isEmployed", user.IsEmployed);
+                command.Parameters.AddWithValue("@staffId", staff.StaffId);
+                command.Parameters.AddWithValue("@name", staff.Name);
+                command.Parameters.AddWithValue("@phoneNumber", staff.PhoneNumber);
+                command.Parameters.AddWithValue("@sex", staff.Sex);
+                command.Parameters.AddWithValue("@role", staff.Role);
+                command.Parameters.AddWithValue("@password", staff.Password);
+                command.Parameters.AddWithValue("@isEmployed", staff.IsEmployed);
 
                 command.Connection.Open();
 
@@ -143,30 +143,29 @@ namespace shappo0.Repositories
             }
         }
 
-        // Leest een User object uit een SqlDataReader
-        private User ReadUser(SqlDataReader reader)
+        // Leest een Staff object uit een SqlDataReader
+        private Staff ReadStaff(SqlDataReader reader)
         {
-            User user = new User();
-            user.UserId = (int)reader["staffId"];
-            user.UserName = (string)reader["Name"];
-            user.PhoneNumber = reader["phoneNumber"] != DBNull.Value ? (string)reader["phoneNumber"] : null;
+            Staff staff = new Staff();
+            staff.StaffId = (int)reader["staffId"];
+            staff.Name = (string)reader["Name"];
+            staff.PhoneNumber = reader["phoneNumber"] != DBNull.Value ? (string)reader["phoneNumber"] : null;
             if (reader["sex"] != DBNull.Value)
             {
                 string sexString = (string)reader["sex"];
-                user.Sex = Enum.Parse<SexType>(sexString);
+                staff.Sex = Enum.Parse<SexType>(sexString);
             }
             else
             {
-                user.Sex = null;
+                staff.Sex = null;
             }
             string roleString = (string)reader["role"];
-            user.Role = Enum.Parse<RoleType>(roleString);
+            staff.Role = Enum.Parse<RoleType>(roleString);
 
-            user.Password = (string)reader["password"];
-            user.IsEmployed = (bool)reader["isEmployed"];
+            staff.Password = (string)reader["password"];
+            staff.IsEmployed = (bool)reader["isEmployed"];
 
-            return user;
+            return staff;
         }
-
     }
 }
