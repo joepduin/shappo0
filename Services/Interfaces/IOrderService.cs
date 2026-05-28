@@ -9,7 +9,11 @@ namespace shappo0.Services
         public List<Order> GetRunningOrders();
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines);
-        public decimal CalculateFinalPrice(decimal price, decimal VATPercentage);
+        void AddProductToCart(List<OrderLine> cart, Product selectedProduct);
+        bool TryIncreaseQuantity(List<OrderLine> cart, int productId);
+        void DecreaseQuantity(List<OrderLine> cart, int productId);
+        void RemoveLine(List<OrderLine> cart, int productId);
+        void AddNote(List<OrderLine> cart, int productId, string note);
 
     }
 }
