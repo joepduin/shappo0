@@ -1,8 +1,5 @@
 namespace shappo0.Models
 {
-    // Model voor de rekening (Bill)
-    // Dit is een simpele POCO-klasse die de database-tabel BILL weerspiegelt.
-    // We gebruiken gewone properties zodat de repository deze eenvoudig kan vullen en opslaan.
     public class Bill
     {
         public int BillId { get; set; }
