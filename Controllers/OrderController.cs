@@ -5,6 +5,7 @@ using shappo0.Extensions;
 using shappo0.Models;
 using shappo0.Services;
 using shappo0.ViewModels;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace shappo0.Controllers
@@ -19,10 +20,6 @@ namespace shappo0.Controllers
         {
             _menuService = menuService;
             _orderService = orderService;
-        }
-        public IActionResult Index()
-        {
-            return View();
         }
 
         private string GetCartKey(int tableNumber)
@@ -43,7 +40,7 @@ namespace shappo0.Controllers
             TakeOrderViewModel model = new(tableNumber);
 
             List<Product> products = _menuService.GetFilteredProducts(productType, menuType, "true");
-            
+
             //Grabs the unique cartId for this table so we have the correct orderLines for this table
             string cartId = GetCartKey(tableNumber);
             List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
@@ -64,77 +61,47 @@ namespace shappo0.Controllers
 
             //Grabs the exisiting orderLines from the cartId and if it's null it will create a new list
             string cartId = GetCartKey(tableNumber);
-            List<OrderLine> orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId) ?? new List<OrderLine>();
+            List<OrderLine> cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId) ?? new List<OrderLine>();
 
-            //A LINQ expression checks if the productId that is passed already exists in the saves OrderLines
-            OrderLine? existingItem = orderLines.FirstOrDefault(i => i.Product.ProductId == productId);
+            _orderService.AddProductToCart(cart, selectedProduct);
 
-            //If the product already existed in the cart, then the quanity is increased
-            if (existingItem != null)
-            {
-                    existingItem.Quantity++;
-            }
-            //Otherwise it creates a new product and adds it to the cart
-            else
-            {
-                OrderLine newOrderLine = new OrderLine
-                {
-                    Product = selectedProduct,
-                    ProductId = productId,
-                    Status = OrderStatus.Running,
-                    Quantity = 1
-                };
-                orderLines.Add(newOrderLine);
-                
-            }
-
-            HttpContext.Session.SetObject(cartId, orderLines);
+            HttpContext.Session.SetObject(cartId, cart);
 
             return RedirectToAction("TakeOrder", new {tableNumber = tableNumber, productType = productType, menuType = menuType });
         }
 
         public IActionResult IncreaseQuantity(int tableNumber, int productId, string? productType, string? menuType)
         {
-
             string cartId = GetCartKey(tableNumber);
-            List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
+            List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
-            if (orderLines != null)
+            if (cart != null)
             {
-                OrderLine? selectedLine = orderLines.FirstOrDefault(i => i.Product.ProductId == productId);
-                if (selectedLine != null && (selectedLine.Product.Stock - selectedLine.Quantity) > 0)
+                bool wasSuccesful = _orderService.TryIncreaseQuantity(cart, productId);
+
+                if (wasSuccesful)
                 {
-                    selectedLine.Quantity++;
-                    HttpContext.Session.SetObject(cartId, orderLines);
+                    HttpContext.Session.SetObject(cartId, cart);
                 }
                 else
                 {
                     TempData["Error"] = "Not enough stock to add this item";
                 }
             }
- 
             return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, productType = productType, menuType = menuType });
         }
 
         public IActionResult DecreaseQuantity(int tableNumber, int productId, string? productType, string? menuType)
         {
             string cartId = GetCartKey(tableNumber);
-            List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
+            List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
-            if (orderLines != null)
+            if(cart != null)
             {
-                OrderLine? selectedLine = orderLines.FirstOrDefault(i => i.Product.ProductId == productId);
-                if (selectedLine != null && selectedLine.Quantity >= 2)
-                {
-                    selectedLine.Quantity--;
-                }
-                else
-                {
-                    orderLines.Remove(selectedLine);
-                }
+                _orderService.DecreaseQuantity(cart, productId);
+                HttpContext.Session.SetObject(cartId, cart);
             }
 
-            HttpContext.Session.SetObject(cartId, orderLines);
             return RedirectToAction("TakeOrder", new { TableNumber = tableNumber, ProductType = productType, MenuType = menuType });
         }
 
@@ -149,16 +116,12 @@ namespace shappo0.Controllers
         public IActionResult RemoveLine(int tableNumber, int productId, string? productType, string? menuType) 
         {
             string cartId = GetCartKey(tableNumber);
-            List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
+            List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
-            if (orderLines != null)
+            if (cart != null)
             {
-                OrderLine? selectedLine = orderLines.FirstOrDefault(i => i.Product.ProductId == productId);
-                if (selectedLine != null)
-                {
-                    orderLines.Remove(selectedLine);
-                    HttpContext.Session.SetObject(cartId, orderLines);
-                }               
+                _orderService.RemoveLine(cart, productId);
+                HttpContext.Session.SetObject(cartId, cart);
             }
 
             return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, menuType = menuType, productType = productType });
@@ -168,17 +131,12 @@ namespace shappo0.Controllers
         public IActionResult AddNote(int tableNumber, int productId, string note, string? productType, string? menuType)
         {
             string cartId = GetCartKey(tableNumber);
-            List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
+            List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
-            if(orderLines != null)
+            if (cart != null)
             {
-                OrderLine? selectedLine = orderLines.FirstOrDefault(i => i.Product.ProductId == productId);
-
-                if (selectedLine != null)
-                {
-                    selectedLine.Note = note;
-                    HttpContext.Session.SetObject(cartId, orderLines);
-                }
+                _orderService.AddNote(cart, productId, note);
+                HttpContext.Session.SetObject(cartId, cart);
             }
 
             return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, menuType = menuType,  productType = productType});

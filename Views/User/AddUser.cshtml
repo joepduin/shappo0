@@ -1,73 +1,70 @@
 ﻿@using shappo0.Enums
-@model shappo0.Models.User
+@model shappo0.Models.Staff
 @{
-	ViewData["Title"] = "Add Staff";
+    ViewData["Title"] = "Add Staff";
 
-	<partial name="_ErrorMessage" />
+    <partial name="_ErrorMessage" />
 }
 
 <div class="container mt-4">
-	<h1>Add Staff Member</h1>
-	<form action="/User/AddUser" method="POST">
-		<input type="hidden" name="userId" value="0" />
+    <h1>Add Staff Member</h1>
+    <form action="/Staff/AddStaff" method="POST">
+        <input type="hidden" name="StaffId" value="0" />
 
-		<!-- Row 1: Basic Info -->
-		<div class="row mb-3">
-			<div class="col-md-6">
-				<label for="name" class="form-label">Name:</label>
-				<input type="text" id="name" name="UserName" class="form-control" required value="@Model?.UserName"/>
-			</div>
-			<div class="col-md-6">
-				<label for="phoneNumber" class="form-label">Phone Number:</label>
-				<input type="text" id="phoneNumber" name="phoneNumber" class="form-control" value="@Model?.PhoneNumber" />
-			</div>
-		</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" id="name" name="Name" class="form-control" required value="@Model?.Name" />
+            </div>
+            <div class="col-md-6">
+                <label for="phoneNumber" class="form-label">Phone Number:</label>
+                <input type="text" id="phoneNumber" name="PhoneNumber" class="form-control" value="@Model?.PhoneNumber" />
+            </div>
+        </div>
 
-		<!-- Row 2: Role & Password -->
-		<div class="row mb-3">
-			<div class="col-md-6">
-				<label for="role" class="form-label">Role:</label>
-				<select id="role" name="role" class="form-select" required>
-					<option value="@RoleType.Waiter" selected="@(Model?.Role == RoleType.Waiter)">Waiter</option>
-					<option value="@RoleType.Bar" selected="@(Model?.Role == RoleType.Bar)">Bartender</option>
-					<option value="@RoleType.Kitchen" selected="@(Model?.Role == RoleType.Kitchen)">Chef</option>
-					<option value="@RoleType.Manager" selected="@(Model?.Role == RoleType.Manager)">Manager</option>
-				</select>
-			</div>
-			<div class="col-md-6">
-				<label for="password" class="form-label">Password:</label>
-				<input type="password" id="password" name="password" class="form-control" required />
-			</div>
-		</div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="role" class="form-label">Role:</label>
+                <select id="role" name="Role" class="form-select" required>
+                    <option value="@RoleType.Waiter" selected="@(Model?.Role == RoleType.Waiter)">Waiter</option>
+                    <option value="@RoleType.Bar" selected="@(Model?.Role == RoleType.Bar)">Bartender</option>
+                    <option value="@RoleType.Kitchen" selected="@(Model?.Role == RoleType.Kitchen)">Chef</option>
+                    <option value="@RoleType.Manager" selected="@(Model?.Role == RoleType.Manager)">Manager</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" id="password" name="Password" class="form-control" required />
+            </div>
+        </div>
 
-		<!-- Row 3: Status & Sex Toggles -->
-		<div class="row mb-4">
-			<div class="col-md-6">
-				<label class="form-label d-block">Is employed?</label>
-				<div class="btn-group" role="group">
-					<input type="radio" class="btn-check" name="isEmployed" id="employedTrue" value="true" checked="@(Model?.IsEmployed ?? true)" autocomplete="off">
-					<label class="btn btn-outline-success" for="employedTrue">True</label>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label d-block">Is employed?</label>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="IsEmployed" id="employedTrue" value="true" checked="@(Model?.IsEmployed ?? true)" autocomplete="off">
+                    <label class="btn btn-outline-success" for="employedTrue">True</label>
 
-					<input type="radio" class="btn-check" name="isEmployed" id="employedFalse" value="false" checked="@(Model != null && !Model.IsEmployed)" autocomplete="off">
-					<label class="btn btn-outline-danger" for="employedFalse">False</label>
-				</div>
-			</div>
+                    <input type="radio" class="btn-check" name="IsEmployed" id="employedFalse" value="false" checked="@(Model != null && !Model.IsEmployed)" autocomplete="off">
+                    <label class="btn btn-outline-danger" for="employedFalse">False</label>
+                </div>
+            </div>
 
-			<div class="col-md-6">
-				<label class="form-label d-block">Sex:</label>
-				<div class="btn-group" role="group">
-					<input type="radio" class="btn-check" name="sex" id="sexM" value="@SexType.M" checked="@(Model == null || Model.Sex == SexType.M)" autocomplete="off">
-					<label class="btn btn-outline-primary" for="sexM">M</label>
+            <div class="col-md-6">
+                <label class="form-label d-block">Sex:</label>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="Sex" id="sexM" value="@SexType.M" checked="@(Model == null || Model.Sex == SexType.M)" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="sexM">M</label>
 
-					<input type="radio" class="btn-check" name="sex" id="sexV" value="@SexType.V" checked="@(Model?.Sex == SexType.V)" autocomplete="off">
-					<label class="btn btn-outline-primary" for="sexV">V</label>
+                    <input type="radio" class="btn-check" name="Sex" id="sexV" value="@SexType.V" checked="@(Model?.Sex == SexType.V)" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="sexV">V</label>
 
-					<input type="radio" class="btn-check" name="sex" id="sexX" value="@SexType.X" checked="@(Model?.Sex == SexType.X)" autocomplete="off">
-					<label class="btn btn-outline-primary" for="sexX">X</label>
-				</div>
-			</div>
-		</div>
+                    <input type="radio" class="btn-check" name="Sex" id="sexX" value="@SexType.X" checked="@(Model?.Sex == SexType.X)" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="sexX">X</label>
+                </div>
+            </div>
+        </div>
 
-		<button type="submit" class="btn btn-primary">Save Staff Member</button>
-	</form>
+        <button type="submit" class="btn btn-primary">Save Staff Member</button>
+    </form>
 </div>

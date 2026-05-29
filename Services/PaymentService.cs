@@ -11,11 +11,8 @@ namespace shappo0.Services
         private readonly IVisitRepository _visitRepository;
         private readonly IPaymentRepository _paymentRepository;
 
-        
         public PaymentService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository, IPaymentRepository paymentRepository)
         {
-            // Constructor injection: de benodigde repositories worden door het framework geplaatst.
-            // Dit volgt de projectstijl en maakt de service testbaar en los gekoppeld.
             _orderRepository = orderRepository;
             _orderLineRepository = orderLineRepository;
             _visitRepository = visitRepository;
@@ -24,9 +21,6 @@ namespace shappo0.Services
 
         public PaymentViewModel GetPaymentOverview(int tableId)
         {
-            //Creates a mostly empty view model to be filled in later
-            // Uitleg: Deze service bouwt het viewmodel dat de controller aan de view geeft.
-            // De service bevat de business logic: ophalen van visit, orders en groeperen van orderregels.
             PaymentViewModel viewModel = new PaymentViewModel
             {
                 TableId = tableId,
@@ -36,34 +30,26 @@ namespace shappo0.Services
                 VatHigh = 0
             };
 
-            //Fetch the active visit for the selected table
-            Visit? activeVisit = _visitRepository.GetActiveVisitForTable(tableId);
+            Visit activeVisit = _visitRepository.GetActiveVisitForTable(tableId);
 
             if (activeVisit == null)
             {
                 return viewModel;
             }
 
-            // Leg het visitId vast in het viewmodel zodat de view het kan opnemen
-            // Dit is nodig om later bij het opslaan van de bill de juiste visit te koppelen.
             viewModel.VisitId = activeVisit.VisitId;
 
             List<Order> visitOrders = _orderRepository.GetOrdersByVisitId(activeVisit.VisitId);
 
-            
-            //If there aren't any orders for this visit, return empty view
-            if (visitOrders == null || visitOrders.Count == 0) return viewModel;
-            
+            if (visitOrders == null || visitOrders.Count == 0)
+                return viewModel;
 
-            // Groepeer orderregels op product zodat dubbele regels worden samengevoegd
             List<OrderLine> groupedItems = new List<OrderLine>();
 
             foreach (Order order in visitOrders)
             {
-                //Haal de werkelijke orderregels voor deze specifieke order uit de database!
                 order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
 
-                // Zorg ervoor dat er daadwerkelijk items zijn voordat we er doorheen loopen
                 if (order.OrderLines != null)
                 {
                     foreach (OrderLine item in order.OrderLines)
@@ -78,7 +64,6 @@ namespace shappo0.Services
                             }
                         }
 
-                        // Als product nog niet in gegroepeerde lijst staat, toevoegen
                         if (existingItem == null)
                         {
                             groupedItems.Add(new OrderLine
@@ -90,7 +75,6 @@ namespace shappo0.Services
                         }
                         else
                         {
-                            // Anders tel de hoeveelheden op (samenvoegen van bijv. 2 cola en nog eens 3 cola)
                             existingItem.Quantity += item.Quantity;
                         }
                     }
@@ -99,31 +83,23 @@ namespace shappo0.Services
 
             viewModel.Items = groupedItems;
 
-            // Bereken totaal en BTW per groep
             decimal total = 0;
             decimal vatLow = 0;
             decimal vatHigh = 0;
 
             foreach (OrderLine item in groupedItems)
             {
-                // Basisprijs per regel = prijs (excl. BTW) * aantal
                 decimal lineBase = item.Product.Price * item.Quantity;
-
-                // Bereken BTW als simpele vermenigvuldiging: basis * (VAT% / 100)
-                // Dit volgt de manier waarop producten worden opgeslagen in Product.Price (excl. BTW)
                 decimal vatAmount = lineBase * (item.Product.VATPercentage / 100m);
 
-                // Tel BTW en basis op bij de totalen
                 total += lineBase + vatAmount;
 
-                // Voeg BTW toe aan hoge of lage categorie
                 if (item.Product.VATPercentage == 21)
                     vatHigh += vatAmount;
                 else
                     vatLow += vatAmount;
             }
 
-            // Sla uitkomsten op in het viewmodel
             viewModel.TotalAmount = total;
             viewModel.VatLow = vatLow;
             viewModel.VatHigh = vatHigh;
@@ -131,18 +107,40 @@ namespace shappo0.Services
             return viewModel;
         }
 
-        public void ProcessPayment(int tableId, int visitId, decimal subTotal, decimal vatLow, decimal vatHigh, decimal tipAmount, decimal paymentAmount, string paymentMethod, string feedbackType, string feedbackDescription)
+        public void ProcessPayment(PaymentSubmissionViewModel submission)
         {
-            // Uitleg: Business flow
-            // 1) Bereken de bill total en sla de Bill op
-            // 2) Bepaal het werkelijke betaalde bedrag en de fooi
-            // 3) Sla de Payment op en koppel Feedback indien aanwezig
-            // 4) Zet de tafel vrij
-            // Deze stappen volgen de Sprint 2 vereisten en gebruiken de repository voor DB-toegang.
-            // Bereken totaal van de bill
+            decimal subTotal = 0;
+            decimal vatLow = 0;
+            decimal vatHigh = 0;
+
+            List<Order> visitOrders = _orderRepository.GetOrdersByVisitId(submission.VisitId);
+
+            if (visitOrders != null)
+            {
+                foreach (Order order in visitOrders)
+                {
+                    order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
+
+                    if (order.OrderLines != null)
+                    {
+                        foreach (OrderLine item in order.OrderLines)
+                        {
+                            decimal lineBase = item.Product.Price * item.Quantity;
+                            decimal vatAmount = lineBase * (item.Product.VATPercentage / 100m);
+
+                            subTotal += lineBase;
+
+                            if (item.Product.VATPercentage == 21)
+                                vatHigh += vatAmount;
+                            else
+                                vatLow += vatAmount;
+                        }
+                    }
+                }
+            }
+
             decimal total = subTotal + vatLow + vatHigh;
 
-            // Maak bill object en zet isPaid = true
             Bill bill = new Bill
             {
                 SubTotal = subTotal,
@@ -150,62 +148,49 @@ namespace shappo0.Services
                 VatLow = vatLow,
                 VatHigh = vatHigh,
                 IsPaid = true,
-                VisitId = visitId
+                VisitId = submission.VisitId
             };
 
-            // Sla bill op en krijg billId terug
             int billId = _paymentRepository.SaveBill(bill);
 
-            // Zorg dat de betaalmethode geldig is, anders default naar cash
-            string method = paymentMethod?.ToLower() ?? "cash";
-            if (method != "credit card" && method != "debit card" && method != "cash")
-            {
-                method = "cash";
-            }
-
-            // Bepaal payment amount en tip. Als paymentAmount > 0 is gebruikt de gast dit bedrag.
             decimal finalPaymentAmount;
             decimal finalTip;
 
-            if (paymentAmount > 0)
+            if (submission.PaymentAmount > 0)
             {
-                finalPaymentAmount = paymentAmount;
-                decimal calcTip = paymentAmount - total;
+                finalPaymentAmount = submission.PaymentAmount;
+                decimal calcTip = submission.PaymentAmount - total;
                 finalTip = calcTip > 0 ? calcTip : 0;
             }
             else
             {
-                finalTip = tipAmount;
-                finalPaymentAmount = total + tipAmount;
+                finalTip = submission.TipAmount;
+                finalPaymentAmount = total + submission.TipAmount;
             }
 
-            // Maak payment object
             Payment payment = new Payment
             {
-                PaymentMethod = method,
+                PaymentMethod = submission.PaymentMethod,
                 PaymentAmount = finalPaymentAmount,
                 BillId = billId,
                 PaymentTip = finalTip
             };
 
-            // Sla payment op en krijg paymentId
             int paymentId = _paymentRepository.SavePayment(payment);
 
-            // Voeg feedback toe indien aanwezig
-            if (!string.IsNullOrEmpty(feedbackDescription))
+            if (!string.IsNullOrEmpty(submission.FeedbackDescription))
             {
                 Feedback feedback = new Feedback
                 {
-                    Type = feedbackType,
-                    Description = feedbackDescription,
+                    Type = submission.FeedbackType,
+                    Description = submission.FeedbackDescription,
                     PaymentId = paymentId
                 };
 
                 _paymentRepository.SaveFeedback(feedback);
             }
 
-            // Zet tafel vrij
-            _paymentRepository.FreeTable(tableId);
+            _visitRepository.CloseVisit(submission.VisitId);
         }
     }
 }

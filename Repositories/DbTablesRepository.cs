@@ -48,5 +48,7 @@ namespace shappo0.Repositories
             table.Status = reader.GetBoolean(1);
             return table;
         }
+
+        
     }
 }
