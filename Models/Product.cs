@@ -12,6 +12,14 @@ namespace shappo0.Models
         public ProductType ProductType { get; set; }
         public MenuType MenuType { get; set; }
         public bool OnMenu { get; set; }
+        public decimal PriceIncludingTax
+        {
+            get
+            {
+                return Price + (Price * (VATPercentage / 100));
+            }
+            set { }
+        }
 
         public Product()
         {
