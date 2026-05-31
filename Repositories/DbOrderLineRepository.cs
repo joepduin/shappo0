@@ -19,11 +19,15 @@ namespace shappo0.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT OL.orderLineId, OL.productId, OL.orderNumber, OL.note, OL.quantity, OL.status, " +
-                    "P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu " +
-                    "FROM [ORDER_LINE] AS OL " + 
-                    "JOIN [PRODUCT] AS P ON P.productId = OL.productId " +
-                    "WHERE orderNumber = @orderNumber";
+                
+                string query = @"SELECT     
+                                    OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
+                                    O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[status] AS OrderStatus, 
+                                    P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu
+                               FROM [ORDER_LINE] AS OL
+                               JOIN [PRODUCT] AS P ON P.productId = OL.productId
+                               JOIN [ORDER] AS O ON O.orderNumber = OL.orderNumber
+                               WHERE OL.orderNumber = @orderNumber";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -42,22 +46,72 @@ namespace shappo0.Repositories
             return orderLines;
         }
 
+        public List<OrderLine> GetActiveOrderLinesByTableNumber(int tableNumber)
+        {
+            List<OrderLine> orderLines = new List<OrderLine>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"SELECT 
+                                    OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
+                                    O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[Status] AS OrderStatus, 
+                                    P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu 
+                               FROM [Visit] AS V
+                               JOIN [Order] AS O ON O.visitId = V.visitId
+                               JOIN [Order_Line] AS OL ON OL.orderNumber = O.orderNumber
+                               JOIN [Product] AS P ON P.productId = OL.productId
+                               WHERE V.TableNumber = @tableNumber AND V.isActive = 1";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@tableNumber", tableNumber);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    OrderLine orderLine = ReadOrderLine(reader);
+                    orderLines.Add(orderLine);
+                }
+                reader.Close();
+            }
+            return orderLines;
+        }
+
         private OrderLine ReadOrderLine(SqlDataReader reader)
         {
-            OrderLine line = new OrderLine();
-            line.OrderLineId = (int)reader["orderLineId"];
-            line.ProductId = (int)reader["productId"];
-            line.OrderNumber = (int)reader["orderNumber"];
-            //Saves the note as a C# string, otherwise it crashes if it finds a NULL value
-            line.Note = reader["note"] as string;
-            line.Quantity = (int)reader["quantity"];
-  
-            string statusString = (string)reader["status"];
-            line.Status = Enum.Parse<OrderStatus>(statusString, true);
+            Product attachedProduct = new Product
+            {
+                ProductId = (int)reader["ProductId"],
+                Name = (string)reader["name"],
+                Price = (decimal)reader["price"],
+                VATPercentage = (decimal)reader["vatPercentage"],
+                Stock = (int)reader["stock"],
+                ProductType = Enum.Parse<ProductType>((string)reader["productType"], true),
+                MenuType = Enum.Parse<MenuType>((string)reader["menuType"], true),
+                OnMenu = (bool)reader["onMenu"]
+            };
 
-            Product attachedProduct = DbMenuRepository.ReadProduct(reader);
-            line.Product = attachedProduct;
-            return line;
+            Order attachedOrder = new Order
+            {
+                OrderNumber = (int)reader["orderNumber"],
+                TimeCreated = (DateTime)reader["timeCreated"],
+                WaitingTimeMinutes = (int)reader["waitingTimeMinutes"],
+                Status = Enum.Parse<OrderStatus>((string)reader["OrderStatus"], true),
+            };
+
+            OrderLine orderLine = new OrderLine
+            {
+                OrderLineId = (int)reader["orderLineId"],
+                Note = reader["note"] as string,
+                Quantity = (int)reader["quantity"],
+                Status = Enum.Parse<OrderStatus>((string)reader["OrderLineStatus"], true),
+                Product = attachedProduct,
+                Order = attachedOrder
+            };
+
+            return orderLine;
         }
 
         public void CreateOrderLine(OrderLine orderLine)
@@ -70,9 +124,8 @@ namespace shappo0.Repositories
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Parameters.AddWithValue("@productId", orderLine.Product.ProductId);
-                command.Parameters.AddWithValue("@orderNumber", orderLine.OrderNumber);
+                command.Parameters.AddWithValue("@orderNumber", orderLine.Order.OrderNumber);
                 command.Parameters.AddWithValue("@note", string.IsNullOrEmpty(orderLine.Note) ? DBNull.Value : orderLine.Note);
-
                 command.Parameters.AddWithValue("@quantity", orderLine.Quantity);
                 command.Parameters.AddWithValue("@status", orderLine.Status.ToString());
 
@@ -95,22 +148,19 @@ namespace shappo0.Repositories
 
                     foreach (OrderLine orderLine in orderLines)
                     {
-                        //Clear the parameters from previous loop
                         command.Parameters.Clear();
 
                         command.Parameters.AddWithValue("@productId", orderLine.Product.ProductId);
-                        command.Parameters.AddWithValue("@orderNumber", orderLine.OrderNumber);
+                        command.Parameters.AddWithValue("@orderNumber", orderLine.Order.OrderNumber);
+
                         command.Parameters.AddWithValue("@note", string.IsNullOrEmpty(orderLine.Note) ? DBNull.Value : orderLine.Note);
                         command.Parameters.AddWithValue("@quantity", orderLine.Quantity);
                         command.Parameters.AddWithValue("@status", orderLine.Status.ToString());
 
                         command.ExecuteNonQuery();
                     }
-                    
                 }
             }
         }
-
-
     }
 }
