@@ -5,11 +5,11 @@ using shappo0.Services;
 namespace shappo0.Controllers
 {
     [Authorize(Roles = "Manager")]
-    public class UserController : Controller
+    public class StaffController : Controller
     {
         private readonly IAccountService _accountService;
 
-        public UserController(IAccountService accountService)
+        public StaffController(IAccountService accountService)
         {
             _accountService = accountService;
         }
@@ -17,8 +17,8 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            List<User> users = _accountService.GetAllUsers();
-            return View(users);
+            List<Staff> staff = _accountService.GetAllStaff();
+            return View(staff);
         }
 
         [HttpGet]
@@ -28,50 +28,50 @@ namespace shappo0.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddUser(User user)
+        public ActionResult AddUser(Staff staff)
         {
             try
             {
-                _accountService.AddUser(user);
+                _accountService.AddStaff(staff);
 
-                TempData["ConfirmMessage"] = "User has been succesfully created";
+                TempData["ConfirmMessage"] = "Staff member has been succesfully created";
                 return RedirectToAction("Index");
             }
             catch
             {
-                ViewBag.ErrorMessage = @"Exception occured: user could not be added";
-                return View(user);
+                ViewBag.ErrorMessage = @"Exception occured: staff member could not be added";
+                return View(staff);
             }
         }
 
         [HttpGet]
-        public IActionResult EditUser(int? id)
+        public IActionResult EditStaff(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            User? user = _accountService.GetUser((int)id);
+            Staff? staff = _accountService.GetStaff((int)id);
 
-            return View(user);
+            return View(staff);
         }
 
         [HttpPost]
-        public ActionResult EditUser(User user)
+        public ActionResult EditStaff(Staff staff)
         {
             try
             {
-                _accountService.EditUser(user);
+                _accountService.EditStaff(staff);
 
-                TempData["ConfirmMessage"] = "User has been successfully edited";
+                TempData["ConfirmMessage"] = "Staff member has been successfully edited";
 
                 return RedirectToAction("Index");
             }
             catch
             {
-                ViewBag.ErrorMessage = @"Exception occured: user could not be edited.";
-                return View(user);
+                ViewBag.ErrorMessage = @"Exception occured: staff member could not be edited.";
+                return View(staff);
             }
         }
     }
