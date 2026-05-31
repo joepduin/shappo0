@@ -19,5 +19,34 @@ namespace shappo0.Controllers
             List<Kitchen> kitchen = _kitchenService.GetAll();
             return View(kitchen);
         }
+
+        
+        public IActionResult ViewOrder(int orderNumber)
+        {
+            List<OrderLine> lines = _kitchenService.GetOrderLines(orderNumber);
+            return View(lines);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateOrderStatus(int orderNumber, OrderStatus status)
+        {
+            _kitchenService.UpdateOrderStatus(orderNumber, status);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult UpdateOrderLineStatus(int orderLineId, int orderNumber, OrderStatus status)
+        {
+            _kitchenService.UpdateOrderLineStatus(orderLineId, status);
+
+            return RedirectToAction("ViewOrder", new { orderNumber });
+        }
+
+        public IActionResult FinishedOrders()
+        {
+            List<Kitchen> kitchen = _kitchenService.FinishedOrders();
+            return View(kitchen);
+        }
     }
 }

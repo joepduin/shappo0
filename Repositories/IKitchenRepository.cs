@@ -5,8 +5,17 @@ namespace shappo0.Repositories
     public interface IKitchenRepository
     {
         List<Kitchen> GetAll();
-        Kitchen? GetById(int OrderNumber);
+        Kitchen? GetById(int orderNumber);
 
-       
+        public List<OrderLine> GetOrderLines(int orderNumber);
+
+        void UpdateOrderStatus(int orderNumber, OrderStatus status);
+
+        void UpdateOrderLineStatus(int orderLineId, OrderStatus status);
+
+        List<Kitchen> FinishedOrders();
+
+
+
     }
 }

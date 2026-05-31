@@ -1,0 +1,67 @@
+﻿@model List<shappo0.Models.OrderLine>
+@{
+	ViewData["Title"] = "View Order";
+}
+<!-- button to go back-->
+<button type="button"
+        onclick="history.back()"
+        class="btn btn-secondary">
+    Back
+</button>
+
+<h1>View order details:</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order line ID</th>
+            <th>Product ID</th>
+            <th>Quantity</th>
+            <th>Note</th>
+            <th>Status</th>
+            <th>Change Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var line in Model)
+        {
+            <tr>
+                <td>@line.OrderLineId</td>
+                <td>@line.ProductId</td>
+                <td>@line.Quantity</td>
+                <td>@line.Note</td>
+                <td>@line.Status</td>
+                <td>
+                    <!-- dropdown to change the order line status from ordered to being prepared to ready to be served-->
+                    <form asp-action="UpdateOrderLineStatus" method="post">
+                        <input type="hidden" name="orderLineId" value="@line.OrderLineId" />
+                        <input type="hidden" name="orderNumber" value="@line.OrderNumber" />
+
+                        <select name="status" onchange="this.form.submit()">
+
+                            <option value="Ordered"
+                                    selected="@(line.Status == OrderStatus.Ordered)">
+                                Ordered
+                            </option>
+
+                            <option value="BeingPrepared"
+                                    selected="@(line.Status == OrderStatus.BeingPrepared)">
+                                Being Prepared
+                            </option>
+
+                            <option value="ReadyToBeServed"
+                                    selected="@(line.Status == OrderStatus.ReadyToBeServed)">
+                                Ready To Be Served
+                            </option>
+
+                        </select>
+                    </form>
+                </td>
+
+            </tr>
+
+        }
+    </tbody>
+</table>
+

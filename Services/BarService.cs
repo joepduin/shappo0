@@ -23,5 +23,25 @@ namespace shappo0.Services
             return _barRepository.GetById(OrderNumber);
            
         }
+
+        public List<OrderLine> GetOrderLines(int orderNumber)
+        {
+            return _barRepository.GetOrderLines(orderNumber);
+        }
+
+        public void UpdateOrderStatus(int orderNumber, OrderStatus status)
+        {
+            _barRepository.UpdateOrderStatus(orderNumber, status);
+        }
+
+        public void UpdateOrderLineStatus(int orderNumber, OrderStatus status)
+        {
+            _barRepository.UpdateOrderLineStatus(orderNumber, status);
+        }
+
+        public List<Bar> FinishedOrders()
+        {
+            return _barRepository.FinishedOrders();
+        }
     }
 }

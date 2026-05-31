@@ -6,5 +6,13 @@ namespace shappo0.Services
     {
         List<Kitchen> GetAll();
         Kitchen? GetById(int OrderNumber);
+
+        public List<OrderLine> GetOrderLines(int orderNumber);
+
+        void UpdateOrderStatus(int orderNumber, OrderStatus status);
+
+        void UpdateOrderLineStatus(int orderLineId, OrderStatus status);
+
+        List<Kitchen> FinishedOrders();
     }
 }
