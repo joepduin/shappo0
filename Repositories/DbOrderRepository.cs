@@ -131,9 +131,5 @@ namespace shappo0.Repositories
                 return order.OrderNumber;
             }
         }
-
-
-
-
     }
 }

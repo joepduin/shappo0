@@ -125,13 +125,12 @@
 			foreach (Product product in Model)
 			{
 				decimal vat = (product.VATPercentage + 100) / 100;
-				// decimal price = product.Price * vat;
 				decimal price = Math.Round((product.Price * vat), 2);
 
 				<tr>
 					<td>@product.ProductId</td>
 					<td>@product.Name</td>
-					<td>@price</td>
+					<td>€@price</td>
 					<td>@product.Stock</td>
 					<td>@product.ProductType</td>
 					<td>@product.MenuType</td>
