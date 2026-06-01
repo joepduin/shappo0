@@ -13,14 +13,13 @@ namespace shappo0.Models
         public List<OrderLine> OrderLines { get; set; }
 
 
-        public Kitchen(int orderNumber, int tableNumber, OrderStatus status, DateTime timeCreated, int waitingTime)
+        public Kitchen(int orderNumber, int tableNumber, OrderStatus status, DateTime timeCreated)
         {
 
             OrderNumber = orderNumber;
             TableNumber = tableNumber;
             Status = status;
             TimeCreated = timeCreated;
-            WaitingTime = waitingTime;
             OrderLines = new List<OrderLine>();
         }
 

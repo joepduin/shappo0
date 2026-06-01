@@ -61,9 +61,8 @@ namespace shappo0.Services
  
             Order newOrder = new Order
             {
-                WaitingTimeMinutes = 0,
                 TimeCreated = DateTime.Now,
-                Status = OrderStatus.Running,
+                Status = OrderStatus.Ordered,
                 Visit = activeVisit,
                 Staff = currentStaff
             };
@@ -95,7 +94,7 @@ namespace shappo0.Services
                 OrderLine newOrderLine = new OrderLine
                 {
                     Product = selectedProduct,
-                    Status = OrderStatus.Running,
+                    Status = OrderStatus.Ordered,
                     Quantity = 1
                 };
 
