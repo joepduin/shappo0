@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using shappo0.Repositories;
+using shappo0.Repositories.Interfaces;
 using shappo0.Services;
+using shappo0.Services.Interfaces;
 
 namespace shappo0
 {

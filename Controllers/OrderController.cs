@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace shappo0.Controllers
 {
-    [Authorize (Roles="Waiter")]
+    [Authorize (Roles="Waiter, Manager")]
     public class OrderController : Controller
     {
         private readonly IMenuService _menuService;
