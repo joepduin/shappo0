@@ -1,25 +1,27 @@
-﻿namespace shappo0.Models
+﻿using shappo0.Enums;
+
+namespace shappo0.Models
 {
     public class Kitchen
     {
-        private string status;
 
         public int OrderNumber { get; set; }
-        public int Tablenumber { get; set; }
-
-        public OrderStatus Status { get; set; } // running, prepared, completed (3)
+        public int TableNumber { get; set; }
+        public OrderStatus Status { get; set; } 
         public DateTime TimeCreated { get; set; }
-
         public int WaitingTime { get; set; }
+        public List<OrderLine> OrderLines { get; set; }
 
 
         public Kitchen(int orderNumber, int tableNumber, OrderStatus status, DateTime timeCreated, int waitingTime)
         {
+
             OrderNumber = orderNumber;
-            Tablenumber = tableNumber;
-            Status = Enum.Parse<OrderStatus>(status.ToString(), true);
+            TableNumber = tableNumber;
+            Status = status;
             TimeCreated = timeCreated;
             WaitingTime = waitingTime;
+            OrderLines = new List<OrderLine>();
         }
 
         public Kitchen() { }
@@ -27,8 +29,8 @@
         public Kitchen(int orderNumber, int tableNumber, string status, DateTime timeCreated, int waitingTime)
         {
             OrderNumber = orderNumber;
-            Tablenumber = tableNumber;
-            this.status = status;
+            TableNumber = tableNumber;
+            Status = Enum.Parse<OrderStatus>(status.ToString(), true);
             TimeCreated = timeCreated;
             WaitingTime = waitingTime;
         }

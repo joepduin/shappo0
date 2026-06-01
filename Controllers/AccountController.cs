@@ -62,33 +62,30 @@ namespace shappo0.Controllers
         [HttpPost]
         public ActionResult Login(LoginModel loginModel)
         {
-            LoginModel CopyLoginModel = new LoginModel(loginModel.UserName, loginModel.Password);
-            User user = _accountService.GetUserByCredentials(CopyLoginModel);
+            LoginModel CopyLoginModel = new LoginModel(loginModel.Name, loginModel.Password);
+            Staff staff = _accountService.GetStaffByCredentials(CopyLoginModel);
 
-            if (user == null)
+            if (staff == null)
             {
                 ViewBag.Message = "Onjuiste gebruikersnaam of wachtwoord.";
                 return View(loginModel); 
             }
             else
             {
-                SignInUser(user);
+                SignInStaff(staff);
                 //je gaat nu gelijk naar de table page. later ga je naar de pagina waarvoor je rol geschikt is.
                 return RedirectToAction("Index", "Table");
             }
         }
 
         //maakt een Claim van de user om Authorize te gebruiken
-        private void SignInUser(User user)
+        private void SignInStaff(Staff staff)
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
-                new Claim(ClaimTypes.Gender, user.Sex?.ToString() ?? string.Empty),
-                new Claim(ClaimTypes.Expired, user.IsEmployed ? "1" : "0") //moet een string zijn 1 is true 0 is false
+                new Claim(ClaimTypes.NameIdentifier, staff.StaffId.ToString()),
+                new Claim(ClaimTypes.Name, staff.Name),
+                new Claim(ClaimTypes.Role, staff.Role.ToString())
             };
 
             ClaimsIdentity identity = new ClaimsIdentity(

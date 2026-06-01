@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Endpoints;
+using shappo0.Enums;
 using shappo0.Models;
 using Microsoft.Data.SqlClient;
 
@@ -227,7 +228,7 @@ namespace shappo0.Repositories
                     {
                         command.Parameters.Clear();
                         command.Parameters.AddWithValue("@quantity", line.Quantity);
-                        command.Parameters.AddWithValue("@productId", line.ProductId);
+                        command.Parameters.AddWithValue("@productId", line.Product.ProductId);
                         command.ExecuteNonQuery();
                     }  
                 }

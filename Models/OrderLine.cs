@@ -1,20 +1,21 @@
-﻿namespace shappo0.Models
+﻿using shappo0.Enums;
+
+namespace shappo0.Models
 {
     public class OrderLine
     {
         public int OrderLineId { get; set; }
-        public int ProductId { get; set; }
         public Product Product { get; set; }
-        public int OrderNumber { get; set; }
+        public Order Order { get; set; }
         public string? Note { get; set; }
         public int Quantity { get; set; }
         public OrderStatus Status { get; set; }
 
-        public OrderLine(int orderLineId, int productId, int orderNumber, string? note, int quantity, OrderStatus status)
+        public OrderLine(int orderLineId, Product product, Order order, string? note, int quantity, OrderStatus status)
         {
             OrderLineId = orderLineId;
-            ProductId = productId;
-            OrderNumber = orderNumber;
+            Product = product;
+            Order = order;
             Note = note;
             Quantity = quantity;
             Status = status;
@@ -25,7 +26,7 @@
 
         }
 
-        //enum status per item --> ---, being prepped, ready to be served (3) --> add column to database
+        
 
 
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using shappo0.Enums;
 using shappo0.Models;
 
 namespace shappo0.Repositories
@@ -20,7 +21,16 @@ namespace shappo0.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT orderNumber, timeCreated, waitingTimeMinutes, status, visitId, staffId FROM [Order]";
+                string query = @"
+                    SELECT 
+                        O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[status] AS OrderStatus, 
+                        V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
+                        OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
+                        VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
+                    FROM [Order] AS O
+                    JOIN [Visit] AS V ON O.visitId = V.visitId
+                    JOIN [Staff] AS OS ON O.staffId = OS.staffId
+                    JOIN [Staff] AS VS ON V.staffId = VS.staffId";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -43,10 +53,21 @@ namespace shappo0.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT orderNumber, timeCreated, waitingTimeMinutes, status, visitId, staffId FROM [Order] " +
-                    "WHERE [status] = 'running'";
+                string query = @"
+                    SELECT 
+                        O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[status] AS OrderStatus, 
+                        V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
+                        OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
+                        VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
+                    FROM [Order] AS O
+                    JOIN [Visit] AS V ON O.visitId = V.visitId
+                    JOIN [Staff] AS OS ON O.staffId = OS.staffId
+                    JOIN [Staff] AS VS ON V.staffId = VS.staffId
+                    WHERE O.[status] = @status";
 
                 SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@status", OrderStatus.Running.ToString());
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -61,31 +82,23 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        private Order ReadOrder(SqlDataReader reader)
-        {
-            int orderNumber = (int)reader["orderNumber"];
-            DateTime timeCreated = (DateTime)reader["timeCreated"];
-            int waitingTimeMinutes = (int)reader["waitingTimeMinutes"];
-
-            string statusString = (string)reader["status"];
-            OrderStatus status = Enum.Parse<OrderStatus>(statusString, true);
-
-            int visitId = (int)reader["visitId"];
-            int staffId = (int)reader["staffId"];
-
-            return new Order(orderNumber, timeCreated, waitingTimeMinutes, status, visitId, staffId);
-        }
-
         public List<Order> GetOrdersByVisitId(int visitId)
         {
             List<Order> orders = new List<Order>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT orderNumber, timeCreated, waitingTimeMinutes, O.[status], O.visitId, O.staffId " +
-                    "FROM[Order] AS O " +
-                    "JOIN Visit AS V ON V.visitId = O.visitId " +
-                    "WHERE V.visitId = @visitId";
+                string query = @"
+                    SELECT 
+                        O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[status] AS OrderStatus, 
+                        V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
+                        OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
+                        VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
+                    FROM [Order] AS O
+                    JOIN [Visit] AS V ON O.visitId = V.visitId
+                    JOIN [Staff] AS OS ON O.staffId = OS.staffId
+                    JOIN [Staff] AS VS ON V.staffId = VS.staffId
+                    WHERE V.visitId = @visitId";
 
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@visitId", visitId);
@@ -104,6 +117,43 @@ namespace shappo0.Repositories
             return orders;
         }
 
+        private Order ReadOrder(SqlDataReader reader)
+        {
+            Staff orderStaff = new Staff
+            {
+                StaffId = (int)reader["OrderStaffId"],
+                Name = (string)reader["OrderStaffName"],
+                Role = Enum.Parse<RoleType>((string)reader["OrderStaffRole"], true)
+            };
+
+            Staff visitStaff = new Staff
+            {
+                StaffId = (int)reader["VisitStaffId"],
+                Name = (string)reader["VisitStaffName"],
+                Role = Enum.Parse<RoleType>((string)reader["VisitStaffRole"], true)
+            };
+
+            Table attachedTable = new Table
+            {
+                TableNumber = (int)reader["tableNumber"]
+            };
+
+            Visit attachedVisit = new Visit
+            {
+                VisitId = (int)reader["visitId"],
+                Table = attachedTable,
+                Staff = visitStaff,
+                IsActive = (bool)reader["VisitIsActive"]
+            };
+
+            int orderNumber = (int)reader["orderNumber"];
+            DateTime timeCreated = (DateTime)reader["timeCreated"];
+            int waitingTimeMinutes = (int)reader["waitingTimeMinutes"];
+            OrderStatus status = Enum.Parse<OrderStatus>((string)reader["OrderStatus"], true);
+
+            return new Order(orderNumber, timeCreated, waitingTimeMinutes, status, attachedVisit, orderStaff);
+        }
+
         public int CreateOrder(Order order)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -114,14 +164,12 @@ namespace shappo0.Repositories
 
                 SqlCommand command = new SqlCommand(query, connection);
 
-                //adding as parameters to prevent sql injection
                 command.Parameters.AddWithValue("@timeCreated", order.TimeCreated);
                 command.Parameters.AddWithValue("@waitingTimeMinutes", order.WaitingTimeMinutes);
-
-                //saving it as a string so the database is readable
                 command.Parameters.AddWithValue("@status", order.Status.ToString());
-                command.Parameters.AddWithValue("@visitId", order.VisitId);
-                command.Parameters.AddWithValue("@staffId", order.StaffId);
+
+                command.Parameters.AddWithValue("@visitId", order.Visit.VisitId);
+                command.Parameters.AddWithValue("@staffId", order.Staff.StaffId);
 
                 command.Connection.Open();
 
@@ -130,9 +178,5 @@ namespace shappo0.Repositories
                 return order.OrderNumber;
             }
         }
-
-
-
-
     }
 }

@@ -15,9 +15,8 @@ namespace shappo0
             builder.Services.AddSingleton<IOrderLineRepository, DbOrderLineRepository>();
             builder.Services.AddSingleton<IVisitRepository, DbVisitRepository>();
             builder.Services.AddSingleton<IPaymentService, PaymentService>();
-            // Registratie van de payment repository zodat de PaymentService deze via DI kan krijgen
             builder.Services.AddSingleton<IPaymentRepository, DbPaymentRepository>();
-            builder.Services.AddSingleton<IUsersRepository, DbUsersRepository>();
+            builder.Services.AddSingleton<IStaffRepository, DbStaffRepository>();
             builder.Services.AddSingleton<ITablesRepository, DbTablesRepository>();
             builder.Services.AddSingleton<IVisitService, VisitService>();
             builder.Services.AddSingleton<IMenuRepository, DbMenuRepository>();
@@ -29,6 +28,8 @@ namespace shappo0
             builder.Services.AddSingleton<IKitchenService, KitchenService>();
             builder.Services.AddSingleton<IBarRepository, DbBarRepository>();
             builder.Services.AddSingleton<IBarService, BarService>();
+            builder.Services.AddSingleton<IFinanceRepository, DbFinanceRepository>();
+            builder.Services.AddSingleton<IFinanceService, FinanceService>();
             builder.Services.AddControllersWithViews();
 
             //Authentication
