@@ -23,7 +23,7 @@ namespace shappo0.Repositories
             {
                 string query = @"
                     SELECT 
-                        O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[status] AS OrderStatus, 
+                        O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
                         V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
                         OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
                         VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
@@ -55,7 +55,7 @@ namespace shappo0.Repositories
             {
                 string query = @"
                     SELECT 
-                        O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[status] AS OrderStatus, 
+                        O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
                         V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
                         OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
                         VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
@@ -67,7 +67,7 @@ namespace shappo0.Repositories
 
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.AddWithValue("@status", OrderStatus.Running.ToString());
+                command.Parameters.AddWithValue("@status", OrderStatus.Ordered.ToString());
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -90,7 +90,7 @@ namespace shappo0.Repositories
             {
                 string query = @"
                     SELECT 
-                        O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[status] AS OrderStatus, 
+                        O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
                         V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
                         OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
                         VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
@@ -148,24 +148,22 @@ namespace shappo0.Repositories
 
             int orderNumber = (int)reader["orderNumber"];
             DateTime timeCreated = (DateTime)reader["timeCreated"];
-            int waitingTimeMinutes = (int)reader["waitingTimeMinutes"];
             OrderStatus status = Enum.Parse<OrderStatus>((string)reader["OrderStatus"], true);
 
-            return new Order(orderNumber, timeCreated, waitingTimeMinutes, status, attachedVisit, orderStaff);
+            return new Order(orderNumber, timeCreated, status, attachedVisit, orderStaff);
         }
 
         public int CreateOrder(Order order)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = $"INSERT INTO [Order](timeCreated, waitingTimeMinutes, status, visitId, staffId) " +
-                                $"VALUES(@timeCreated, @waitingTimeMinutes, @status, @visitId, @staffId); " +
+                string query = $"INSERT INTO [Order](timeCreated, status, visitId, staffId) " +
+                                $"VALUES(@timeCreated, @status, @visitId, @staffId); " +
                                 "SELECT SCOPE_IDENTITY();";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Parameters.AddWithValue("@timeCreated", order.TimeCreated);
-                command.Parameters.AddWithValue("@waitingTimeMinutes", order.WaitingTimeMinutes);
                 command.Parameters.AddWithValue("@status", order.Status.ToString());
 
                 command.Parameters.AddWithValue("@visitId", order.Visit.VisitId);
