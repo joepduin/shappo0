@@ -1,0 +1,52 @@
+﻿@using shappo0.Models
+@model List<shappo0.Models.Bar>
+@{
+	ViewData["Title"] = "Finished Orders";
+}
+<h1>Bar</h1>
+<h2>Finished orders</h2>
+<!-- button to see the running orders page (index)-->
+<a asp-action="Index" class="btn btn-primary">
+	View Running orders
+</a>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Order number</th>
+			<th>Table number</th>
+			<th>Status</th>
+			<th>Time created</th>
+			<th>Waiting time</th>
+			<th>Order details</th>
+
+		</tr>
+	</thead>
+	<tbody>
+		@{
+			foreach (Bar bars in Model)
+			{
+				var rowStyle = "";
+
+				<tr @rowStyle>
+					<td>@bars.OrderNumber</td>
+					<td>@bars.TableNumber</td>
+					<td>@bars.Status</td>
+					<td>@bars.TimeCreated</td>
+					<td>@bars.WaitingTime</td>
+					<td>
+						<!-- button to see the orderlines-->
+						<a asp-controller="Bar"
+						   asp-action="ViewOrder"
+						   asp-route-id="" class="btn btn-outline-dark"
+						   asp-route-orderNumber="@bars.OrderNumber">
+							View Order
+						</a>
+
+
+					</td>
+					
+				</tr>
+			}
+		}
+	</tbody>
+</table>
