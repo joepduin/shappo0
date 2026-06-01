@@ -1,0 +1,44 @@
+﻿@using System.Linq
+@using shappo0.Models
+@model List<shappo0.Models.Order>
+
+@{
+    ViewData["Title"] = "Table Status";
+}
+
+<h2>Table @ViewBag.TableNumber</h2>
+
+@if (Model.Count > 1)
+{
+    @foreach(Order order in Model)
+    {
+        <h3>Order: @order.OrderNumber</h3>
+
+        <table class="table table-sm" style="table-layout: fixed;">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Aantal</th>
+                    <th>Opmerking</th>
+                    <th>Item status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (OrderLine orderLine in order.OrderLines)
+                {
+                    <tr>
+                        <td>@orderLine.Product.Name</td>
+                        <td>@orderLine.Quantity</td>
+                        <td>@orderLine.Note</td>
+                        <td>@orderLine.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+else 
+{
+    <div class="alert alert-danger">Geen orders voor deze tafel.</div>
+}
