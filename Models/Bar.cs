@@ -11,13 +11,12 @@ namespace shappo0.Models
         public int WaitingTime { get; set; }
         public List<OrderLine> OrderLines { get; set; }
 
-        public Bar(int orderNumber,int tableNumber, OrderStatus status, DateTime timeCreated, int waitingTime)
+        public Bar(int orderNumber,int tableNumber, OrderStatus status, DateTime timeCreated)
         {
             OrderNumber = orderNumber;
             TableNumber = tableNumber;
             Status = status; 
             TimeCreated = timeCreated;
-            WaitingTime = waitingTime;
 
         }
 

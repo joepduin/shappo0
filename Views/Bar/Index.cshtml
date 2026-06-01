@@ -52,13 +52,13 @@
 							<input type="hidden" name="orderNumber" value="@bar.OrderNumber" />
 
 							<select name="status" onchange="this.form.submit()">
-								<option value="Running"
-										selected="@(bar.Status == OrderStatus.Running)">
-									Running
+								<option value="Ordered"
+										selected="@(bar.Status == OrderStatus.Ordered)">
+									Ordered
 								</option>
-								<option value="Finished"
-										selected="@(bar.Status == OrderStatus.Finished)">
-									Finished
+								<option value="Served"
+										selected="@(bar.Status == OrderStatus.Served)">
+									Served
 								</option>
 							</select>
 						</form>

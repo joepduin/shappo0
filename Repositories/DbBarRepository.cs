@@ -16,11 +16,10 @@ namespace shappo0.Repositories
         {
             int orderNumber = (int)reader["orderNumber"];
             int tableNumber = (int)reader["tableNumber"];
-            string status = (string)reader["status"];
+            OrderStatus status = Enum.Parse<OrderStatus>((string)reader["status"], true);
             DateTime timeCreated = (DateTime)reader["timeCreated"];
-            int waitingTime = (int)reader["waitingTimeMinutes"];
 
-            return new Bar(orderNumber, tableNumber, status, timeCreated, waitingTime);
+            return new Bar(orderNumber, tableNumber, status, timeCreated);
         }
 
         public List<Bar> GetAll()
@@ -33,10 +32,10 @@ namespace shappo0.Repositories
               //Uses DISTINCT so not multiple orders will be seen
               // o.status --> shows only the running orders
               //Ordered by timeCreated
-                string query = "SELECT DISTINCT o.orderNumber, o.staffId, t.tableNumber, o.status, o.timeCreated, o.waitingTimeMinutes FROM [ORDER] AS o " +
+                string query = "SELECT DISTINCT o.orderNumber, o.staffId, t.tableNumber, o.status, o.timeCreated FROM [ORDER] AS o " +
                     " INNER JOIN VISIT AS v ON o.visitId = v.visitId INNER JOIN [TABLE] AS t ON v.tableNumber = t.tableNumber " +
                     "INNER JOIN ORDER_LINE AS ol ON ol.orderNumber = o.orderNumber INNER JOIN PRODUCT AS p ON ol.productId = p.productId " +
-                    "WHERE o.status = 'Running' and p.ProductType = 'Drink' " +
+                    "WHERE o.status = 'Ordered' and p.ProductType = 'Drink' " +
                     "ORDER BY timeCreated"
 ;
 
@@ -180,10 +179,10 @@ namespace shappo0.Repositories
               //another join on order - orderline - product where productType Drink
               // o.status --> shows only the finished orders
               //Ordered by timeCreated
-                string query = "SELECT DISTINCT o.orderNumber, o.staffId, t.tableNumber, o.status, o.timeCreated, o.waitingTimeMinutes FROM [ORDER] AS o " +
+                string query = "SELECT DISTINCT o.orderNumber, o.staffId, t.tableNumber, o.status, o.timeCreated FROM [ORDER] AS o " +
                     " INNER JOIN VISIT AS v ON o.visitId = v.visitId INNER JOIN [TABLE] AS t ON v.tableNumber = t.tableNumber " +
                     "INNER JOIN ORDER_LINE AS ol ON ol.orderNumber = o.orderNumber INNER JOIN PRODUCT AS p ON ol.productId = p.productId" +
-                    " WHERE p.ProductType = 'Drink' AND o.status = 'Finished' " +
+                    " WHERE p.ProductType = 'Drink' AND o.status = 'Served' " +
                     "ORDER BY timeCreated";
 
                 SqlCommand command = new SqlCommand(query, connection);

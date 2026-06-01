@@ -22,7 +22,7 @@ namespace shappo0.Repositories
                 
                 string query = @"SELECT     
                                     OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
-                                    O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[status] AS OrderStatus, 
+                                    O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
                                     P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu
                                FROM [ORDER_LINE] AS OL
                                JOIN [PRODUCT] AS P ON P.productId = OL.productId
@@ -54,7 +54,7 @@ namespace shappo0.Repositories
             {
                 string query = @"SELECT 
                                     OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
-                                    O.orderNumber, O.timeCreated, O.waitingTimeMinutes, O.[Status] AS OrderStatus, 
+                                    O.orderNumber, O.timeCreated, O.[Status] AS OrderStatus, 
                                     P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu 
                                FROM [Visit] AS V
                                JOIN [Order] AS O ON O.visitId = V.visitId
@@ -97,7 +97,6 @@ namespace shappo0.Repositories
             {
                 OrderNumber = (int)reader["orderNumber"],
                 TimeCreated = (DateTime)reader["timeCreated"],
-                WaitingTimeMinutes = (int)reader["waitingTimeMinutes"],
                 Status = Enum.Parse<OrderStatus>((string)reader["OrderStatus"], true),
             };
 

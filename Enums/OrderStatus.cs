@@ -1,4 +1,4 @@
 namespace shappo0.Enums
 {
-    public enum OrderStatus { Running, Ordered, BeingPrepared, ReadyToBeServed, Finished }
+    public enum OrderStatus { Ordered, BeingPrepared, ReadyToBeServed, Served }
 }
