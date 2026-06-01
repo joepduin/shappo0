@@ -1,1 +1,81 @@
-﻿
+﻿@* Rather than using a ViewModel to get both the finance data and the tips, I just put the tips in the ViewBag *@
+@model List<Finance>
+
+@{
+    ViewData["Title"] = "Financial Overview";
+}
+
+<div class="container mt-4">
+    <h2>Financial Overview</h2>
+    <hr />
+
+    <div class="card p-3 mb-4 bg-light">
+        <form action="/Finance/Index" method="POST" class="row g-3 align-items-end">
+
+            <div class="col-12 mb-2">
+                <label class="form-label d-block">Quick Filters</label>
+                <div class="btn-group w-100" role="group">
+                    <button type="submit" name="quickFilter" value="month" class="btn btn-outline-secondary">This Month</button>
+                    <button type="submit" name="quickFilter" value="quarter" class="btn btn-outline-secondary">This Quarter</button>
+                    <button type="submit" name="quickFilter" value="year" class="btn btn-outline-secondary">This Year</button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label for="startDate" class="form-label">Start Date</label>
+                <input type="date" id="startDate" name="startDate" class="form-control" value="@ViewBag.StartDate" />
+            </div>
+            <div class="col-md-4">
+                <label for="endDate" class="form-label">End Date</label>
+                <input type="date" id="endDate" name="endDate" class="form-control" value="@ViewBag.EndDate" />
+            </div>
+            <div class="col-md-4">
+                <button type="submit" name="quickFilter" value="custom" class="btn btn-primary w-100">Filter Custom Dates</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h4>Finances per category</h4>
+            <!-- This is used to check if any data is provided -->
+            @if (Model == null || !Model.Any())
+            {
+                <div class="alert alert-warning">No transaction data found.</div>
+            }
+            else
+            {
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Menu Category</th>
+                            <th class="text-end">Total Items Ordered</th>
+                            <th class="text-end">Total Revenue (incl. VAT)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-capitalize">@item.MenuType</td>
+                                <td class="text-end">@item.TotalItemsOrdered</td>
+                                <td class="text-end">€@item.TotalRevenue.ToString("F2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <h4>Tips Earnings</h4>
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header font-weight-bold">Total Tips</div>
+                <div class="card-body">
+                    <h3 class="card-title">€@(((decimal)ViewBag.TotalTips).ToString("F2"))</h3>
+                    <p class="card-text">Total tips collected from visits within this date range.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

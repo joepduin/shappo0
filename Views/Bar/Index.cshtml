@@ -1,9 +1,15 @@
 ﻿@model List<shappo0.Models.Bar>
+@using shappo0.Enums;
 @{
 	ViewData["Title"] = "Bar";
 }
 <h1>Bar</h1>
 <h2>Running orders</h2>
+
+<!-- button to see the finished orders page -->
+<a asp-action="FinishedOrders" class="btn btn-primary">
+	View Finished orders
+</a>
 
 <table class="table">
 	<thead>
@@ -13,6 +19,8 @@
 			<th>Status</th>
 			<th>Time created</th>
 			<th>Waiting time</th>
+			<th>Order details</th>
+			<th>Change Status</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -23,10 +31,38 @@
 
 				<tr @rowStyle>
 					<td>@bar.OrderNumber</td>
-					<td>@bar.Tablenumber</td>
+					<td>@bar.TableNumber</td>
 					<td>@bar.Status</td>
 					<td>@bar.TimeCreated</td>
 					<td>@bar.WaitingTime</td>
+					<td>
+						<!-- button to see the orderlines-->
+						<a asp-controller="Bar"
+						   asp-action="ViewOrder"
+						   asp-route-id="" class="btn btn-outline-dark"
+						   asp-route-orderNumber="@bar.OrderNumber">
+							View Order
+						</a>
+
+
+					</td>
+					<td>
+						<!-- dropwdown to change the order status to finished-->
+						<form asp-action="UpdateOrderStatus" method="post">
+							<input type="hidden" name="orderNumber" value="@bar.OrderNumber" />
+
+							<select name="status" onchange="this.form.submit()">
+								<option value="Running"
+										selected="@(bar.Status == OrderStatus.Running)">
+									Running
+								</option>
+								<option value="Finished"
+										selected="@(bar.Status == OrderStatus.Finished)">
+									Finished
+								</option>
+							</select>
+						</form>
+					</td>
 				</tr>
 			}
 		}
