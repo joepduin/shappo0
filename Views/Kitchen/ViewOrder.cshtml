@@ -1,0 +1,90 @@
+﻿@model List<shappo0.Models.OrderLine>
+@using shappo0.Enums;
+@{
+	ViewData["Title"] = "View Order";
+}
+
+<h1>View order details:</h1>
+<!-- button to go back-->
+<button type="button"
+        onclick="history.back()"
+        class="btn btn-secondary">
+        Back
+</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order line ID</th>
+            <th>Product ID</th>
+            <th>Product name</th>
+            <th>Product type</th>
+            <th>Quantity</th>
+            <th>Note</th>
+            <th>Status</th>
+            <th>Change status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+
+        @{
+            ProductType? currentType = null;
+        }
+
+        @foreach (var line in Model)
+        {
+            if (line.Product.ProductType != currentType)
+            {
+                currentType = line.Product.ProductType;
+
+                <tr class="table-primary">
+                    <td colspan="8">
+                        <strong>@currentType</strong>
+                    </td>
+                </tr>
+            }
+
+            <tr>
+                <td>@line.OrderLineId</td>
+                    <td>@line.Product.ProductId</td>
+                    <td>@line.Product.Name</td>
+                    <td>@line.Product.ProductType</td>
+                <td>@line.Quantity</td>
+                <td>@line.Note</td>
+                <td>@line.Status</td>        
+                <td>
+                    <!-- dropdown to change the orderline status from ordered to preparing to ready to serve-->
+                        <form asp-action="UpdateOrderLineStatus" method="post">
+                            <input type="hidden" name="orderLineId" value="@line.OrderLineId" />
+                                <input type="hidden" name="orderNumber" value="@line.Order.OrderNumber" />
+
+                            <select name="status" onchange="this.form.submit()">
+
+                                <option value="Ordered"
+                                        selected="@(line.Status == OrderStatus.Ordered)">
+                                    Ordered
+                                </option>
+
+                                <option value="BeingPrepared"
+                                        selected="@(line.Status == OrderStatus.BeingPrepared)">
+                                    Being Prepared
+                                </option>
+
+                                <option value="ReadyToBeServed"
+                                        selected="@(line.Status == OrderStatus.ReadyToBeServed)">
+                                    Ready To Be Served
+                                </option>
+
+                            </select>
+                        </form>
+                </td>
+                
+            </tr>
+
+            
+            
+        }
+    </tbody>
+</table>
+

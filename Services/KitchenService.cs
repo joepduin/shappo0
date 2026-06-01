@@ -1,5 +1,6 @@
 ﻿using shappo0.Models;
 using shappo0.Repositories;
+using shappo0.Enums;
 
 namespace shappo0.Services
 {
@@ -21,6 +22,26 @@ namespace shappo0.Services
         {
             return _kitchenRepository.GetById(OrderNumber);
 
+        }
+
+        public List<OrderLine> GetOrderLines(int orderNumber)
+        {
+            return _kitchenRepository.GetOrderLines(orderNumber);
+        }
+
+        public void UpdateOrderStatus(int orderNumber, OrderStatus status)
+        {
+            _kitchenRepository.UpdateOrderStatus(orderNumber, status);
+        }
+
+        public void UpdateOrderLineStatus(int orderNumber, OrderStatus status)
+        {
+            _kitchenRepository.UpdateOrderLineStatus(orderNumber, status);
+        }
+
+       public List<Kitchen> FinishedOrders()
+        {
+            return _kitchenRepository.FinishedOrders();
         }
     }
 }
