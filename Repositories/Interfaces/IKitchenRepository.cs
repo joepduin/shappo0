@@ -16,6 +16,8 @@ namespace shappo0.Repositories
 
         List<Kitchen> FinishedOrders();
 
+        void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status);
+
 
 
     }

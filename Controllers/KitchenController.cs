@@ -49,5 +49,13 @@ namespace shappo0.Controllers
             List<Kitchen> kitchen = _kitchenService.FinishedOrders();
             return View(kitchen);
         }
+
+        [HttpPost]
+        public IActionResult UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
+        {
+            _kitchenService.UpdateCourseStatus(orderNumber, productType, status);
+
+            return RedirectToAction("Vieworder", new { orderNumber });
+        }
     }
 }
