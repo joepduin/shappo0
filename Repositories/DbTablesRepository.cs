@@ -1,5 +1,5 @@
-﻿using shappo0.Models;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using shappo0.Models;
 
 namespace shappo0.Repositories
 {
@@ -21,12 +21,12 @@ namespace shappo0.Repositories
             {
                 connection.Open();
 
-                string query = @"SELECT tableNumber, [status]
-                                 FROM [TABLE]";
+                string query = @"SELECT tableNumber, status
+                                 FROM [TABLE]
+                                 ORDER BY tableNumber;";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -40,15 +40,42 @@ namespace shappo0.Repositories
             return tables;
         }
 
-        //geeft per tafel het tafel opject
-        private Table ReadTable(SqlDataReader reader)
+        public Table GetTableByNumber(int tableNumber)
         {
-            Table table = new Table();
-            table.TableNumber = reader.GetInt32(0);
-            table.Status = reader.GetBoolean(1);
+            Table table = null;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                string query = @"SELECT tableNumber, status
+                                 FROM [TABLE]
+                                 WHERE tableNumber = @tableNumber
+                                 ORDER BY tableNumber;";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@tableNumber", tableNumber);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            table = ReadTable(reader);
+                        }
+                    }
+                }
+            }
             return table;
         }
 
-        
+
+        private Table ReadTable(SqlDataReader reader)
+        {
+            return new Table
+            {
+                TableNumber = (int)reader["tableNumber"],
+                Status = (bool)reader["status"]
+            };
+        }
     }
 }
