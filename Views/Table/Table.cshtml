@@ -1,16 +1,17 @@
 ﻿@using System.Linq
 @using shappo0.Models
-@model List<shappo0.Models.Order>
+@using shappo0.ViewModels
+@model TableViewModel
 
 @{
     ViewData["Title"] = "Table Status";
 }
 
-<h2>Table @ViewBag.TableNumber</h2>
+<h2>Table @Model.TableNumber</h2>
 
-@if (Model.Count > 1)
+@if (Model.Orders.Count > 0)
 {
-    @foreach(Order order in Model)
+    @foreach(Order order in Model.Orders)
     {
         <h3>Order: @order.OrderNumber</h3>
 

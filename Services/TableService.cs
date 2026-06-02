@@ -2,23 +2,41 @@ using shappo0.ViewModels;
 using shappo0.Models;
 using shappo0.Repositories;
 using shappo0.Enums;
+using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
     public class TableService : ITableService
     {
         private readonly ITablesRepository _tablesRepository;
+        private readonly IVisitRepository _visitRepository;
+        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderLineRepository _orderLineRepository;
 
-        public TableService(ITablesRepository tablesRepository)
+        public TableService(ITablesRepository tablesRepository, IVisitRepository visitRepository, IOrderRepository orderRepository, IOrderLineRepository orderLineRepository)
         {
             _tablesRepository = tablesRepository;
+            _visitRepository = visitRepository;
+            _orderRepository = orderRepository;
+            _orderLineRepository = orderLineRepository;
         }
 
-        public List<Order> GetTableByNumber(int tableNumber)
+        public TableViewModel GetTableByNumber(int tableNumber)
         {
             Table table = _tablesRepository.GetTableByNumber(tableNumber);
+            List<Order> orders = new List<Order>();
 
-            return table.Orders;
+            Visit? visit = _visitRepository.GetActiveVisitForTable(tableNumber);
+            if (visit != null)
+            {
+                orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
+                foreach (Order order in orders)
+                {
+                    order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
+                }
+            }
+
+            return new TableViewModel(table.TableNumber, table.Status, orders);
         }
 
         public List<TableViewModel> GetAllTables()
@@ -28,19 +46,17 @@ namespace shappo0.Services
 
             foreach(Table table in tables)
             {
-                List<OrderStatus> DrinkLines = new List<OrderStatus>();
-                List<OrderStatus> FoodLines = new List<OrderStatus>();
+                List<OrderStatus> drinkLines = new List<OrderStatus>();
+                List<OrderStatus> foodLines = new List<OrderStatus>();
+                List<OrderLine> orderLines = _orderLineRepository.GetActiveOrderLinesByTableNumber(table.TableNumber);
 
-                foreach (Order order in table.Orders)
+                foreach(OrderLine orderLine in orderLines)
                 {
-                    foreach(OrderLine orderLine in order.OrderLines)
-                    {
-                        if (orderLine.Product.ProductType == ProductType.Drink) DrinkLines.Add(orderLine.Status);
-                        else FoodLines.Add(orderLine.Status);
-                    }
+                    if (orderLine.Product.ProductType == ProductType.Drink) drinkLines.Add(orderLine.Status);
+                    else foodLines.Add(orderLine.Status);
                 }
 
-                tablesViewModels.Add(new(table.TableNumber, table.Status, GetStatus(DrinkLines), GetStatus(FoodLines)));
+                tablesViewModels.Add(new(table.TableNumber, table.Status, GetStatus(drinkLines), GetStatus(foodLines)));
             }
 
             return tablesViewModels;

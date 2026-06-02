@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using shappo0.ViewModels;
-using shappo0.Models;
 using shappo0.Services;
 
 namespace shappo0.Controllers
@@ -28,9 +27,8 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Table(int tableNumber)
         {
-            List<Order> orders= _tableService.GetTableByNumber(tableNumber);
-            ViewBag.TableNumber = tableNumber;
-            return View(orders);
+            TableViewModel table = _tableService.GetTableByNumber(tableNumber);
+            return View(table);
         }
     }
 }
