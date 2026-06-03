@@ -29,7 +29,6 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Table(int tableNumber)
         {
-            TableViewModel tableViewModel = null;
             TableViewModel table = _tableService.GetTableByNumber(tableNumber);
             return View(table);
         }
