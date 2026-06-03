@@ -19,7 +19,7 @@ namespace shappo0.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                
+
                 string query = @"SELECT     
                                     OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
                                     O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
@@ -28,6 +28,47 @@ namespace shappo0.Repositories
                                JOIN [PRODUCT] AS P ON P.productId = OL.productId
                                JOIN [ORDER] AS O ON O.orderNumber = OL.orderNumber
                                WHERE OL.orderNumber = @orderNumber";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@orderNumber", orderNumber);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    OrderLine orderLine = ReadOrderLine(reader);
+                    orderLines.Add(orderLine);
+                }
+                reader.Close();
+            }
+            return orderLines;
+        }
+
+        public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type)
+        {
+            List<OrderLine> orderLines = new List<OrderLine>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                
+                string query = @"SELECT     
+                                    OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
+                                    O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
+                                    P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu
+                               FROM [ORDER_LINE] AS OL
+                               JOIN [PRODUCT] AS P ON P.productId = OL.productId
+                               JOIN [ORDER] AS O ON O.orderNumber = OL.orderNumber
+                               WHERE OL.orderNumber = @orderNumber AND ";
+                if (type == ProductType.Drink)
+                {
+                    query += "ProductType = 'Drink'";
+                }
+                else
+                {
+                    query += "ProductType != 'Drink'";
+                }
 
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -175,6 +216,45 @@ namespace shappo0.Repositories
 
             command.Parameters.AddWithValue("@status", status.ToString());
             command.Parameters.AddWithValue("@orderLineId", orderLineId);
+
+            connection.Open();
+            command.ExecuteNonQuery();
+        }
+
+        public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
+        {
+            using SqlConnection connection = new SqlConnection(_connectionString);
+
+            string query =
+            "UPDATE ol " +
+            "SET ol.status = @status " +
+            "FROM ORDER_LINE AS ol " +
+            "INNER JOIN PRODUCT AS p ON p.productId = ol.productId " +
+            "WHERE orderNumber = @orderNumber AND p.productType = @productType";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@status", status.ToString());
+            command.Parameters.AddWithValue("@orderNumber", orderNumber);
+            command.Parameters.AddWithValue("@productType", productType.ToString());
+
+            connection.Open();
+            command.ExecuteNonQuery();
+        }
+
+        public void UpdateOrderStatus(int orderNumber, OrderStatus status)
+        { // updates the whole status order from running to finished
+            using SqlConnection connection = new SqlConnection(_connectionString);
+
+            string query =
+                "UPDATE [ORDER] " +
+                "SET status = @status " +
+                "WHERE orderNumber = @orderNumber";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@status", status.ToString());
+            command.Parameters.AddWithValue("@orderNumber", orderNumber);
 
             connection.Open();
             command.ExecuteNonQuery();
