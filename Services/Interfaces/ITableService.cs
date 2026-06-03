@@ -6,6 +6,7 @@ namespace shappo0.Services
 {
     public interface ITableService
     {
+        bool GetStatusByNumber(int tableNumber);
         List<TableViewModel> GetAllTables();
         TableViewModel GetTableByNumber(int tableNumber);
         void UpdateOrderLineStatus(int orderLineId, OrderStatus status, int orderNumber);
