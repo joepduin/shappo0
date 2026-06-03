@@ -26,6 +26,8 @@ namespace shappo0.Services
                 TableId = tableId,
                 Items = new List<OrderLine>(),
                 TotalAmount = 0,
+                TotalPaid = 0,
+                RemainingAmount = 0,
                 VatLow = 0,
                 VatHigh = 0
             };
@@ -104,6 +106,20 @@ namespace shappo0.Services
             viewModel.VatLow = vatLow;
             viewModel.VatHigh = vatHigh;
 
+            Bill bill = _paymentRepository.GetBillByVisitId(activeVisit.VisitId);
+            if (bill != null)
+            {
+                decimal totalPaid = _paymentRepository.GetTotalPaidForBill(bill.BillId);
+                viewModel.TotalPaid = totalPaid;
+                decimal remaining = total - totalPaid;
+                viewModel.RemainingAmount = remaining < 0 ? 0 : remaining;
+            }
+            else
+            {
+                viewModel.TotalPaid = 0;
+                viewModel.RemainingAmount = total;
+            }
+
             return viewModel;
         }
 
@@ -141,32 +157,45 @@ namespace shappo0.Services
 
             decimal total = subTotal + vatLow + vatHigh;
 
-            Bill bill = new Bill
+            Bill bill = _paymentRepository.GetBillByVisitId(submission.VisitId);
+            int billId;
+
+            if (bill == null)
             {
-                SubTotal = subTotal,
-                Total = total,
-                VatLow = vatLow,
-                VatHigh = vatHigh,
-                IsPaid = true,
-                VisitId = submission.VisitId
-            };
+                Bill newBill = new Bill
+                {
+                    SubTotal = subTotal,
+                    Total = total,
+                    VatLow = vatLow,
+                    VatHigh = vatHigh,
+                    IsPaid = false,
+                    VisitId = submission.VisitId
+                };
 
-            int billId = _paymentRepository.SaveBill(bill);
-
-            decimal finalPaymentAmount;
-            decimal finalTip;
-
-            if (submission.PaymentAmount > 0)
-            {
-                finalPaymentAmount = submission.PaymentAmount;
-                decimal calcTip = submission.PaymentAmount - total;
-                finalTip = calcTip > 0 ? calcTip : 0;
+                billId = _paymentRepository.SaveBill(newBill);
             }
             else
             {
-                finalTip = submission.TipAmount;
-                finalPaymentAmount = total + submission.TipAmount;
+                billId = bill.BillId;
             }
+
+            decimal totalPaid = _paymentRepository.GetTotalPaidForBill(billId);
+            decimal remaining = total - totalPaid;
+
+            decimal expectedAmount;
+            if (submission.IsEqualSplit && submission.SplitCount > 0)
+                expectedAmount = total / submission.SplitCount;
+            else
+                expectedAmount = remaining;
+
+            decimal finalPaymentAmount;
+            if (submission.PaymentAmount > 0)
+                finalPaymentAmount = submission.PaymentAmount;
+            else
+                finalPaymentAmount = expectedAmount + submission.TipAmount;
+
+            decimal calcTip = finalPaymentAmount - expectedAmount;
+            decimal finalTip = calcTip > 0 ? calcTip : 0;
 
             Payment payment = new Payment
             {
@@ -190,7 +219,12 @@ namespace shappo0.Services
                 _paymentRepository.SaveFeedback(feedback);
             }
 
-            _visitRepository.CloseVisit(submission.VisitId);
+            decimal newTotalPaid = totalPaid + finalPaymentAmount;
+            if (newTotalPaid >= total)
+            {
+                _paymentRepository.UpdateBillPaid(billId, true);
+                _visitRepository.CloseVisit(submission.VisitId);
+            }
         }
     }
 }

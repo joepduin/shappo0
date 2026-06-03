@@ -68,5 +68,78 @@ namespace shappo0.Repositories
             }
         }
 
+        public Bill GetBillByVisitId(int visitId)
+        {
+            Bill bill = null;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT billId, subTotal, total, VATLow, VATHigh, isPaid, visitId FROM BILL WHERE visitId = @visitId";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@visitId", visitId);
+
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            bill = new Bill
+                            {
+                                BillId = (int)reader["billId"],
+                                SubTotal = (decimal)reader["subTotal"],
+                                Total = (decimal)reader["total"],
+                                VatLow = (decimal)reader["VATLow"],
+                                VatHigh = (decimal)reader["VATHigh"],
+                                IsPaid = (bool)reader["isPaid"],
+                                VisitId = (int)reader["visitId"]
+                            };
+                        }
+                    }
+                }
+            }
+
+            return bill;
+        }
+
+        public decimal GetTotalPaidForBill(int billId)
+        {
+            decimal totalPaid = 0;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT ISNULL(SUM(paymentAmount), 0) FROM PAYMENT WHERE billId = @billId";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@billId", billId);
+
+                    connection.Open();
+                    object result = command.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        totalPaid = Convert.ToDecimal(result);
+                    }
+                }
+            }
+
+            return totalPaid;
+        }
+
+        public void UpdateBillPaid(int billId, bool isPaid)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE BILL SET isPaid = @isPaid WHERE billId = @billId";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@isPaid", isPaid);
+                    command.Parameters.AddWithValue("@billId", billId);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
     }
 }

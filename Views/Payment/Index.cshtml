@@ -6,6 +6,13 @@
 
 <h2>Afrekenen Tafel @Model.TableId</h2>
 
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        @Html.ValidationSummary()
+    </div>
+}
+
 @if (overview == null || overview.Items == null || overview.Items.Count == 0)
 {
     <div class="alert alert-warning" role="alert">
@@ -40,7 +47,8 @@ else
     <div>
         <p>BTW 9% (Eten/Fris): € @overview.VatLow.ToString("0.00")</p>
         <p>BTW 21% (Eten/Alcohol): € @overview.VatHigh.ToString("0.00")</p>
-        <h3>Te betalen: € @overview.TotalAmount.ToString("0.00")</h3>
+        <h3>Te betalen totaal: € @overview.TotalAmount.ToString("0.00")</h3>
+        <h4>Resterend bedrag: € @overview.RemainingAmount.ToString("0.00")</h4>
     </div>
 
     <hr />
@@ -50,13 +58,25 @@ else
         <input type="hidden" name="VisitId" value="@Model.VisitId" />
 
         <div class="mb-3">
-            <label for="PaymentAmount" class="form-label">Totaal betaald door gasten (€) (optioneel)</label>
-            <input type="number" step="0.01" id="PaymentAmount" name="PaymentAmount" class="form-control" value="0" />
-            <small class="form-text text-muted">Vul dit in als gasten het totaal zelf betalen. Laat 0 om fooi te gebruiken.</small>
+            <label class="form-label">Split type</label>
+            <div>
+                <input type="radio" id="equal" name="IsEqualSplit" value="true" checked /> <label for="equal">Gelijk verdelen</label>
+                <input type="radio" id="different" name="IsEqualSplit" value="false" /> <label for="different">Verschillende bedragen</label>
+            </div>
         </div>
 
         <div class="mb-3">
-            <label for="TipAmount" class="form-label">Fooi (€)</label>
+            <label for="SplitCount" class="form-label">Aantal personen</label>
+            <input type="number" id="SplitCount" name="SplitCount" class="form-control" value="1" min="1" />
+        </div>
+
+        <div class="mb-3">
+            <label for="PaymentAmount" class="form-label">Bedrag van deze betaling (€)</label>
+            <input type="number" step="0.01" id="PaymentAmount" name="PaymentAmount" class="form-control" value="0" />
+        </div>
+
+        <div class="mb-3">
+            <label for="TipAmount" class="form-label">Extra fooi (€)</label>
             <input type="number" step="0.01" id="TipAmount" name="TipAmount" class="form-control" value="0" />
         </div>
 
@@ -83,6 +103,6 @@ else
             <textarea id="FeedbackDescription" name="FeedbackDescription" class="form-control" rows="3"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Afrekenen</button>
+        <button type="submit" class="btn btn-primary">Betaling opslaan</button>
     </form>
 }
