@@ -9,7 +9,7 @@ namespace shappo0.Extensions
             if (orderStatus == OrderStatus.Ordered) return "🧾";
             if (orderStatus == OrderStatus.BeingPrepared) return "👨‍🍳";
             if (orderStatus == OrderStatus.ReadyToBeServed) return "🍽️";
-            else return ""; //ik weet niet welke emoji ik hier moet doen als er geen actieve order is.
+            else return "💤"; //ik weet niet welke emoji ik hier moet doen als er geen actieve order is.
         }
     }
 }

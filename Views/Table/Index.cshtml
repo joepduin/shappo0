@@ -23,10 +23,10 @@
 <h2>Tables</h2>
 
 <div class="tables-grid">
-    @foreach (TableViewModel table in Model)
+    @foreach (TableViewModel tableViewModel in Model)
     {
         string bg;
-        if (table.Status)
+        if (tableViewModel.Table.Status)
         {
             bg = "#d9534f"; //rood
         }
@@ -35,13 +35,13 @@
            bg = "#5cb85c"; //groen
         }
 
-        <a href="Table/Table?tableNumber=@table.TableNumber">
-            <div class="table-square" style="background-color:@bg">
-                Table @table.TableNumber
+        <a href="Table/Table?tableNumber=@tableViewModel.Table.TableNumber" style="text-decoration: none;">
+            <div class="table-square text-dark" style="background-color:@bg;">
+                Table @tableViewModel.Table.TableNumber
                 <div>
-                    Food: @table.FoodStatus.ToEmoji()
+                    Food: @tableViewModel.FoodStatus.ToEmoji()
                     <br />
-                    Drink: @table.DrinkStatus.ToEmoji()
+                    Drink: @tableViewModel.DrinkStatus.ToEmoji()
                 </div>
             </div>
         </a>

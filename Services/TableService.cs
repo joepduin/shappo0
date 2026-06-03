@@ -22,20 +22,24 @@ namespace shappo0.Services
 
         public TableViewModel GetTableByNumber(int tableNumber)
         {
+            TableViewModel tableViewModel = null;
             Table table = _tablesRepository.GetTableByNumber(tableNumber);
-            List<Order> orders = new List<Order>();
-
-            Visit? visit = _visitRepository.GetActiveVisitForTable(tableNumber);
-            if (visit != null)
+            if (table != null)
             {
-                orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
-                foreach (Order order in orders)
+                Visit? visit = _visitRepository.GetActiveVisitForTable(tableNumber);
+                List<Order> orders = new List<Order>();
+                if (visit != null)
                 {
-                    order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
+                    orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
+                    foreach (Order order in orders)
+                    {
+                        order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
+                    }
                 }
+                tableViewModel = new TableViewModel(table, orders);
             }
 
-            return new TableViewModel(table.TableNumber, table.Status, orders);
+            return tableViewModel;
         }
 
         public List<TableViewModel> GetAllTables()
@@ -55,7 +59,7 @@ namespace shappo0.Services
                     else foodLines.Add(orderLine.Status);
                 }
 
-                tablesViewModels.Add(new(table.TableNumber, table.Status, GetStatus(drinkLines), GetStatus(foodLines)));
+                tablesViewModels.Add(new(table, GetStatus(drinkLines), GetStatus(foodLines)));
             }
 
             return tablesViewModels;
@@ -105,9 +109,9 @@ namespace shappo0.Services
             if (allLinesServed) _orderRepository.UpdateOrderStatus(orderNumber, OrderStatus.Served);
         }
 
-        public bool UpdateTableStatus(int tableNumber, bool status)
+        public bool UpdateTableStatus(Table table)
         {
-            Visit? visit = _visitRepository.GetActiveVisitForTable(tableNumber);
+            Visit? visit = _visitRepository.GetActiveVisitForTable(table.TableNumber);
 
             if (visit != null)
             {
@@ -123,14 +127,14 @@ namespace shappo0.Services
                     if (allOrdersServed)
                     {
                         _visitRepository.CloseVisit(visit.VisitId);
-                        _tablesRepository.ChangeTableStatus(tableNumber, status);
+                        _tablesRepository.ChangeTableStatus(table);
                         return true; //het is gelukt
                     }
                 }
             }
             else //dit gebeurd als er geen visit is, dus geen orders of tafel is vrij.
             {
-                _tablesRepository.ChangeTableStatus(tableNumber, status);
+                _tablesRepository.ChangeTableStatus(table);
                 return true;
             }
 
