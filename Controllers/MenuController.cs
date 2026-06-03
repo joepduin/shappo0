@@ -5,6 +5,7 @@ using shappo0.Services;
 
 namespace shappo0.Controllers
 {
+    [Authorize]
     public class MenuController : Controller
     {
         private readonly IMenuService _menuService;
@@ -61,7 +62,7 @@ namespace shappo0.Controllers
 
                 TempData["ConfirmMessage"] = "Product has been succesfully created";
                 return RedirectToAction("Index");
-            }
+            } 
             catch
             {
                 ViewBag.ErrorMessage = @"Exception occured: product could not be added";

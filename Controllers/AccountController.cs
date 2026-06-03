@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace shappo0.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly IAccountService _accountService;
