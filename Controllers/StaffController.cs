@@ -22,13 +22,13 @@ namespace shappo0.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddUser()
+        public IActionResult AddStaff()
         {
             return View();
         }
 
         [HttpPost]
-        public ActionResult AddUser(Staff staff)
+        public ActionResult AddStaff(Staff staff)
         {
             try
             {

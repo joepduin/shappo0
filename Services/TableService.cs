@@ -2,7 +2,6 @@ using shappo0.ViewModels;
 using shappo0.Models;
 using shappo0.Repositories;
 using shappo0.Enums;
-using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
@@ -88,6 +87,54 @@ namespace shappo0.Services
             }
 
             return status;
+        }
+
+        public void UpdateOrderLineStatus(int orderLineId, OrderStatus status, int orderNumber)
+        {
+            _orderLineRepository.UpdateOrderLineStatus(orderLineId, status);
+
+            //dit stukje checkt of de order in zijn geheel served is, als dat zo is gaat de gehele order naar served.
+            List<OrderLine> orderLines = _orderLineRepository.GetOrderLinesByOrderNumber(orderNumber);
+            bool allLinesServed = true;
+
+            foreach (OrderLine orderLine in orderLines)
+            {
+                if (orderLine.Status != OrderStatus.Served) allLinesServed = false;
+            }
+
+            if (allLinesServed) _orderRepository.UpdateOrderStatus(orderNumber, OrderStatus.Served);
+        }
+
+        public bool UpdateTableStatus(int tableNumber, bool status)
+        {
+            Visit? visit = _visitRepository.GetActiveVisitForTable(tableNumber);
+
+            if (visit != null)
+            {
+                List<Order> orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
+                if (orders != null)
+                {
+                    bool allOrdersServed = true;
+                    foreach (Order order in orders)
+                    {
+                        if (order.Status != OrderStatus.Served) allOrdersServed = false; //niet alle orders zijn served
+                    }
+
+                    if (allOrdersServed)
+                    {
+                        _visitRepository.CloseVisit(visit.VisitId);
+                        _tablesRepository.ChangeTableStatus(tableNumber, status);
+                        return true; //het is gelukt
+                    }
+                }
+            }
+            else //dit gebeurd als er geen visit is, dus geen orders of tafel is vrij.
+            {
+                _tablesRepository.ChangeTableStatus(tableNumber, status);
+                return true;
+            }
+
+            return false;
         }
     }
 }

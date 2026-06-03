@@ -21,6 +21,7 @@ namespace shappo0.ViewModels
             Status = status;
             DrinkStatus = drinkStatus;
             FoodStatus = foodStatus;
+            Orders = new List<Order>();
         }
 
         public TableViewModel(int tableNumber, bool status, List<Order> orders)
