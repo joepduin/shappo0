@@ -81,7 +81,7 @@ namespace shappo0.Repositories
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@tableNumber", table.TableNumber);
-                    command.Parameters.AddWithValue("@status", table.TableNumber);
+                    command.Parameters.AddWithValue("@status", table.Status);
                     command.ExecuteNonQuery();
                 }
             }

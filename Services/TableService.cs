@@ -97,7 +97,6 @@ namespace shappo0.Services
         {
             _orderLineRepository.UpdateOrderLineStatus(orderLineId, status);
 
-            //dit stukje checkt of de order in zijn geheel served is, als dat zo is gaat de gehele order naar served.
             List<OrderLine> orderLines = _orderLineRepository.GetOrderLinesByOrderNumber(orderNumber);
             bool allLinesServed = true;
 
@@ -121,18 +120,18 @@ namespace shappo0.Services
                     bool allOrdersServed = true;
                     foreach (Order order in orders)
                     {
-                        if (order.Status != OrderStatus.Served) allOrdersServed = false; //niet alle orders zijn served
+                        if (order.Status != OrderStatus.Served) allOrdersServed = false;
                     }
 
                     if (allOrdersServed)
                     {
                         _visitRepository.CloseVisit(visit.VisitId);
                         _tablesRepository.ChangeTableStatus(table);
-                        return true; //het is gelukt
+                        return true;
                     }
                 }
             }
-            else //dit gebeurd als er geen visit is, dus geen orders of tafel is vrij.
+            else
             {
                 _tablesRepository.ChangeTableStatus(table);
                 return true;
@@ -142,4 +141,3 @@ namespace shappo0.Services
         }
     }
 }
-

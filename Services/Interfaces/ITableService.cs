@@ -1,3 +1,4 @@
+using shappo0.Enums;
 using shappo0.Models;
 using shappo0.ViewModels;
 
@@ -7,7 +8,7 @@ namespace shappo0.Services
     {
         List<TableViewModel> GetAllTables();
         TableViewModel GetTableByNumber(int tableNumber);
-        void UpdateOrderLineStatus(Order order);
+        void UpdateOrderLineStatus(int orderLineId, OrderStatus status, int orderNumber);
         bool UpdateTableStatus(Table table);
     }
 }

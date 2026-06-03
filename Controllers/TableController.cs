@@ -35,10 +35,10 @@ namespace shappo0.Controllers
 
         [Authorize]
         [HttpGet]
-        public IActionResult UpdateOrderLineStatus(Order order)
+        public IActionResult UpdateOrderLineStatus(int orderLineId, int tableNumber, int orderNumber)
         {
-            _tableService.UpdateOrderLineStatus(order);
-            return RedirectToAction("Table", "Table", new {tableNumber = order.OrderNumber});
+            _tableService.UpdateOrderLineStatus(orderLineId, OrderStatus.Served, orderNumber);
+            return RedirectToAction("Table", "Table", new { tableNumber = tableNumber });
         }
 
         [Authorize]
@@ -47,11 +47,11 @@ namespace shappo0.Controllers
         {
             if (_tableService.UpdateTableStatus(table))
             {
-                TempData["ConfirmMessage"] = $"Tafel is succesvol gewijzigd.";
+                TempData["ConfirmMessage"] = "Tafel is succesvol gewijzigd.";
                 return RedirectToAction("Index", "Table");
             }
 
-            TempData["ErrorMessage"] = $"Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
+            TempData["ErrorMessage"] = "Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
             return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
         }
     }
