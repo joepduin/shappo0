@@ -39,9 +39,9 @@ namespace shappo0.Repositories
             return products;
         }
 
-        public Product GetByProductId(int productId)
+        public Product? GetByProductId(int productId)
         {
-            Product product = null;
+            Product? product = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {

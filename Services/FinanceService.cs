@@ -14,13 +14,13 @@ namespace shappo0.Services
         }
 
         // Uses a helper method to prevent code duplication
-        public List<Finance> GetIncomeByDate(DateRange range, string? quickFilter)
+        public List<Finance> GetIncomeByDate(DateRange? range, string? quickFilter)
         {
             DateRange calculatedRange = CalculateRange(range, quickFilter);
             return _financeRepository.GetIncomeByDate(calculatedRange);
         }
 
-        public decimal GetTipsByDate(DateRange range, string? quickFilter)
+        public decimal GetTipsByDate(DateRange? range, string? quickFilter)
         {
             DateRange calculatedRange = CalculateRange(range, quickFilter);
             return _financeRepository.GetTipsByDate(calculatedRange);
