@@ -7,7 +7,7 @@ namespace shappo0.Models
     {
         public int OrderNumber { get; set; }
         public DateTime TimeCreated { get; set; }
-        public int WaitingTimeMinutes { get
+        public int WaitingTimeMinutes { get 
             {
                 TimeSpan span = DateTime.Now.Subtract(TimeCreated);
                 int waitingTime = (int)span.TotalMinutes;
