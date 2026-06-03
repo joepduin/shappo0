@@ -5,9 +5,11 @@ namespace shappo0.Services.Interfaces
 {
     public interface IFinanceService
     {
-        List<Finance> GetIncomeByDate(DateTime startDate, DateTime endDate);
-        
-        decimal GetTipsByDate(DateTime startDate, DateTime endDate);
+        List<Finance> GetIncomeByDate(DateTime? startDate, DateTime? endDate, string? quickFilter);
+
+
+        decimal GetTipsByDate(DateTime? startDate, DateTime? endDate, string? quickFilter);
+        DateRange CalculateRange(DateTime? startDate, DateTime? endDate, string? quickFilter);
 
     }
 }
