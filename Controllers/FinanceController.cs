@@ -19,25 +19,24 @@ namespace shappo0.Controllers
         public IActionResult Index()
         {
             // Sends null values to the helper method in order to activate the default date range (30 days) in the service
-            return ProcessFinanceView(null, null, null);
+            return ProcessFinanceView(null, null);
         }
 
         [HttpPost]
-        public IActionResult Index(DateTime? startDate, DateTime? endDate, string quickFilter)
+        public IActionResult Index(DateRange? range, string quickFilter)
         {
             // Sends along the user-selected values to the helper method
-            return ProcessFinanceView(startDate, endDate, quickFilter);
+            return ProcessFinanceView(range, quickFilter);
         }
 
         // Helper method for the GET and POST methods to prevent double code
-        private IActionResult ProcessFinanceView(DateTime? start, DateTime? end, string filter)
+        private IActionResult ProcessFinanceView(DateRange? range, string filter)
         {
             // Retrieves the income data and total tips based on the provided date range and quick filter
-            List<Finance> incomeData = _financeService.GetIncomeByDate(start, end, filter);
-            decimal totalTips = _financeService.GetTipsByDate(start, end, filter);
-
+            List<Finance> incomeData = _financeService.GetIncomeByDate(range, filter);
+            decimal totalTips = _financeService.GetTipsByDate(range, filter);
             // Retrievves the selected range so it can be used in the view
-            DateRange resolvedRange = _financeService.CalculateRange(start, end, filter);
+            DateRange resolvedRange = _financeService.CalculateRange(range, filter);
 
             // Adds the start date, end date, and total tips to the ViewBag so they can be displayed in the view
             ViewBag.StartDate = resolvedRange.Start.ToString("yyyy-MM-dd");
