@@ -15,5 +15,7 @@ namespace shappo0.Services
         void UpdateOrderLineStatus(int orderLineId, OrderStatus status);
 
         List<Kitchen> FinishedOrders();
+
+        void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status);
     }
 }

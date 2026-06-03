@@ -41,6 +41,28 @@
                 <tr class="table-primary">
                     <td colspan="8">
                         <strong>@currentType</strong>
+                    
+                    <form asp-action="UpdateCourseStatus" method="post" style="display:inline">
+                        <input type="hidden" name="orderNumber" value="@line.Order.OrderNumber" />
+                        <input type="hidden" name="productType" value="@currentType" />
+
+                        <select name="status" onchange="this.form.submit()">
+
+                            <option value="Ordered"
+                                    selected="@(line.Status == OrderStatus.Ordered)">
+                                Ordered
+                            </option>
+
+                            <option value="BeingPrepared"
+                                    selected="@(line.Status == OrderStatus.BeingPrepared)">
+                                Being Prepared
+                            </option>
+
+                            <option value="ReadyToBeServed"
+                                    selected="@(line.Status == OrderStatus.ReadyToBeServed)">
+                                Ready To Be Served
+                            </option>
+                    </form>
                     </td>
                 </tr>
             }

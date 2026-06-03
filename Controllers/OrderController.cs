@@ -10,12 +10,12 @@ using System.Security.Claims;
 
 namespace shappo0.Controllers
 {
-    [Authorize (Roles="Waiter, Manager")]
+    [Authorize(Roles = "Waiter, Manager")]
     public class OrderController : Controller
     {
         private readonly IMenuService _menuService;
         private readonly IOrderService _orderService;
-        
+
         public OrderController(IMenuService menuService, IOrderService orderService)
         {
             _menuService = menuService;
@@ -36,7 +36,7 @@ namespace shappo0.Controllers
                 TempData["Error"] = "Please select a table first.";
                 return RedirectToAction("Index", "Table");
             }
-            
+
             TakeOrderViewModel model = new(tableNumber);
 
             List<Product> products = _menuService.GetFilteredProducts(productType, menuType, "true");
@@ -67,7 +67,7 @@ namespace shappo0.Controllers
 
             HttpContext.Session.SetObject(cartId, cart);
 
-            return RedirectToAction("TakeOrder", new {tableNumber = tableNumber, productType = productType, menuType = menuType });
+            return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, productType = productType, menuType = menuType });
         }
 
         public IActionResult IncreaseQuantity(int tableNumber, int productId, string? productType, string? menuType)
@@ -96,7 +96,7 @@ namespace shappo0.Controllers
             string cartId = GetCartKey(tableNumber);
             List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
-            if(cart != null)
+            if (cart != null)
             {
                 _orderService.DecreaseQuantity(cart, productId);
                 HttpContext.Session.SetObject(cartId, cart);
@@ -113,7 +113,7 @@ namespace shappo0.Controllers
             return RedirectToAction("Index", "Table");
         }
 
-        public IActionResult RemoveLine(int tableNumber, int productId, string? productType, string? menuType) 
+        public IActionResult RemoveLine(int tableNumber, int productId, string? productType, string? menuType)
         {
             string cartId = GetCartKey(tableNumber);
             List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
@@ -139,7 +139,7 @@ namespace shappo0.Controllers
                 HttpContext.Session.SetObject(cartId, cart);
             }
 
-            return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, menuType = menuType,  productType = productType});
+            return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, menuType = menuType, productType = productType });
         }
 
         public IActionResult SaveOrder(int tableNumber)

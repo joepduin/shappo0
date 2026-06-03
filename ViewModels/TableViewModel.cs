@@ -1,5 +1,6 @@
 using shappo0.Enums;
 using shappo0.Models;
+using System.Collections.Generic;
 
 namespace shappo0.ViewModels
 {
@@ -27,7 +28,7 @@ namespace shappo0.ViewModels
         {
             TableNumber = tableNumber;
             Status = status;
-            Orders = orders;
+            Orders = orders ?? new List<Order>();
         }
     }
 }
