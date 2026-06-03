@@ -1,4 +1,4 @@
-﻿@model List<shappo0.Models.Bar>
+﻿@model shappo0.ViewModels.KitchenBarViewModel
 @using shappo0.Enums;
 @{
 	ViewData["Title"] = "Bar";
@@ -25,7 +25,7 @@
 	</thead>
 	<tbody>
 		@{
-			foreach (Bar bar in Model)
+			foreach (Bar bar in Model.Bar)
 			{
 				var rowStyle = "";
 
@@ -56,9 +56,13 @@
 										selected="@(bar.Status == OrderStatus.Ordered)">
 									Ordered
 								</option>
-								<option value="Served"
-										selected="@(bar.Status == OrderStatus.Served)">
-									Served
+								<option value="BeingPrepared"
+										selected="@(bar.Status == OrderStatus.BeingPrepared)">
+									Being Prepared
+								</option>
+								<option value="ReadyToBeserved"
+										selected="@(bar.Status == OrderStatus.ReadyToBeServed)">
+									Ready to be Served
 								</option>
 							</select>
 						</form>

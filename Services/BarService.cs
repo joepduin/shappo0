@@ -38,6 +38,7 @@ namespace shappo0.Services
         public void UpdateOrderLineStatus(int orderNumber, OrderStatus status)
         {
             _barRepository.UpdateOrderLineStatus(orderNumber, status);
+
         }
 
         public List<Bar> FinishedOrders()
