@@ -43,5 +43,11 @@ namespace shappo0.Services
         {
             return _kitchenRepository.FinishedOrders();
         }
+
+        public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
+        {
+            _kitchenRepository.UpdateCourseStatus(orderNumber, productType, status);
+        }
+
     }
 }

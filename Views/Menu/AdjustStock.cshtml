@@ -62,13 +62,11 @@
 				<tr>
 					<td>
 						@Model[i].ProductId
-						<!-- Hidden field ensures the ID travels back with the form -->
 						<input type="hidden" name="[@i].ProductId" value="@Model[i].ProductId" />
 					</td>
 					<td>@Model[i].Name</td>
 					<td>@Model[i].Stock</td>
 					<td>
-						<!-- Native browser number field -->
 						<input type="number" name="[@i].Stock" class="form-control" value="@Model[i].Stock" min="0" required />
 					</td>
 				</tr>
