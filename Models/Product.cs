@@ -18,7 +18,6 @@ namespace shappo0.Models
             {
                 return Price + (Price * (VATPercentage / 100));
             }
-            set { }
         }
 
         public Product()
