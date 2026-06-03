@@ -6,6 +6,6 @@ namespace shappo0.Repositories
     {
         List<Table> GetAllTables();
         Table GetTableByNumber(int tableNumber);
-        void ChangeTableStatus(int tableNumber, bool status);
+        void ChangeTableStatus(Table table);
     }
 }

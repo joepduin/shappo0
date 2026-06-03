@@ -7,61 +7,76 @@
 @{
     ViewData["Title"] = "Table Status";
     <partial name="_ErrorMessage" />
+    <partial name="_SuccessMessage" />
 }
 
-<h2>Table @Model.TableNumber</h2>
-
-<form action="/Table/UpdateTableStatus" method="POST">
-    <input type="hidden" name="tableNumber" value="@Model.TableNumber" />
-    <div class="mb-4">
-        <input type="radio" class="btn-check" name="status" id="false" value="false" @(!Model.Status ? "checked" : "")>
-        <label class="btn btn-outline-success" for="false">Vrij</label>
-        <input type="radio" class="btn-check" name="status" id="true" value="true" @(Model.Status ? "checked" : "")>
-        <label class="btn btn-outline-danger" for="true">Bezet</label>
-        <button type="submit" class="btn btn-primary">Save changes</button>
-    </div>
-</form>
-
-@if (Model.Orders.Count > 0)
+@if (Model == null)
 {
-    @foreach(Order order in Model.Orders)
+    <div class="alert alert-danger">Tafel bestaat niet.</div>
+}
+else
+{
+    <h2>Table @Model.Table.TableNumber</h2>
+
+    <form action="/Table/UpdateTableStatus" method="POST">
+        <input type="hidden" name="TableNumber" value="@Model.Table.TableNumber" />
+        <div class="mb-4">
+            <input type="radio" class="btn-check" name="Status" id="false" value="false" @(!Model.Table.Status ? "checked" : "")>
+            <label class="btn btn-outline-success" for="false">Vrij</label>
+            <input type="radio" class="btn-check" name="Status" id="true" value="true" @(Model.Table.Status ? "checked" : "")>
+            <label class="btn btn-outline-danger" for="true">Bezet</label>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+
+            @if (Model.Table.Status == true)
+            {
+                <a href="/Order/TakeOrder?tableNumber=@Model.Table.TableNumber">Take order</a>
+                <a href="/Payment/Index?tableId=@Model.Table.TableNumber">Make payment</a>
+            }
+
+        </div>
+    </form>
+
+    @if (Model.Orders.Count > 0)
     {
-        <h3>Order: @order.OrderNumber, Status: @order.Status</h3>
+        @foreach (Order order in Model.Orders)
+        {
+            <h3>Order: @order.OrderNumber, Status: @order.Status</h3>
 
-        <table class="table table-sm" style="table-layout: fixed;">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Aantal</th>
-                    <th>Opmerking</th>
-                    <th>Item status</th>
-                    <th>Verander status</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach (OrderLine orderLine in order.OrderLines)
-                {
+            <table class="table table-sm" style="table-layout: fixed;">
+                <thead>
                     <tr>
-                        <td>@orderLine.Product.Name</td>
-                        <td>@orderLine.Quantity</td>
-                        <td>@orderLine.Note</td>
-                        <td>@orderLine.Status</td>
-                        <td>
-                            @if (orderLine.Status == OrderStatus.ReadyToBeServed)
-                            {
-                                <a href="/Table/UpdateOrderLineStatus?orderLineId=@orderLine.OrderLineId&tableNumber=@Model.TableNumber&orderNumber=@order.OrderNumber">
-                                    Zet als Served
-                                </a>
-                            }
-                        </td>
+                        <th>Product</th>
+                        <th>Aantal</th>
+                        <th>Opmerking</th>
+                        <th>Item status</th>
+                        <th>Verander status</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    @foreach (OrderLine orderLine in order.OrderLines)
+                    {
+                        <tr>
+                            <td>@orderLine.Product.Name</td>
+                            <td>@orderLine.Quantity</td>
+                            <td>@orderLine.Note</td>
+                            <td>@orderLine.Status</td>
+                            <td>
+                                @if (orderLine.Status == OrderStatus.ReadyToBeServed)
+                                {
+                                    <a href="/Table/UpdateOrderLineStatus?orderLineId=@orderLine.OrderLineId&tableNumber=@Model.Table.TableNumber&orderNumber=@order.OrderNumber">
+                                        Zet als Served
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     }
-}
-else 
-{
-    <div class="alert alert-danger">Geen orders voor deze tafel.</div>
+    else
+    {
+        <div class="alert alert-info">Geen orders voor deze tafel.</div>
+    }
 }
