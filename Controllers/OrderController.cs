@@ -31,9 +31,9 @@ namespace shappo0.Controllers
         [Authorize]
         public IActionResult TakeOrder(int tableNumber, string? productType, string? menuType)
         {
-            if (tableNumber <= 0)
+            if (tableNumber <= 0 || tableNumber > 10)
             {
-                TempData["Error"] = "Please select a table first.";
+                TempData["Error"] = "Please select an existing table.";
                 return RedirectToAction("Index", "Table");
             }
 
