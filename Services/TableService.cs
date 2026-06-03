@@ -2,7 +2,6 @@ using shappo0.ViewModels;
 using shappo0.Models;
 using shappo0.Repositories;
 using shappo0.Enums;
-using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
