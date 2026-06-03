@@ -6,13 +6,13 @@ namespace shappo0.Repositories
 {
     public class DbFinanceRepository : IFinanceRepository
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
         public DbFinanceRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        public List<Finance> GetIncomeByDate(DateTime startDate, DateTime endDate)
+        public List<Finance> GetIncomeByDate(DateRange? range)
         {
             List<Finance> finances = new List<Finance>();
 
@@ -29,8 +29,8 @@ namespace shappo0.Repositories
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@StartDate", startDate);
-                    command.Parameters.AddWithValue("@EndDate", endDate);
+                    command.Parameters.AddWithValue("@StartDate", range?.Start);
+                    command.Parameters.AddWithValue("@EndDate", range?.End);
 
                     connection.Open();
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -48,7 +48,7 @@ namespace shappo0.Repositories
         }
 
 
-        public decimal GetTipsByDate(DateTime startDate, DateTime endDate)
+        public decimal GetTipsByDate(DateRange? range)
         {
             decimal totalTips = 0;
 
@@ -63,8 +63,8 @@ namespace shappo0.Repositories
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@StartDate", startDate);
-                    command.Parameters.AddWithValue("@EndDate", endDate);
+                    command.Parameters.AddWithValue("@StartDate", range?.Start);
+                    command.Parameters.AddWithValue("@EndDate", range?.End);
 
                     connection.Open();
                     totalTips = (decimal)command.ExecuteScalar();

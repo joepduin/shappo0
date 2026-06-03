@@ -1,4 +1,4 @@
-﻿@model List<shappo0.Models.Bar>
+﻿@model List<shappo0.Models.Order>
 @using shappo0.Enums;
 @{
 	ViewData["Title"] = "Bar";
@@ -25,22 +25,22 @@
 	</thead>
 	<tbody>
 		@{
-			foreach (Bar bar in Model)
+			foreach (Order order in Model)
 			{
 				var rowStyle = "";
 
 				<tr @rowStyle>
-					<td>@bar.OrderNumber</td>
-					<td>@bar.TableNumber</td>
-					<td>@bar.Status</td>
-					<td>@bar.TimeCreated</td>
-					<td>@bar.WaitingTime</td>
+					<td>@order.OrderNumber</td>
+					<td>@order.Visit.Table.TableNumber</td>
+					<td>@order.Status</td>
+					<td>@order.TimeCreated</td>
+					<td>@order.WaitingTimeMinutes</td>
 					<td>
 						<!-- button to see the orderlines-->
 						<a asp-controller="Bar"
 						   asp-action="ViewOrder"
 						   asp-route-id="" class="btn btn-outline-dark"
-						   asp-route-orderNumber="@bar.OrderNumber">
+						   asp-route-orderNumber="@order.OrderNumber">
 							View Order
 						</a>
 
@@ -49,16 +49,16 @@
 					<td>
 						<!-- dropwdown to change the order status to finished-->
 						<form asp-action="UpdateOrderStatus" method="post">
-							<input type="hidden" name="orderNumber" value="@bar.OrderNumber" />
+							<input type="hidden" name="orderNumber" value="@order.OrderNumber" />
 
 							<select name="status" onchange="this.form.submit()">
 								<option value="Ordered"
-										selected="@(bar.Status == OrderStatus.Ordered)">
+										selected="@(order.Status == OrderStatus.Ordered)">
 									Ordered
 								</option>
-								<option value="Served"
-										selected="@(bar.Status == OrderStatus.Served)">
-									Served
+								<option value="ReadyToBeServed"
+										selected="@(order.Status == OrderStatus.ReadyToBeServed)">
+									ReadyToBeServed
 								</option>
 							</select>
 						</form>

@@ -1,3 +1,4 @@
+using shappo0.Enums;
 using shappo0.Models;
 
 namespace shappo0.Repositories
@@ -8,9 +9,13 @@ namespace shappo0.Repositories
 
         public List<Order> GetAllOrders();
 
-        public List<Order> GetRunningOrders();
+        public List<Order> GetRunningOrders(OrderStatus status);
+
+        public List<Order> GetRunningOrdersByType(ProductType type);
 
         public int CreateOrder(Order order);
+
+        public void UpdateOrderStatus(int orderNumber, OrderStatus status);
     }
 
 }

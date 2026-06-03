@@ -1,6 +1,7 @@
 ﻿using shappo0.Enums;
+using shappo0.Models;
 
-namespace shappo0.Models
+namespace shappo0.Discard
 {
     public class Kitchen
     {
@@ -9,7 +10,16 @@ namespace shappo0.Models
         public int TableNumber { get; set; }
         public OrderStatus Status { get; set; } 
         public DateTime TimeCreated { get; set; }
-        public int WaitingTime { get; set; }
+        public int WaitingTime
+        {
+            get
+            {
+                TimeSpan span = DateTime.Now.Subtract(TimeCreated);
+                int waitingTime = (int)span.TotalMinutes;
+                return waitingTime;
+            }
+            set { }
+        }
         public List<OrderLine> OrderLines { get; set; }
 
 

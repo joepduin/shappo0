@@ -68,6 +68,24 @@ namespace shappo0.Repositories
             return table;
         }
 
+        public void ChangeTableStatus(Table table)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                string query = @"UPDATE [TABLE]
+                                 SET status = @status
+                                 WHERE tableNumber = @tableNumber";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@tableNumber", table.TableNumber);
+                    command.Parameters.AddWithValue("@status", table.Status);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
 
         private Table ReadTable(SqlDataReader reader)
         {

@@ -15,35 +15,11 @@ namespace shappo0.Repositories
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        // Method for getting a staff member by id, rather than by login credentials
-        public Staff GetStaff(int? id)
-        {
-            Staff staff = null;
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                string query = @"SELECT staffId, [name], phoneNumber, sex, [role], [password], isEmployed
-                                 FROM Staff
-                                 WHERE staffId = @StaffId";
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@StaffId", id);
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            staff = ReadStaff(reader);
-                        }
-                    }
-                }
-                return staff;
-            }
-        }
-
+        // Joep
         //checkt of een stafflid bestaat, retourneert de staff bij true en false een lege staff
-        public Staff GetStaffByCredentials(LoginModel loginModel)
+        public Staff? GetStaffByCredentials(LoginModel loginModel)
         {
-            Staff staff = null;
+            Staff? staff = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -68,6 +44,32 @@ namespace shappo0.Repositories
                 }
             }
             return staff;
+        }
+
+        // Ylvi
+        // Method for getting a staff member by id, rather than by login credentials
+        public Staff? GetStaff(int? id)
+        {
+            Staff? staff = null;
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                string query = @"SELECT staffId, [name], phoneNumber, sex, [role], [password], isEmployed
+                                 FROM Staff
+                                 WHERE staffId = @StaffId";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@StaffId", id);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            staff = ReadStaff(reader);
+                        }
+                    }
+                }
+                return staff;
+            }
         }
 
         public List<Staff> GetAllStaff()
@@ -143,6 +145,7 @@ namespace shappo0.Repositories
             }
         }
 
+        // Joep
         // Leest een Staff object uit een SqlDataReader
         private Staff ReadStaff(SqlDataReader reader)
         {

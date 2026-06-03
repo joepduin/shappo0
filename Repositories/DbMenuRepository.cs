@@ -2,6 +2,7 @@
 using shappo0.Enums;
 using shappo0.Models;
 using Microsoft.Data.SqlClient;
+using shappo0.ViewModels;
 
 namespace shappo0.Repositories
 {
@@ -38,9 +39,9 @@ namespace shappo0.Repositories
             return products;
         }
 
-        public Product GetByProductId(int productId)
+        public Product? GetByProductId(int? productId)
         {
-            Product product = null;
+            Product? product = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -61,7 +62,7 @@ namespace shappo0.Repositories
             return product;
         }
 
-        public List<Product> GetFilteredProducts(string? productType, string? menuType, string? onMenu)
+        public List<Product> GetFilteredProducts(FilterItemsViewModel? filters)
         {
             string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu " +
                 "FROM product";
@@ -69,18 +70,18 @@ namespace shappo0.Repositories
             List<string> conditions = new List<string>();
 
 
-            if (!string.IsNullOrEmpty(productType)) 
+            if (!string.IsNullOrEmpty(filters?.ProductType)) 
             {
                 conditions.Add("productType = @productType");
             }
 
             //Add the menutype to the query BUT if the productType is set to 'Drink' then it doesn't matter what the menuType is
-            if (!string.IsNullOrEmpty(menuType))
+            if (!string.IsNullOrEmpty(filters?.MenuType))
             {
                 conditions.Add("(menuType = @menuType OR productType = 'Drink')");
             }
 
-            if (!string.IsNullOrEmpty(onMenu))
+            if (!string.IsNullOrEmpty(filters?.OnMenu))
             {
                 conditions.Add("onMenu = @onMenu");
             }
@@ -104,14 +105,14 @@ namespace shappo0.Repositories
                     //hierdoor werkte de filter methode niet meer
                     //!!!!!!!!!!!!!
 
-                    if (!string.IsNullOrEmpty(productType))
-                        command.Parameters.AddWithValue("@productType", productType);
-                    if (!string.IsNullOrEmpty(menuType))
-                        command.Parameters.AddWithValue("@menuType", menuType);
+                    if (!string.IsNullOrEmpty(filters?.ProductType))
+                        command.Parameters.AddWithValue("@productType", filters?.ProductType);
+                    if (!string.IsNullOrEmpty(filters?.MenuType))
+                        command.Parameters.AddWithValue("@menuType", filters?.MenuType);
                     // Since onMenu is a boolean, we need to convert the string value to a boolean before adding it as a parameter
-                    if (!string.IsNullOrEmpty(onMenu))
+                    if (!string.IsNullOrEmpty(filters?.OnMenu))
                     {
-                        bool isOnMenu = onMenu.ToLower() == "true";
+                        bool isOnMenu = filters?.OnMenu.ToLower() == "true";
                         command.Parameters.AddWithValue("@onMenu", isOnMenu);
                     }
 

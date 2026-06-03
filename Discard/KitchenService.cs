@@ -1,8 +1,7 @@
 ﻿using shappo0.Models;
-using shappo0.Repositories;
 using shappo0.Enums;
 
-namespace shappo0.Services
+namespace shappo0.Discard
 {
     public class KitchenService : IKitchenService
     {
@@ -43,5 +42,11 @@ namespace shappo0.Services
         {
             return _kitchenRepository.FinishedOrders();
         }
+
+        public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
+        {
+            _kitchenRepository.UpdateCourseStatus(orderNumber, productType, status);
+        }
+
     }
 }

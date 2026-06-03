@@ -1,12 +1,12 @@
 using shappo0.Models;
 using shappo0.Enums;
 
-namespace shappo0.Services
+namespace shappo0.Discard
 {
-    public interface IKitchenService 
+    public interface IKitchenRepository
     {
         List<Kitchen> GetAll();
-        Kitchen? GetById(int OrderNumber);
+        Kitchen? GetById(int orderNumber);
 
         public List<OrderLine> GetOrderLines(int orderNumber);
 
@@ -15,5 +15,10 @@ namespace shappo0.Services
         void UpdateOrderLineStatus(int orderLineId, OrderStatus status);
 
         List<Kitchen> FinishedOrders();
+
+        void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status);
+
+
+
     }
 }
