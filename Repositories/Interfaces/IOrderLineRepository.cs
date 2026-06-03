@@ -1,3 +1,4 @@
+using shappo0.Enums;
 using shappo0.Models;
 
 namespace shappo0.Repositories
@@ -12,5 +13,6 @@ namespace shappo0.Repositories
         public void CreateOrderLine(OrderLine orderLine);
 
         public void CreateOrderLines(List<OrderLine> orderLines);
+        public void UpdateOrderLineStatus(int orderLineId, OrderStatus status);
     }
 }

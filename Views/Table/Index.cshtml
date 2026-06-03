@@ -1,7 +1,11 @@
-﻿@model IEnumerable<shappo0.Models.Table>
-@using System.Linq
+﻿@using System.Linq
+@using shappo0.Enums
+@using shappo0.ViewModels
+@using shappo0.Extensions
+@model IEnumerable<TableViewModel>
 @{
     ViewData["Title"] = "Tables";
+    <partial name="_SuccessMessage" />
 }
 
 <style>
@@ -19,7 +23,7 @@
 <h2>Tables</h2>
 
 <div class="tables-grid">
-    @foreach (Table table in Model)
+    @foreach (TableViewModel table in Model)
     {
         string bg;
         if (table.Status)
@@ -30,9 +34,16 @@
         {
            bg = "#5cb85c"; //groen
         }
-        
-        <div class="table-square" style="background-color:@bg">
-            Table @table.TableNumber
-        </div>
+
+        <a href="Table/Table?tableNumber=@table.TableNumber">
+            <div class="table-square" style="background-color:@bg">
+                Table @table.TableNumber
+                <div>
+                    Food: @table.FoodStatus.ToEmoji()
+                    <br />
+                    Drink: @table.DrinkStatus.ToEmoji()
+                </div>
+            </div>
+        </a>
     }
 </div>

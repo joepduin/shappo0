@@ -161,5 +161,23 @@ namespace shappo0.Repositories
                 }
             }
         }
+
+        public void UpdateOrderLineStatus(int orderLineId, OrderStatus status)
+        {
+            using SqlConnection connection = new SqlConnection(_connectionString);
+
+            string query =
+                "UPDATE [ORDER_LINE] " +
+                "SET status = @status " +
+                "WHERE orderLineId = @orderLineId";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@status", status.ToString());
+            command.Parameters.AddWithValue("@orderLineId", orderLineId);
+
+            connection.Open();
+            command.ExecuteNonQuery();
+        }
     }
 }

@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using shappo0.Models;
+using shappo0.ViewModels;
 using shappo0.Services;
+using shappo0.Enums;
 
 namespace shappo0.Controllers
 {
@@ -19,8 +20,38 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            List<Table> tables = _tableService.GetAllTables();
-            return View(tables);
+            List<TableViewModel> tablesViewModels = _tableService.GetAllTables();
+            return View(tablesViewModels);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult Table(int tableNumber)
+        {
+            TableViewModel table = _tableService.GetTableByNumber(tableNumber);
+            return View(table);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult UpdateOrderLineStatus(int orderLineId, int tableNumber, int orderNumber)
+        {
+            _tableService.UpdateOrderLineStatus(orderLineId, OrderStatus.Served, orderNumber);
+            return RedirectToAction("Table", "Table", new {tableNumber = tableNumber});
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult UpdateTableStatus(int tableNumber, bool status)
+        {
+            if (_tableService.UpdateTableStatus(tableNumber, status))
+            {
+                TempData["ConfirmMessage"] = $"Tafel is succesvol gewijzigd.";
+                return RedirectToAction("Index", "Table");
+            }
+
+            TempData["ErrorMessage"] = $"Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
+            return RedirectToAction("Table", "Table", new { tableNumber = tableNumber });
         }
     }
 }

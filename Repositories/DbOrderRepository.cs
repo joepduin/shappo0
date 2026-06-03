@@ -176,5 +176,23 @@ namespace shappo0.Repositories
                 return order.OrderNumber;
             }
         }
+
+        public void UpdateOrderStatus(int orderNumber, OrderStatus status)
+        {
+            using SqlConnection connection = new SqlConnection(_connectionString);
+
+            string query =
+                "UPDATE [ORDER] " +
+                "SET status = @status " +
+                "WHERE orderNumber = @orderNumber";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@status", status.ToString());
+            command.Parameters.AddWithValue("@orderNumber", orderNumber);
+
+            connection.Open();
+            command.ExecuteNonQuery();
+        }
     }
 }
