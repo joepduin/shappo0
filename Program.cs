@@ -17,6 +17,8 @@ namespace shappo0
             builder.Services.AddSingleton<IOrderLineRepository, DbOrderLineRepository>();
             builder.Services.AddSingleton<IVisitRepository, DbVisitRepository>();
             builder.Services.AddSingleton<IPaymentService, PaymentService>();
+            builder.Services.AddSingleton<IBillRepository, DbBillRepository>();
+            builder.Services.AddSingleton<IFeedbackRepository, DbFeedbackRepository>();
             builder.Services.AddSingleton<IPaymentRepository, DbPaymentRepository>();
             builder.Services.AddSingleton<IStaffRepository, DbStaffRepository>();
             builder.Services.AddSingleton<ITablesRepository, DbTablesRepository>();

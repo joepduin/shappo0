@@ -4,19 +4,14 @@
     var overview = ViewBag.PaymentOverview as shappo0.ViewModels.PaymentViewModel;
 }
 
-<h2>Afrekenen Tafel @Model.TableId</h2>
+<h2>Afrekenen Tafel @Model.TableNumber</h2>
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-danger" role="alert">
-        @Html.ValidationSummary()
-    </div>
-}
+<partial name="_ErrorMessage" />
 
 @if (overview == null || overview.Items == null || overview.Items.Count == 0)
 {
     <div class="alert alert-warning" role="alert">
-        Er is geen openstaande bestelling gevonden voor deze tafel. Zorg dat er producten zijn toegevoegd aan deze tafel.
+        No open orders found for this table. Please ensure products have been added.
     </div>
 }
 else
@@ -54,7 +49,7 @@ else
     <hr />
 
     <form method="post" asp-action="ProcessPayment">
-        <input type="hidden" name="TableId" value="@Model.TableId" />
+        <input type="hidden" name="TableNumber" value="@Model.TableNumber" />
         <input type="hidden" name="VisitId" value="@Model.VisitId" />
 
         <div class="mb-3">
@@ -76,7 +71,7 @@ else
         </div>
 
         <div class="mb-3">
-            <label for="TipAmount" class="form-label">Extra fooi (€)</label>
+            <label for="TipAmount" class="form-label">Fooi (extra) (€)</label>
             <input type="number" step="0.01" id="TipAmount" name="TipAmount" class="form-control" value="0" />
         </div>
 
@@ -93,8 +88,8 @@ else
             <label class="form-label">Feedback type</label>
             <select name="FeedbackType" class="form-select">
                 <option value="@FeedbackCategory.Compliment">Compliment</option>
-                <option value="@FeedbackCategory.Klacht">Klacht</option>
-                <option value="@FeedbackCategory.Opmerking">Opmerking</option>
+                <option value="@FeedbackCategory.Klacht">Complaint</option>
+                <option value="@FeedbackCategory.Opmerking">Comment</option>
             </select>
         </div>
 
@@ -103,6 +98,6 @@ else
             <textarea id="FeedbackDescription" name="FeedbackDescription" class="form-control" rows="3"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Betaling opslaan</button>
+        <button type="submit" class="btn btn-primary">Pay the Bill</button>
     </form>
 }

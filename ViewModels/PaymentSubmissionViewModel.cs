@@ -4,7 +4,7 @@ namespace shappo0.ViewModels
 {
     public class PaymentSubmissionViewModel
     {
-        public int TableId { get; set; }
+        public int TableNumber { get; set; }
         public int VisitId { get; set; }
         public bool IsEqualSplit { get; set; }
         public int SplitCount { get; set; }
@@ -18,9 +18,9 @@ namespace shappo0.ViewModels
         {
         }
 
-        public PaymentSubmissionViewModel(int tableId, int visitId, bool isEqualSplit, int splitCount, decimal tipAmount, decimal paymentAmount, PaymentMethodType paymentMethod, FeedbackCategory feedbackType, string feedbackDescription)
+        public PaymentSubmissionViewModel(int tableNumber, int visitId, bool isEqualSplit, int splitCount, decimal tipAmount, decimal paymentAmount, PaymentMethodType paymentMethod, FeedbackCategory feedbackType, string feedbackDescription)
         {
-            TableId = tableId;
+            TableNumber = tableNumber;
             VisitId = visitId;
             IsEqualSplit = isEqualSplit;
             SplitCount = splitCount;

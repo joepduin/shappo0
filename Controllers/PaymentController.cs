@@ -10,26 +10,35 @@ namespace shappo0.Controllers
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
-        private readonly IVisitRepository _visitRepository;
-        private readonly IPaymentRepository _paymentRepository;
 
-        public PaymentController(IPaymentService paymentService, IVisitRepository visitRepository, IPaymentRepository paymentRepository)
+        public PaymentController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
-            _visitRepository = visitRepository;
-            _paymentRepository = paymentRepository;
         }
 
         [Authorize]
         [HttpGet]
-        public IActionResult Index(int tableId)
+        public IActionResult Index(int tableNumber)
         {
-            PaymentViewModel overview = _paymentService.GetPaymentOverview(tableId);
-            ViewBag.PaymentOverview = overview;
+            PaymentOverview overview = _paymentService.GetPaymentOverview(tableNumber);
+
+            PaymentViewModel viewModelOverview = new PaymentViewModel
+            {
+                TableNumber = overview.TableNumber,
+                VisitId = overview.VisitId,
+                Items = overview.Items,
+                TotalAmount = overview.TotalAmount,
+                TotalPaid = overview.TotalPaid,
+                RemainingAmount = overview.RemainingAmount,
+                VatLow = overview.VatLow,
+                VatHigh = overview.VatHigh
+            };
+
+            ViewData["PaymentOverview"] = viewModelOverview;
 
             PaymentSubmissionViewModel model = new PaymentSubmissionViewModel
             {
-                TableId = tableId,
+                TableNumber = tableNumber,
                 VisitId = overview.VisitId
             };
 
@@ -42,43 +51,65 @@ namespace shappo0.Controllers
         {
             if (submission.IsEqualSplit && submission.SplitCount > 0)
             {
-                PaymentViewModel overview = _paymentService.GetPaymentOverview(submission.TableId);
+                PaymentOverview overview = _paymentService.GetPaymentOverview(submission.TableNumber);
                 decimal expectedAmount = overview.TotalAmount / submission.SplitCount;
 
                 if (submission.PaymentAmount < expectedAmount)
                 {
-                    ModelState.AddModelError("PaymentAmount", "Bij gelijk verdelen moet het bedrag minimaal het verwachte bedrag zijn.");
-                    ViewBag.PaymentOverview = overview;
+                    ViewData["ErrorMessage"] = "When splitting equally, the payment amount must be at least the expected amount.";
+
+                    PaymentViewModel viewModelOverview = new PaymentViewModel
+                    {
+                        TableNumber = overview.TableNumber,
+                        VisitId = overview.VisitId,
+                        Items = overview.Items,
+                        TotalAmount = overview.TotalAmount,
+                        TotalPaid = overview.TotalPaid,
+                        RemainingAmount = overview.RemainingAmount,
+                        VatLow = overview.VatLow,
+                        VatHigh = overview.VatHigh
+                    };
+
+                    ViewData["PaymentOverview"] = viewModelOverview;
                     return View("Index", submission);
                 }
             }
 
-            _paymentService.ProcessPayment(submission);
-            Bill bill = _paymentRepository.GetBillByVisitId(submission.VisitId);
-            if (bill != null)
+            PaymentRequest request = new PaymentRequest
             {
-                decimal totalPaid = _paymentRepository.GetTotalPaidForBill(bill.BillId);
-                if (totalPaid >= bill.Total)
-                    return RedirectToAction("PaymentSuccess", new { tableId = submission.TableId });
+                TableNumber = submission.TableNumber,
+                VisitId = submission.VisitId,
+                IsEqualSplit = submission.IsEqualSplit,
+                SplitCount = submission.SplitCount,
+                PaymentAmount = submission.PaymentAmount,
+                TipAmount = submission.TipAmount,
+                PaymentMethod = submission.PaymentMethod,
+                FeedbackType = submission.FeedbackType,
+                FeedbackDescription = submission.FeedbackDescription
+            };
+
+            bool isFullyPaid = _paymentService.ProcessPayment(request);
+
+            if (isFullyPaid)
+            {
+                return RedirectToAction("PaymentSuccess", new { tableNumber = submission.TableNumber });
             }
 
-            return RedirectToAction("Index", new { tableId = submission.TableId });
+            return RedirectToAction("Index", new { tableNumber = submission.TableNumber });
         }
 
         [Authorize]
         [HttpGet]
-        public IActionResult PaymentSuccess(int tableId)
+        public IActionResult PaymentSuccess(int tableNumber)
         {
-            Visit activeVisit = _visitRepository.GetActiveVisitForTable(tableId);
+            bool isSuccess = _paymentService.VerifyPaymentSuccess(tableNumber);
 
-            if (activeVisit != null)
+            if (!isSuccess)
             {
-                Bill bill = _paymentRepository.GetBillByVisitId(activeVisit.VisitId);
-                if (bill == null || bill.IsPaid == false)
-                    return RedirectToAction("Index", new { tableId = tableId });
+                return RedirectToAction("Index", new { tableNumber = tableNumber });
             }
 
-            ViewBag.TableId = tableId;
+            ViewBag.TableNumber = tableNumber;
             return View();
         }
     }

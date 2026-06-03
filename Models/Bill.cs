@@ -14,9 +14,8 @@ namespace shappo0.Models
         {
         }
 
-        public Bill(int billId, decimal subTotal, decimal total, decimal vatLow, decimal vatHigh, bool isPaid, int visitId)
+        public Bill(decimal subTotal, decimal total, decimal vatLow, decimal vatHigh, bool isPaid, int visitId)
         {
-            BillId = billId;
             SubTotal = subTotal;
             Total = total;
             VatLow = vatLow;

@@ -1,10 +1,12 @@
+using shappo0.Models;
 using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
     public interface IPaymentService
     {
-        PaymentViewModel GetPaymentOverview(int tableId);
-        void ProcessPayment(PaymentSubmissionViewModel submission);
+        PaymentOverview GetPaymentOverview(int tableNumber);
+        bool ProcessPayment(PaymentRequest request);
+        bool VerifyPaymentSuccess(int tableNumber);
     }
 }
