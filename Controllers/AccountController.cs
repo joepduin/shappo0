@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace shappo0.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly IAccountService _accountService;
@@ -63,7 +64,7 @@ namespace shappo0.Controllers
         public ActionResult Login(LoginModel loginModel)
         {
             LoginModel CopyLoginModel = new LoginModel(loginModel.Name, loginModel.Password);
-            Staff staff = _accountService.GetStaffByCredentials(CopyLoginModel);
+            Staff? staff = _accountService.GetStaffByCredentials(CopyLoginModel);
 
             if (staff == null)
             {
@@ -84,8 +85,8 @@ namespace shappo0.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, staff.StaffId.ToString()),
-                new Claim(ClaimTypes.Name, staff.Name),
-                new Claim(ClaimTypes.Role, staff.Role.ToString())
+                new Claim(ClaimTypes.Name, staff?.Name ?? string.Empty),
+                new Claim(ClaimTypes.Role, staff?.Role.ToString() ?? string.Empty)
             };
 
             ClaimsIdentity identity = new ClaimsIdentity(

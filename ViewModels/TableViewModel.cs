@@ -1,13 +1,11 @@
 using shappo0.Enums;
 using shappo0.Models;
-using System.Collections.Generic;
 
 namespace shappo0.ViewModels
 {
     public class TableViewModel
     {
-        public int TableNumber { get; set; }
-        public bool Status { get; set; }
+        public Table Table { get; set; }
         public OrderStatus DrinkStatus { get; set; }
         public OrderStatus FoodStatus { get; set; }
         public List<Order> Orders { get; set; }
@@ -16,18 +14,17 @@ namespace shappo0.ViewModels
         {
         }
 
-        public TableViewModel(int tableNumber, bool status, OrderStatus drinkStatus, OrderStatus foodStatus)
+        public TableViewModel(Table table, OrderStatus drinkStatus, OrderStatus foodStatus)
         {
-            TableNumber = tableNumber;
-            Status = status;
+            Table = table;
             DrinkStatus = drinkStatus;
             FoodStatus = foodStatus;
+            Orders = new List<Order>();
         }
 
-        public TableViewModel(int tableNumber, bool status, List<Order> orders)
+        public TableViewModel(Table table, List<Order> orders)
         {
-            TableNumber = tableNumber;
-            Status = status;
+            Table = table;
             Orders = orders ?? new List<Order>();
         }
     }

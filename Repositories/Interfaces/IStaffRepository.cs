@@ -4,9 +4,9 @@ namespace shappo0.Repositories
 {
     public interface IStaffRepository
     {
-        Staff GetStaffByCredentials(LoginModel loginModel);
+        Staff? GetStaffByCredentials(LoginModel loginModel);
 
-        Staff GetStaff(int? id);
+        Staff? GetStaff(int? id);
 
         List<Staff> GetAllStaff();
 

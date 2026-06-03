@@ -4,9 +4,9 @@ namespace shappo0.Services
 {
     public interface IAccountService
     {
-        Staff GetStaffByCredentials(LoginModel loginModel);
+        Staff? GetStaffByCredentials(LoginModel loginModel);
 
-        Staff GetStaff(int? id);
+        Staff? GetStaff(int? id);
 
         List<Staff> GetAllStaff();
 

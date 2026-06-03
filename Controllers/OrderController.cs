@@ -29,17 +29,19 @@ namespace shappo0.Controllers
 
 
         [Authorize]
-        public IActionResult TakeOrder(int tableNumber, string? productType, string? menuType)
+        public IActionResult TakeOrder(int tableNumber, FilterItemsViewModel filters)
         {
-            if (tableNumber <= 0)
+            if (tableNumber <= 0 || tableNumber > 10)
             {
-                TempData["Error"] = "Please select a table first.";
+                TempData["Error"] = "Please select an existing table.";
                 return RedirectToAction("Index", "Table");
             }
 
             TakeOrderViewModel model = new(tableNumber);
 
-            List<Product> products = _menuService.GetFilteredProducts(productType, menuType, "true");
+            filters.OnMenu = "true";
+
+            List<Product> products = _menuService.GetFilteredProducts(filters);
 
             //Grabs the unique cartId for this table so we have the correct orderLines for this table
             string cartId = GetCartKey(tableNumber);

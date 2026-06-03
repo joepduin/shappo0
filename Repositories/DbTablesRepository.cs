@@ -68,7 +68,7 @@ namespace shappo0.Repositories
             return table;
         }
 
-        public void ChangeTableStatus(int tableNumber, bool status)
+        public void ChangeTableStatus(Table table)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -80,8 +80,8 @@ namespace shappo0.Repositories
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@tableNumber", tableNumber);
-                    command.Parameters.AddWithValue("@status", status);
+                    command.Parameters.AddWithValue("@tableNumber", table.TableNumber);
+                    command.Parameters.AddWithValue("@status", table.Status);
                     command.ExecuteNonQuery();
                 }
             }
