@@ -14,6 +14,7 @@ namespace shappo0.Services
             _usersRepository = usersRepository;
         }
 
+        // Joep
         public Staff GetStaffByCredentials(LoginModel loginModel)
         {
 
@@ -21,6 +22,7 @@ namespace shappo0.Services
             return _usersRepository.GetStaffByCredentials(loginModel);
         }
 
+        // Ylvi
         public Staff GetStaff(int? id)
         {
             return _usersRepository.GetStaff(id);
@@ -33,9 +35,10 @@ namespace shappo0.Services
 
         public void AddStaff(Staff staff)
         {
+            //Creates a copy user object to prevent original user not loading anymore in case of error
             Staff copyStaff = new Staff(staff);
-            copyStaff.Password = HashPassword(staff.Password);
 
+            copyStaff.Password = HashPassword(staff.Password);
             _usersRepository.AddStaff(copyStaff);
 
             if(staff.StaffId != copyStaff.StaffId)
@@ -47,6 +50,7 @@ namespace shappo0.Services
             _usersRepository.EditStaff(staff);
         }
 
+        // Joep
         //maakt een hash van het wachtwoord
         private string HashPassword(string password)
         {
