@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using shappo0.Discard;
 using shappo0.Repositories;
 using shappo0.Repositories.Interfaces;
 using shappo0.Services;
@@ -26,10 +27,6 @@ namespace shappo0
             builder.Services.AddSingleton<IOrderService, OrderService>();
             builder.Services.AddSingleton<IAccountService, AccountService>();
             builder.Services.AddSingleton<ITableService, TableService>();
-            builder.Services.AddSingleton<IKitchenRepository, DbKitchenRepository>();
-            builder.Services.AddSingleton<IKitchenService, KitchenService>();
-            builder.Services.AddSingleton<IBarRepository, DbBarRepository>();
-            builder.Services.AddSingleton<IBarService, BarService>();
             builder.Services.AddSingleton<IFinanceRepository, DbFinanceRepository>();
             builder.Services.AddSingleton<IFinanceService, FinanceService>();
             builder.Services.AddControllersWithViews();

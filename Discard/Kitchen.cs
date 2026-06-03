@@ -1,6 +1,7 @@
 ﻿using shappo0.Enums;
+using shappo0.Models;
 
-namespace shappo0.Models
+namespace shappo0.Discard
 {
     public class Kitchen
     {

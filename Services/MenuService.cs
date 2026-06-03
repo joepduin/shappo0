@@ -1,5 +1,6 @@
 ﻿using shappo0.Models;
 using shappo0.Repositories;
+using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
@@ -22,9 +23,9 @@ namespace shappo0.Services
             return _menuRepository.GetByProductId(id);
         }
 
-        public List<Product> GetFilteredProducts(string? productType, string? menuType, string? onMenu)
+        public List<Product> GetFilteredProducts(FilterItemsViewModel? filters)
         {
-            return _menuRepository.GetFilteredProducts(productType, menuType, onMenu);
+            return _menuRepository.GetFilteredProducts(filters);
         }
 
         public void AddMenuItem(Product product)

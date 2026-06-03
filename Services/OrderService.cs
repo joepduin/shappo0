@@ -33,9 +33,19 @@ namespace shappo0.Services
             return _orderRepository.GetAllOrders();
         }
 
-        public List<Order> GetRunningOrders()
+        public List<Order> GetRunningOrders(OrderStatus status)
         {
-            return _orderRepository.GetRunningOrders();
+            return _orderRepository.GetRunningOrders(status);
+        }
+
+        public List<Order> GetRunningOrdersByType(ProductType type)
+        {
+            return _orderRepository.GetRunningOrdersByType(type);
+        }
+
+        public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type)
+        {
+            return _orderLineRepository.GetOrderLinesByType(orderNumber, type);
         }
 
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber)
@@ -152,6 +162,20 @@ namespace shappo0.Services
             {
                 selectedLine.Note = note;
             }
+        }
+
+        public void UpdateOrderLineStatus(int orderLineId, OrderStatus status)
+        {
+            _orderLineRepository.UpdateOrderLineStatus(orderLineId, status);
+        }
+        public void UpdateOrderStatus(int orderNumber, OrderStatus status)
+        {
+            _orderLineRepository.UpdateOrderStatus(orderNumber, status);
+        }
+
+        public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
+        {
+            _orderLineRepository.UpdateCourseStatus(orderNumber, productType, status);
         }
     }
 }
