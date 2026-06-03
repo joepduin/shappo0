@@ -16,7 +16,7 @@ namespace shappo0.Controllers
         }
 
         // QUESTION: All these filtering options belong to the same Model, but are separate parameters. Would it be better to create an instance of the Model?
-        public IActionResult Index(string? productType, string? menuType, string? onMenu)
+        public IActionResult Index(string? productType, string? menuType, string? onMenu) //viewmodel
         {
             List<Product> products = _menuService.GetFilteredProducts(productType, menuType, onMenu);
             return View(products);

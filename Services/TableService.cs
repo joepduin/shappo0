@@ -71,6 +71,7 @@ namespace shappo0.Services
             return tablesViewModels;
         }
 
+        //methode makkelijker maken
         private OrderStatus GetStatus(List<OrderStatus> orderStatuses)
         {
             OrderStatus status = OrderStatus.Served;
@@ -108,7 +109,11 @@ namespace shappo0.Services
 
             foreach (OrderLine orderLine in orderLines)
             {
-                if (orderLine.Status != OrderStatus.Served) allLinesServed = false;
+                if (orderLine.Status != OrderStatus.Served)
+                {
+                    allLinesServed = false;
+                    break;
+                }
             }
 
             if (allLinesServed) _orderRepository.UpdateOrderStatus(orderNumber, OrderStatus.Served);
