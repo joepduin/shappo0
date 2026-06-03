@@ -13,7 +13,7 @@ namespace shappo0.Models
                 TimeSpan span = DateTime.Now.Subtract(TimeCreated);
                 int waitingTime = (int)span.TotalMinutes;
                 return waitingTime;
-            }
+            set { } }
         }
         public OrderStatus Status { get; set; }
         public Visit Visit { get; set; }
