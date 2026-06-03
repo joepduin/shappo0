@@ -20,6 +20,12 @@ namespace shappo0.Services
             _orderLineRepository = orderLineRepository;
         }
 
+        public bool GetStatusByNumber(int tableNumber)
+        {
+            Table table = _tablesRepository.GetTableByNumber(tableNumber);
+            return table.Status;
+        }
+
         public TableViewModel GetTableByNumber(int tableNumber)
         {
             TableViewModel tableViewModel = null;

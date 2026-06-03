@@ -48,6 +48,10 @@ namespace shappo0.Controllers
             if (_tableService.UpdateTableStatus(table))
             {
                 TempData["ConfirmMessage"] = "Tafel is succesvol gewijzigd.";
+                if (table.Status == true)
+                {
+                    return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
+                }
                 return RedirectToAction("Index", "Table");
             }
 
