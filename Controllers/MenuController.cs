@@ -50,8 +50,8 @@ namespace shappo0.Controllers
             return AddItem(product);
         }
 
-        // Overarching method for adding an item (either drink or food), preventing double code
-        public ActionResult AddItem(Product product)
+        // Overarching helper method for adding an item (either drink or food), preventing double code
+        private ActionResult AddItem(Product product)
         {
             try
             {
@@ -85,6 +85,7 @@ namespace shappo0.Controllers
             return View(product);
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public ActionResult Edit(Product product)
         {
@@ -111,6 +112,7 @@ namespace shappo0.Controllers
             return View(products);
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public ActionResult AdjustStock(List<Product> adjustedProducts)
         {
