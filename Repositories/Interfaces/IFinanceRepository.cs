@@ -5,7 +5,7 @@ namespace shappo0.Repositories.Interfaces
 {
     public interface IFinanceRepository
     {
-        List<Finance> GetIncomeByDate(DateTime startDate, DateTime endDate);
-        decimal GetTipsByDate(DateTime startDate, DateTime endDate);
+        List<Finance> GetIncomeByDate(DateRange range);
+        decimal GetTipsByDate(DateRange range);
     }
 }
