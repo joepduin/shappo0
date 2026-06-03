@@ -199,6 +199,28 @@ namespace shappo0.Repositories
             }
             return kitchens;
         }
+
+        public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
+        {
+            using SqlConnection connection = new SqlConnection(_connectionString);
+
+            string query =
+            "UPDATE ol " +
+            "SET ol.status = @status " +
+            "FROM ORDER_LINE AS ol " +
+            "INNER JOIN PRODUCT AS p ON p.productId = ol.productId " +
+            "WHERE orderNumber = @orderNumber AND p.productType = @productType";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@status", status.ToString());
+            command.Parameters.AddWithValue("@orderNumber", orderNumber);
+            command.Parameters.AddWithValue("@productType", productType.ToString());
+
+            connection.Open();
+            command.ExecuteNonQuery();
+        }
+
     }
 }
 
