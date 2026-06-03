@@ -5,6 +5,7 @@ using shappo0.Services;
 
 namespace shappo0.Controllers
 {
+    [Authorize]
     public class MenuController : Controller
     {
         private readonly IMenuService _menuService;
@@ -14,6 +15,7 @@ namespace shappo0.Controllers
             _menuService = menuService;
         }
 
+        // QUESTION: All these filtering options belong to the same Model, but are separate parameters. Would it be better to create an instance of the Model?
         public IActionResult Index(string? productType, string? menuType, string? onMenu)
         {
             List<Product> products = _menuService.GetFilteredProducts(productType, menuType, onMenu);
@@ -49,8 +51,8 @@ namespace shappo0.Controllers
             return AddItem(product);
         }
 
-        // Overarching method for adding an item (either drink or food), preventing double code
-        public ActionResult AddItem(Product product)
+        // Overarching helper method for adding an item (either drink or food), preventing double code
+        private ActionResult AddItem(Product product)
         {
             try
             {
@@ -61,7 +63,7 @@ namespace shappo0.Controllers
 
                 TempData["ConfirmMessage"] = "Product has been succesfully created";
                 return RedirectToAction("Index");
-            }
+            } 
             catch
             {
                 ViewBag.ErrorMessage = @"Exception occured: product could not be added";
@@ -84,6 +86,7 @@ namespace shappo0.Controllers
             return View(product);
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public ActionResult Edit(Product product)
         {
@@ -110,6 +113,7 @@ namespace shappo0.Controllers
             return View(products);
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public ActionResult AdjustStock(List<Product> adjustedProducts)
         {
