@@ -5,11 +5,11 @@ namespace shappo0.Models
     public class Staff
     {
         public int StaffId { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public string? PhoneNumber { get; set; }
         public SexType? Sex { get; set; } // M, V, X
         public RoleType Role { get; set; } // Waiter, Bar, Kitchen, Manager
-        public string Password { get; set; } // 4 cijfers hashed
+        public string? Password { get; set; } // 4 cijfers hashed
         public bool IsEmployed { get; set; }
 
         public Staff()

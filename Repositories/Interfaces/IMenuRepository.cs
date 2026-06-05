@@ -7,7 +7,7 @@ namespace shappo0.Repositories
     public interface IMenuRepository
     {
         List<Product> GetProducts();
-        Product GetByProductId(int id);
+        Product? GetByProductId(int? id);
         void AddMenuItem(Product product);
         void EditMenuItem(Product product);
         List<Product> GetFilteredProducts(FilterItemsViewModel? filters);

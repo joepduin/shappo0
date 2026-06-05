@@ -17,9 +17,9 @@ namespace shappo0.Repositories
 
         // Joep
         //checkt of een stafflid bestaat, retourneert de staff bij true en false een lege staff
-        public Staff GetStaffByCredentials(LoginModel loginModel)
+        public Staff? GetStaffByCredentials(LoginModel loginModel)
         {
-            Staff staff = null;
+            Staff? staff = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -48,9 +48,9 @@ namespace shappo0.Repositories
 
         // Ylvi
         // Method for getting a staff member by id, rather than by login credentials
-        public Staff GetStaff(int? id)
+        public Staff? GetStaff(int? id)
         {
-            Staff staff = null;
+            Staff? staff = null;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
