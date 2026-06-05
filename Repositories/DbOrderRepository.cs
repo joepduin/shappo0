@@ -47,7 +47,7 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<Order> GetRunningOrders(OrderStatus status)
+        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
             List<Order> orders = new List<Order>();
 
@@ -63,11 +63,15 @@ namespace shappo0.Repositories
                     JOIN [Visit] AS V ON O.visitId = V.visitId
                     JOIN [Staff] AS OS ON O.staffId = OS.staffId
                     JOIN [Staff] AS VS ON V.staffId = VS.staffId
-                    WHERE O.[status] = @status";
+                    WHERE O.[status] ";
+
+                if (status2 != null) query += "in (@status, @status2)";
+                else query += "= @status";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Parameters.AddWithValue("@status", status.ToString());
+                if (status2 != null) command.Parameters.AddWithValue("@status2", status2.ToString());
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -100,7 +104,7 @@ namespace shappo0.Repositories
                     JOIN [Staff] AS VS ON V.staffId = VS.staffId " +
                     "INNER JOIN [Order_Line] AS OL ON O.orderNumber = OL.orderNumber " +
                     "INNER JOIN [Product] AS P ON OL.productId = P.productId " +
-                    "WHERE O.[status] = @status AND ";
+                    "WHERE O.[status] IN(@statusOrdered, @statusBeingPrepared) AND ";
 
                 if (type == ProductType.Drink)
                 {
@@ -113,7 +117,8 @@ namespace shappo0.Repositories
 
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.AddWithValue("@status", OrderStatus.Ordered.ToString());
+                command.Parameters.AddWithValue("@statusOrdered", OrderStatus.Ordered.ToString());
+                command.Parameters.AddWithValue("@statusBeingPrepared", OrderStatus.BeingPrepared.ToString());
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();

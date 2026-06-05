@@ -39,7 +39,7 @@
                     <!-- dropdown to change the order line status from ordered to being prepared to ready to be served-->
                     <form asp-action="UpdateOrderLineStatus" method="post">
                         <input type="hidden" name="orderLineId" value="@line.OrderLineId" />
-                        <input type="hidden" name="orderNumber" value="@line.Order.OrderNumber" />
+                        <input type="hidden" name="Order.orderNumber" value="@line.Order.OrderNumber" />
 
                         <select name="status" onchange="this.form.submit()">
 

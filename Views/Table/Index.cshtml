@@ -9,6 +9,11 @@
 }
 
 <style>
+    .layout-container {
+        display: flex;
+        gap: 40px;
+    }
+
     .tables-grid {
         display: grid;
         grid-template-columns: repeat(2, 120px);
@@ -17,33 +22,63 @@
     .table-square {
         padding: 12px;
         margin: 12px;
+        text-align: center;
+    }
+
+    .legend {
+        padding: 20px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
     }
 </style>
 
 <h2>Tables</h2>
 
-<div class="tables-grid">
-    @foreach (TableViewModel tableViewModel in Model)
-    {
-        string bg;
-        if (tableViewModel.Table.Status)
+<div class="layout-container">
+    <div class="tables-grid">
+        @foreach (TableViewModel tableViewModel in Model)
         {
-            bg = "#d9534f"; //rood
-        }
-        else
-        {
-            bg = "#5cb85c"; //groen
-        }
+            string bg;
+            if (tableViewModel.FoodStatus == OrderStatus.ReadyToBeServed || tableViewModel.DrinkStatus == OrderStatus.ReadyToBeServed)
+            {
+                bg = "#9768ae";
+            }
+            else if (tableViewModel.Table.Status)
+            {
+                bg = "#d9534f";
+            }
+            else
+            {
+                bg = "#5cb85c";
+            }
 
-        <a href="Table/Table?tableNumber=@tableViewModel.Table.TableNumber" style="text-decoration: none;">
-            <div class="table-square text-dark" style="background-color:@bg;">
-                Table @tableViewModel.Table.TableNumber
-                <div>
-                    Food: @tableViewModel.FoodStatus.ToEmoji()
-                    <br />
-                    Drink: @tableViewModel.DrinkStatus.ToEmoji()
+            <a href="Table/Table?tableNumber=@tableViewModel.Table.TableNumber" style="text-decoration: none;">
+                <div class="table-square text-dark" style="background-color:@bg;">
+                    <strong>Table @tableViewModel.Table.TableNumber</strong>
+                    <div>
+                        Food: @tableViewModel.FoodStatus.ToEmoji()
+                        <br />
+                        Drink: @tableViewModel.DrinkStatus.ToEmoji()
+                    </div>
                 </div>
-            </div>
-        </a>
-    }
+            </a>
+        }
+    </div>
+
+    <div class="legend">
+        <h5>Legend</h5>
+        <p><strong>Table colors:</strong></p>
+        <ul>
+            <li><span style="display:inline-block; width:15px; height:15px; background-color:#9768ae;"></span> Ready to serve</li>
+            <li><span style="display:inline-block; width:15px; height:15px; background-color:#d9534f;"></span> Occupied</li>
+            <li><span style="display:inline-block; width:15px; height:15px; background-color:#5cb85c;"></span> Free</li>
+        </ul>
+        <p><strong>Table Emojis:</strong></p>
+        <ul>
+            <li>🧾 Ordered</li>
+            <li>👨‍🍳 Being Prepared</li>
+            <li>🍽️ Ready To Be Served</li>
+            <li>💤 Non active order</li>
+        </ul>
+    </div>
 </div>

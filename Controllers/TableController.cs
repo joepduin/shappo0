@@ -10,10 +10,14 @@ namespace shappo0.Controllers
     public class TableController : Controller
     {
         private readonly ITableService _tableService;
+        private readonly IOrderService _orderService;
+        private readonly IVisitService _visitService;
 
-        public TableController(ITableService tableService)
+        public TableController(ITableService tableService, IOrderService orderService, IVisitService visitService)
         {
             _tableService = tableService;
+            _orderService = orderService;
+            _visitService = visitService;
         }
 
         //je moet ingelogd zijn. tafels woorden doorgegeven aan de view.
@@ -21,23 +25,40 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            List<TableViewModel> tablesViewModels = _tableService.GetAllTables();
-            return View(tablesViewModels);
+            List<Table> tables= _tableService.GetAllTables();
+            List<TableViewModel> tableViewModels = new List<TableViewModel>();
+
+            foreach (Table table in tables)
+            {
+                tableViewModels.Add(BuildTableOverviewModel(table));
+            }
+
+            return View(tableViewModels);
         }
 
         [Authorize]
         [HttpGet]
         public IActionResult Table(int tableNumber)
         {
-            TableViewModel table = _tableService.GetTableByNumber(tableNumber);
-            return View(table);
+            Table table = _tableService.GetTableByNumber(tableNumber);
+
+            if (table == null)
+            {
+                TempData["ErrorMessage"] = "Tafel bestaat niet.";
+                return RedirectToAction("Index");
+            }
+
+            TableViewModel viewModel = BuildTableDetailModel(table);
+            return View(viewModel);
         }
 
         [Authorize]
-        [HttpGet]
-        public IActionResult UpdateOrderLineStatus(int orderLineId, int tableNumber, int orderNumber)
+        [HttpPost]
+        public ActionResult UpdateOrderLineStatus(OrderLine orderLine, int tableNumber)
         {
-            _tableService.UpdateOrderLineStatus(orderLineId, OrderStatus.Served, orderNumber);
+            _orderService.UpdateOrderLineStatus(orderLine, OrderStatus.Served);
+
+
             return RedirectToAction("Table", "Table", new { tableNumber = tableNumber });
         }
 
@@ -57,6 +78,40 @@ namespace shappo0.Controllers
 
             TempData["ErrorMessage"] = "Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
             return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
+        }
+
+        private TableViewModel BuildTableOverviewModel(Table table)
+        {
+            List<OrderLine> orderLines = _orderService.GetActiveOrderLinesByTableNumber(table.TableNumber);
+
+            OrderStatus drinkStatus = orderLines
+                .Where(ol => ol.Product.ProductType == ProductType.Drink)
+                .Select(ol => ol.Status)
+                .DefaultIfEmpty(OrderStatus.Served)
+                .Max();
+
+            OrderStatus foodStatus = orderLines
+                .Where(ol => ol.Product.ProductType != ProductType.Drink)
+                .Select(ol => ol.Status)
+                .DefaultIfEmpty(OrderStatus.Served)
+                .Max();
+
+            return new(table, drinkStatus, foodStatus);
+        }
+
+        private TableViewModel BuildTableDetailModel(Table table)
+        {
+            Visit? visit = _visitService.GetActiveVisitForTable(table.TableNumber);
+            List<Order> orders = new List<Order>();
+            if (visit != null)
+            {
+                orders = _orderService.GetOrdersByVisitId(visit.VisitId);
+                foreach (Order order in orders)
+                {
+                    order.OrderLines = _orderService.GetOrderLinesByOrderNumber(order.OrderNumber);
+                }
+            }
+            return new(table, orders);
         }
     }
 }
