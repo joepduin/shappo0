@@ -23,7 +23,7 @@
 	</thead>
 	<tbody>
 		@{
-			foreach (Kitchen kitchen in Model)
+			foreach (Order order in Model)
 			{
 				var rowStyle = "";
 
@@ -55,11 +55,11 @@
 									Ordered
 								</option>
 								<option value="BeingPrepared"
-										selected="@(kitchen.Status == OrderStatus.BeingPrepared)">
+										selected="@(order.Status == OrderStatus.BeingPrepared)">
 									Being Prepared
 								</option>
 								<option value="ReadyToBeServed"
-										selected="@(kitchen.Status == OrderStatus.ReadyToBeServed)">
+										selected="@(order.Status == OrderStatus.ReadyToBeServed)">
 									ReadyToBeServed
 								</option>
 							</select>

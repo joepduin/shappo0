@@ -49,7 +49,7 @@ namespace shappo0.Controllers
 
         public IActionResult FinishedOrders()
         {
-            List<Order> orders = _orderService.GetRunningOrders(OrderStatus.ReadyToBeServed, OrderStatus.Served);
+            List<Order> orders = _orderService.GetFinishedOrdersByType(ProductType.Main);
             return View(orders);
         }
 
@@ -60,5 +60,7 @@ namespace shappo0.Controllers
 
             return RedirectToAction("Vieworder", new { orderNumber });
         }
+
+       
     }
 }
