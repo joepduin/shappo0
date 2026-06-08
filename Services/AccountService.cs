@@ -15,7 +15,7 @@ namespace shappo0.Services
         }
 
         // Joep
-        public Staff GetStaffByCredentials(LoginModel loginModel)
+        public Staff? GetStaffByCredentials(LoginModel loginModel)
         {
 
             loginModel.Password = HashPassword(loginModel.Password);
@@ -23,7 +23,7 @@ namespace shappo0.Services
         }
 
         // Ylvi
-        public Staff GetStaff(int? id)
+        public Staff? GetStaff(int? id)
         {
             return _usersRepository.GetStaff(id);
         }
@@ -52,8 +52,11 @@ namespace shappo0.Services
 
         // Joep
         //maakt een hash van het wachtwoord
-        private string HashPassword(string password)
+        private string HashPassword(string? password)
         {
+            if(password == null)
+                return string.Empty;
+
             using (SHA256 sha256 = SHA256.Create())
             {
                 return Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(password)));

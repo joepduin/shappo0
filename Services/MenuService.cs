@@ -18,7 +18,7 @@ namespace shappo0.Services
             return _menuRepository.GetProducts();
         }
 
-        public Product GetByProductId(int id)
+        public Product? GetByProductId(int? id)
         {
             return _menuRepository.GetByProductId(id);
         }

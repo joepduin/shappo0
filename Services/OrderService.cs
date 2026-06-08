@@ -33,9 +33,9 @@ namespace shappo0.Services
             return _orderRepository.GetAllOrders();
         }
 
-        public List<Order> GetRunningOrders(OrderStatus status)
+        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
-            return _orderRepository.GetRunningOrders(status);
+            return _orderRepository.GetRunningOrders(status, status2);
         }
 
         public List<Order> GetRunningOrdersByType(ProductType type)
@@ -53,6 +53,10 @@ namespace shappo0.Services
             return _orderLineRepository.GetOrderLinesByOrderNumber(orderNumber);
         }
 
+        public List<OrderLine> GetActiveOrderLinesByTableNumber(int orderNumber)
+        {
+            return _orderLineRepository.GetActiveOrderLinesByTableNumber(orderNumber);
+        }
 
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines)
         {
@@ -164,13 +168,30 @@ namespace shappo0.Services
             }
         }
 
-        public void UpdateOrderLineStatus(int orderLineId, OrderStatus status)
+        public void UpdateOrderLineStatus(OrderLine orderLine, OrderStatus status)
         {
-            _orderLineRepository.UpdateOrderLineStatus(orderLineId, status);
+            _orderLineRepository.UpdateOrderLineStatus(orderLine.OrderLineId, status);
+
+            List<OrderLine> orderLines = _orderLineRepository.GetOrderLinesByOrderNumber(orderLine.Order.OrderNumber);
+            bool allLinesStatus = true;
+
+            foreach (OrderLine newOrderLine in orderLines)
+            {
+                if (newOrderLine.Status != status) allLinesStatus = false;
+            }
+
+            if (allLinesStatus) _orderRepository.UpdateOrderStatus(orderLine.Order.OrderNumber, status);
         }
+
         public void UpdateOrderStatus(int orderNumber, OrderStatus status)
         {
-            _orderLineRepository.UpdateOrderStatus(orderNumber, status);
+            _orderRepository.UpdateOrderStatus(orderNumber, status);
+
+            List<OrderLine> orderLines = _orderLineRepository.GetOrderLinesByOrderNumber(orderNumber);
+            foreach (OrderLine orderLine in orderLines)
+            {
+                if (orderLine.Status != status) _orderLineRepository.UpdateOrderLineStatus(orderLine.OrderLineId, status);
+            }
         }
 
         public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
