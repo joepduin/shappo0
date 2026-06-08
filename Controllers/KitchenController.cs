@@ -11,32 +11,30 @@ namespace shappo0.Controllers
     //[Authorize(Roles = "Kitchen")]
     public class KitchenController : Controller
     {
-        private readonly IKitchenService _kitchenService;
+        private readonly IOrderService _orderService;
 
-        public KitchenController(IKitchenService kitchenService)
+        public KitchenController(IOrderService orderService)
         {
-            _kitchenService = kitchenService;
+            _orderService = orderService;
         }
 
         public IActionResult Index()
         {
-            List<Kitchen> kitchen = _kitchenService.GetAll();
-            KitchenBarViewModel kitchens = new KitchenBarViewModel(kitchen);
-
-            return View(kitchens);
+            List<Order> orders = _orderService.GetRunningOrdersByType(ProductType.Main);
+            return View(orders);
         }
 
         
         public IActionResult ViewOrder(int orderNumber)
         {
-            List<OrderLine> lines = _kitchenService.GetOrderLines(orderNumber);
+            List<OrderLine> lines = _orderService.GetOrderLinesByType(orderNumber, ProductType.Main);
             return View(lines);
         }
 
         [HttpPost]
         public IActionResult UpdateOrderStatus(int orderNumber, OrderStatus status)
         {
-            _kitchenService.UpdateOrderStatus(orderNumber, status);
+            _orderService.UpdateOrderStatus(orderNumber, status);
 
             return RedirectToAction("Index");
         }
@@ -44,21 +42,21 @@ namespace shappo0.Controllers
         [HttpPost]
         public IActionResult UpdateOrderLineStatus(int orderLineId, int orderNumber, OrderStatus status)
         {
-            _kitchenService.UpdateOrderLineStatus(orderLineId, status);
+            _orderService.UpdateOrderLineStatus(orderLineId, status);
 
             return RedirectToAction("ViewOrder", new { orderNumber });
         }
 
         public IActionResult FinishedOrders()
         {
-            List<Kitchen> kitchen = _kitchenService.FinishedOrders();
-            return View(kitchen);
+            List<Order> orders = _orderService.GetRunningOrders(OrderStatus.Served);
+            return View(orders);
         }
 
         [HttpPost]
         public IActionResult UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
         {
-            _kitchenService.UpdateCourseStatus(orderNumber, productType, status);
+            _orderService.UpdateCourseStatus(orderNumber, productType, status);
 
             return RedirectToAction("Vieworder", new { orderNumber });
         }

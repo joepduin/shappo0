@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using shappo0.Models;
 using shappo0.Services;
+using shappo0.ViewModels;
 
 namespace shappo0.Controllers
 {
@@ -16,9 +17,9 @@ namespace shappo0.Controllers
         }
 
         // QUESTION: All these filtering options belong to the same Model, but are separate parameters. Would it be better to create an instance of the Model?
-        public IActionResult Index(string? productType, string? menuType, string? onMenu)
+        public IActionResult Index(FilterItemsViewModel? filters)
         {
-            List<Product> products = _menuService.GetFilteredProducts(productType, menuType, onMenu);
+            List<Product> products = _menuService.GetFilteredProducts(filters);
             return View(products);
         }
 
@@ -57,7 +58,7 @@ namespace shappo0.Controllers
             try
             {
                 // The price is divided by 1 + VAT percentage to get the price without VAT, which is what is stored in the database
-                product.Price = product.Price / (1 + product.VATPercentage / 100);
+                product.PriceIncludingTax = product.Price;
 
                 _menuService.AddMenuItem(product);
 

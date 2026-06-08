@@ -1,5 +1,5 @@
 ﻿@using shappo0.Models
-@model List<shappo0.Models.Kitchen>
+@model List<shappo0.Models.Order>
 @{
 	ViewData["Title"] = "Finished Orders";
 }
@@ -23,22 +23,22 @@
 	</thead>
 	<tbody>
 		@{
-			foreach (Kitchen kitchen in Model)
+			foreach (Order order in Model)
 			{
 				var rowStyle = "";
 
 				<tr @rowStyle>
-					<td>@kitchen.OrderNumber</td>
-					<td>@kitchen.TableNumber</td>
-					<td>@kitchen.Status</td>
-					<td>@kitchen.TimeCreated</td>
-					<td>@kitchen.WaitingTime</td>
+					<td>@order.OrderNumber</td>
+					<td>@order.Visit.Table.TableNumber</td>
+					<td>@order.Status</td>
+					<td>@order.TimeCreated</td>
+					<td>@order.WaitingTimeMinutes</td>
 					<td>
 					<!-- button to see the oderlines-->
 						<a asp-controller="Kitchen"
 						   asp-action="ViewOrder"
 						   asp-route-id="" class="btn btn-outline-dark"
-						   asp-route-orderNumber="@kitchen.OrderNumber">
+						   asp-route-orderNumber="@order.OrderNumber">
 							View Order
 						</a>
 

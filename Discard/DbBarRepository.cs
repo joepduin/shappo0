@@ -2,41 +2,42 @@
 using shappo0.Models;
 using shappo0.Enums;
 
-namespace shappo0.Repositories
+namespace shappo0.Discard
 {
-    public class DbKitchenRepository : IKitchenRepository
+    public class DbBarRepository : IBarRepository
     {
         private readonly string? _connectionString;
-        public DbKitchenRepository(IConfiguration configuration)
+        public DbBarRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        private Kitchen ReadKitchen(SqlDataReader reader)
+        private Bar ReadBar(SqlDataReader reader)
         {
             int orderNumber = (int)reader["orderNumber"];
             int tableNumber = (int)reader["tableNumber"];
             OrderStatus status = Enum.Parse<OrderStatus>((string)reader["status"], true);
             DateTime timeCreated = (DateTime)reader["timeCreated"];
 
-            return new Kitchen(orderNumber, tableNumber, status, timeCreated);
+            return new Bar(orderNumber, tableNumber, status, timeCreated);
         }
 
-        public List<Kitchen> GetAll()
+        public List<Bar> GetAll()
         {
-            List<Kitchen> kitchens = new List<Kitchen>();
+            List<Bar> bars = new List<Bar>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             { //double join order - visit - table
-              //another join on order - orderline - product where productType != Drink
+              //another join on order - orderline - product where ProductType drink
               //Uses DISTINCT so not multiple orders will be seen
               // o.status --> shows only the running orders
               //Ordered by timeCreated
                 string query = "SELECT DISTINCT o.orderNumber, o.staffId, t.tableNumber, o.status, o.timeCreated FROM [ORDER] AS o " +
                     " INNER JOIN VISIT AS v ON o.visitId = v.visitId INNER JOIN [TABLE] AS t ON v.tableNumber = t.tableNumber " +
-                    "INNER JOIN ORDER_LINE AS ol ON ol.orderNumber = o.orderNumber INNER JOIN PRODUCT AS p ON ol.productId = p.productId" +
-                    " WHERE p.ProductType != 'Drink' AND o.status != 'Served'" +
-                    "ORDER BY timeCreated";
+                    "INNER JOIN ORDER_LINE AS ol ON ol.orderNumber = o.orderNumber INNER JOIN PRODUCT AS p ON ol.productId = p.productId " +
+                    "WHERE o.status != 'Served' and p.ProductType = 'Drink' " +
+                    "ORDER BY timeCreated"
+;
 
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -45,18 +46,18 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    Kitchen kitchen = ReadKitchen(reader);
-                    kitchens.Add(kitchen);
+                    Bar bar = ReadBar(reader);
+                    bars.Add(bar);
                 }
                 reader.Close();
             }
-            return kitchens;
+            return bars;
 
         }
 
-        public Kitchen? GetById(int orderNumber)
+        public Bar? GetById(int orderNumber)
         {
-            Kitchen kitchen = null;
+            Bar bar = null;
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT orderNumber,staffId, status, timeCreated FROM [ORDER] WHERE orderNumber = @orderNumber";
@@ -70,30 +71,31 @@ namespace shappo0.Repositories
 
                 if (reader.Read())
                 {
-                    kitchen = ReadKitchen(reader);
+                    bar = ReadBar(reader);
                 }
 
                 reader.Close();
             }
-            return kitchen;
+            return bar;
         }
 
         public List<OrderLine> GetOrderLines(int orderNumber)
-        {  //get the order lines of a specific order
+        {
+            //Gets all orderlines from a specific order
             List<OrderLine> orderLines = new List<OrderLine>();
 
+            
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query =
                     "SELECT ol.orderLineId, ol.productId, ol.orderNumber, " +
                     "ol.note, ol.quantity, ol.status, " +
-                    "p.name, p.menuType, p.productType " +
+                    "p.name,  p.productType " +
                     "FROM [ORDER_LINE] AS ol " +
                     "INNER JOIN [ORDER] AS o ON o.orderNumber = ol.orderNumber " +
                     "INNER JOIN [PRODUCT] AS p ON p.productId = ol.productId " +
                     "WHERE ol.orderNumber = @orderNumber " +
-                    "AND p.productType != 'Drink' " +
-                    "ORDER BY p.productType DESC";
+                    "AND p.productType = 'Drink' ";
 
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@orderNumber", orderNumber);
@@ -107,9 +109,7 @@ namespace shappo0.Repositories
                     Product product = new Product
                     {
                         ProductId = (int)reader["ProductId"],
-                        Name = (string)reader["name"],
-                        ProductType = Enum.Parse<ProductType>((string)reader["productType"], true)
-
+                        Name = (string)reader["name"]
                     };
 
                     Order order = new Order
@@ -153,7 +153,7 @@ namespace shappo0.Repositories
         }
 
         public void UpdateOrderLineStatus(int orderLineId, OrderStatus status)
-        {//updates each order line from ordered --> being prepared --> ready to serve
+        { //updates each order line from ordered --> being prepared --> ready to serve
             using SqlConnection connection = new SqlConnection(_connectionString);
 
             string query =
@@ -170,19 +170,19 @@ namespace shappo0.Repositories
             command.ExecuteNonQuery();
         }
 
-        public List<Kitchen> FinishedOrders()
+        public List<Bar> FinishedOrders()
         {
-            List<Kitchen> kitchens = new List<Kitchen>();
+            List<Bar> bars = new List<Bar>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             { //double join order - visit - table
-              //another join on order - orderline - product where productType!= Drink
+              //another join on order - orderline - product where productType Drink
               // o.status --> shows only the finished orders
               //Ordered by timeCreated
                 string query = "SELECT DISTINCT o.orderNumber, o.staffId, t.tableNumber, o.status, o.timeCreated FROM [ORDER] AS o " +
                     " INNER JOIN VISIT AS v ON o.visitId = v.visitId INNER JOIN [TABLE] AS t ON v.tableNumber = t.tableNumber " +
                     "INNER JOIN ORDER_LINE AS ol ON ol.orderNumber = o.orderNumber INNER JOIN PRODUCT AS p ON ol.productId = p.productId" +
-                    " WHERE p.ProductType != 'Drink' AND o.status = 'Served' " +
+                    " WHERE p.ProductType = 'Drink' AND o.status = 'Served' " +
                     "ORDER BY timeCreated";
 
                 SqlCommand command = new SqlCommand(query, connection);
@@ -192,35 +192,13 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    Kitchen kitchen = ReadKitchen(reader);
-                    kitchens.Add(kitchen);
+                    Bar bar = ReadBar(reader);
+                    bars.Add(bar);
                 }
                 reader.Close();
             }
-            return kitchens;
+            return bars;
         }
-
-        public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
-        {
-            using SqlConnection connection = new SqlConnection(_connectionString);
-
-            string query =
-            "UPDATE ol " +
-            "SET ol.status = @status " +
-            "FROM ORDER_LINE AS ol " +
-            "INNER JOIN PRODUCT AS p ON p.productId = ol.productId " +
-            "WHERE orderNumber = @orderNumber AND p.productType = @productType";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@status", status.ToString());
-            command.Parameters.AddWithValue("@orderNumber", orderNumber);
-            command.Parameters.AddWithValue("@productType", productType.ToString());
-
-            connection.Open();
-            command.ExecuteNonQuery();
-        }
-
     }
 }
 

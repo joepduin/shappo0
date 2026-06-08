@@ -11,35 +11,31 @@ namespace shappo0.Controllers
    // [Authorize(Roles = "Bar")]
     public class BarController : Controller
     {
-        private readonly IBarService _barService;
+        private readonly IOrderService _orderService;
 
-        public BarController(IBarService barService)
+        public BarController(IOrderService orderService)
         {
-            _barService = barService;
+            _orderService = orderService;
         }
 
         
         public IActionResult Index()
         {
-            List<Bar> bar = _barService.GetAll();
-
-
-            KitchenBarViewModel bars = new KitchenBarViewModel(bar);
-
-            return View(bars);
+            List<Order> orders = _orderService.GetRunningOrdersByType(ProductType.Drink);
+            return View(orders);
         }
 
         
         public IActionResult ViewOrder(int orderNumber)
         {
-            List<OrderLine> lines = _barService.GetOrderLines(orderNumber);
+            List<OrderLine> lines = _orderService.GetOrderLinesByType(orderNumber, ProductType.Drink);
             return View(lines);
         }
 
         [HttpPost]
         public IActionResult UpdateOrderStatus(int orderNumber, OrderStatus status)
         {
-            _barService.UpdateOrderStatus(orderNumber, status);
+            _orderService.UpdateOrderStatus(orderNumber, status);
 
             return RedirectToAction("Index");
         }
@@ -47,15 +43,15 @@ namespace shappo0.Controllers
         [HttpPost]
         public IActionResult UpdateOrderLineStatus(int orderLineId, int orderNumber, OrderStatus status)
         {
-            _barService.UpdateOrderLineStatus(orderLineId, status);
+            _orderService.UpdateOrderLineStatus(orderLineId, status);
 
             return RedirectToAction("ViewOrder", new { orderNumber });
         }
 
         public IActionResult FinishedOrders()
         {
-            List<Bar> bars = _barService.FinishedOrders();
-            return View(bars);
+            List<Order> orders= _orderService.GetRunningOrders(OrderStatus.Served);
+            return View(orders);
         }
     }
 }
