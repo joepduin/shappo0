@@ -64,9 +64,14 @@ else
                             <td>
                                 @if (orderLine.Status == OrderStatus.ReadyToBeServed)
                                 {
-                                    <a href="/Table/UpdateOrderLineStatus?orderLineId=@orderLine.OrderLineId&tableNumber=@Model.Table.TableNumber&orderNumber=@order.OrderNumber">
-                                        Zet als Served
-                                    </a>
+                                    <form action="/Table/UpdateOrderLineStatus" method="POST">
+                                        <input type="hidden" name="OrderLineId" value="@orderLine.OrderLineId" />
+                                        <input type="hidden" name="Order.OrderNumber" value="@orderLine.Order.OrderNumber" />
+                                        <input type="hidden" name="tableNumber" value="@Model.Table.TableNumber" />
+                                        <button type="submit">
+                                            Zet als Served
+                                        </button>
+                                    </form>
                                 }
                             </td>
                         </tr>

@@ -38,16 +38,16 @@ namespace shappo0.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateOrderLineStatus(int orderLineId, int orderNumber, OrderStatus status)
+        public IActionResult UpdateOrderLineStatus(OrderLine orderLine, OrderStatus status)
         {
-            _orderService.UpdateOrderLineStatus(orderLineId, status);
+            _orderService.UpdateOrderLineStatus(orderLine, status);
 
-            return RedirectToAction("ViewOrder", new { orderNumber });
+            return RedirectToAction("ViewOrder", new { orderLine.Order.OrderNumber });
         }
 
         public IActionResult FinishedOrders()
         {
-            List<Order> orders= _orderService.GetRunningOrders(OrderStatus.Served);
+            List<Order> orders= _orderService.GetRunningOrders(OrderStatus.ReadyToBeServed, OrderStatus.Served);
             return View(orders);
         }
     }
