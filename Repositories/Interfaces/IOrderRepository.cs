@@ -9,7 +9,8 @@ namespace shappo0.Repositories
 
         public List<Order> GetAllOrders();
 
-        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2);
+        public List<Order> GetRunningOrders();
+        public List<Order> GetFinishedOrders();
 
         public List<Order> GetRunningOrdersByType(ProductType type);
 

@@ -47,7 +47,7 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
+        public List<Order> GetRunningOrders()
         {
             List<Order> orders = new List<Order>();
 
@@ -63,15 +63,48 @@ namespace shappo0.Repositories
                     JOIN [Visit] AS V ON O.visitId = V.visitId
                     JOIN [Staff] AS OS ON O.staffId = OS.staffId
                     JOIN [Staff] AS VS ON V.staffId = VS.staffId
-                    WHERE O.[status] ";
-
-                if (status2 != null) query += "in (@status, @status2)";
-                else query += "= @status";
+                    WHERE O.[status] == @status;";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.AddWithValue("@status", status.ToString());
-                if (status2 != null) command.Parameters.AddWithValue("@status2", status2.ToString());
+                command.Parameters.AddWithValue("@status", OrderStatus.Ordered.ToString());
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Order order = ReadOrder(reader);
+                    orders.Add(order);
+                }
+                reader.Close();
+            }
+            return orders;
+        }
+
+        public List<Order> GetFinishedOrders()
+        {
+            List<Order> orders = new List<Order>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                    SELECT DISTINCT 
+                        O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
+                        V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
+                        OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
+                        VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
+                    FROM [Order] AS O
+                    JOIN [Visit] AS V ON O.visitId = V.visitId
+                    JOIN [Staff] AS OS ON O.staffId = OS.staffId
+                    JOIN [Staff] AS VS ON V.staffId = VS.staffId
+                    WHERE O.[status] in (@status_ReadyToBeServed, @status_Served);";
+
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@status_ReadyToBeServed", OrderStatus.ReadyToBeServed.ToString());
+                command.Parameters.AddWithValue("@status_Served", OrderStatus.Served.ToString());
 
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();

@@ -33,9 +33,14 @@ namespace shappo0.Services
             return _orderRepository.GetAllOrders();
         }
 
-        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
+        public List<Order> GetRunningOrders()
         {
-            return _orderRepository.GetRunningOrders(status, status2);
+            return _orderRepository.GetRunningOrders();
+        }
+
+        public List<Order> GetFinishedOrders()
+        {
+            return _orderRepository.GetFinishedOrders();
         }
 
         public List<Order> GetRunningOrdersByType(ProductType type)
