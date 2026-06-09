@@ -1,273 +1,91 @@
 ﻿using shappo0.Models;
 using shappo0.Repositories;
-using shappo0.Repositories.Interfaces;
 
 namespace shappo0.Services
 {
     public class PaymentService : IPaymentService
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IOrderLineRepository _orderLineRepository;
-        private readonly IVisitRepository _visitRepository;
+        private const int VAT_LOW = 9;
+        private const int VAT_HIGH = 21;
+
         private readonly IPaymentRepository _paymentRepository;
-        private readonly IBillRepository _billRepository;   
-        private readonly IFeedbackRepository _feedbackRepository;
+        private readonly IOrderService _orderService;
 
-        public PaymentService(
-            IOrderRepository orderRepository, 
-            IOrderLineRepository orderLineRepository, 
-            IVisitRepository visitRepository, 
-            IPaymentRepository paymentRepository,
-            IBillRepository billRepository,            
-            IFeedbackRepository feedbackRepository)
+        public PaymentService(IPaymentRepository paymentRepository, IOrderService orderService)
         {
-            _orderRepository = orderRepository;
-            _orderLineRepository = orderLineRepository;
-            _visitRepository = visitRepository;
             _paymentRepository = paymentRepository;
-            _billRepository = billRepository;               
-            _feedbackRepository = feedbackRepository;
+            _orderService = orderService;
         }
-
-        public PaymentOverview GetPaymentOverview(int tableNumber)
+        public Bill GenerateBillByVisit(Visit visit)
         {
-            PaymentOverview viewModel = new PaymentOverview
+            List<OrderLine> orderLines = _orderService.GetGroupedOrderLinesByVisitId(visit.VisitId);
+            decimal subTotal = 0, total = 0, vatLow = 0, vatHigh = 0;
+
+            foreach (OrderLine orderLine in orderLines)
             {
-                TableNumber = tableNumber,
-                Items = new List<OrderLine>(),
-                TotalAmount = 0,
-                TotalPaid = 0,
-                RemainingAmount = 0,
-                VatLow = 0,
-                VatHigh = 0
-            };
+                decimal orderLineSubTotal = orderLine.Product.Price * orderLine.Quantity;
+                subTotal += orderLineSubTotal;
+                decimal orderLineTotal = orderLine.Product.PriceIncludingTax * orderLine.Quantity;
+                total += orderLineTotal;
+                decimal vatAmount = orderLineTotal - orderLineSubTotal;
 
-            Visit activeVisit = _visitRepository.GetActiveVisitForTable(tableNumber);
-
-            if (activeVisit == null)
-            {
-                return viewModel;
-            }
-
-            viewModel.VisitId = activeVisit.VisitId;
-
-            List<Order> visitOrders = _orderRepository.GetOrdersByVisitId(activeVisit.VisitId);
-
-            if (visitOrders == null || visitOrders.Count == 0)
-                return viewModel;
-
-            List<OrderLine> groupedItems = new List<OrderLine>();
-
-            foreach (Order order in visitOrders)
-            {
-                order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
-
-                if (order.OrderLines != null)
+                if (orderLine.Product.VATPercentage == VAT_LOW)
                 {
-                    foreach (OrderLine item in order.OrderLines)
-                    {
-                        OrderLine existingItem = null;
-                        foreach (OrderLine groupedItem in groupedItems)
-                        {
-                            if (groupedItem.Product.ProductId == item.Product.ProductId)
-                            {
-                                existingItem = groupedItem;
-                                break;
-                            }
-                        }
-
-                        if (existingItem == null)
-                        {
-                            groupedItems.Add(new OrderLine
-                            {
-                                OrderLineId = item.OrderLineId,
-                                Quantity = item.Quantity,
-                                Product = item.Product
-                            });
-                        }
-                        else
-                        {
-                            existingItem.Quantity += item.Quantity;
-                        }
-                    }
-                }
-            }
-
-            viewModel.Items = groupedItems;
-
-            decimal total = 0;
-            decimal vatLow = 0;
-            decimal vatHigh = 0;
-
-            foreach (OrderLine item in groupedItems)
-            {
-                decimal lineBase = item.Product.Price * item.Quantity;
-                decimal vatAmount = lineBase * (item.Product.VATPercentage / 100m);
-
-                total += lineBase + vatAmount;
-
-                if (item.Product.VATPercentage == 21)
-                    vatHigh += vatAmount;
-                else
                     vatLow += vatAmount;
-            }
-
-            viewModel.TotalAmount = total;
-            viewModel.VatLow = vatLow;
-            viewModel.VatHigh = vatHigh;
-
-            Bill bill = _billRepository.GetBillByVisitId(activeVisit.VisitId);
-            if (bill != null)
-            {
-                decimal totalPaid = _paymentRepository.GetTotalPaidForBill(bill.BillId);
-                viewModel.TotalPaid = totalPaid;
-                decimal remaining = total - totalPaid;
-                if (remaining < 0)
-                {
-                    viewModel.RemainingAmount = 0;
                 }
-                else
+                else if (orderLine.Product.VATPercentage == VAT_HIGH)
                 {
-                    viewModel.RemainingAmount = remaining;
+                    vatHigh += vatAmount;
                 }
             }
-            else
-            {
-                viewModel.TotalPaid = 0;
-                viewModel.RemainingAmount = total;
-            }
-
-            return viewModel;
+            return new Bill(subTotal, total, vatLow, vatHigh, false, visit, orderLines);
         }
 
-        public bool ProcessPayment(PaymentRequest request)
+        public Bill? GetBillById(int? billId)
         {
-            decimal subTotal = 0;
-            decimal vatLow = 0;
-            decimal vatHigh = 0;
-
-            List<Order> visitOrders = _orderRepository.GetOrdersByVisitId(request.VisitId);
-
-            if (visitOrders != null)
-            {
-                foreach (Order order in visitOrders)
-                {
-                    order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
-
-                    if (order.OrderLines != null)
-                    {
-                        foreach (OrderLine item in order.OrderLines)
-                        {
-                            decimal lineBase = item.Product.Price * item.Quantity;
-                            decimal vatAmount = lineBase * (item.Product.VATPercentage / 100m);
-
-                            subTotal += lineBase;
-
-                            if (item.Product.VATPercentage == 21)
-                                vatHigh += vatAmount;
-                            else
-                                vatLow += vatAmount;
-                        }
-                    }
-                }
-            }
-
-            decimal total = subTotal + vatLow + vatHigh;
-
-            Bill bill = _billRepository.GetBillByVisitId(request.VisitId);
-            int billId;
-
-            if (bill == null)
-            {
-                Bill newBill = new Bill(subTotal, total, vatLow, vatHigh, false, request.VisitId);
-
-                billId = _billRepository.SaveBill(newBill);
-            }
-            else
-            {
-                billId = bill.BillId;
-            }
-
-            decimal totalPaid = _paymentRepository.GetTotalPaidForBill(billId);
-            decimal remaining = total - totalPaid;
-
-            decimal expectedAmount;
-            if (request.IsEqualSplit && request.SplitCount > 0)
-                expectedAmount = total / request.SplitCount;
-            else
-                expectedAmount = remaining;
-
-            decimal finalPaymentAmount;
-            if (request.PaymentAmount > 0)
-                finalPaymentAmount = request.PaymentAmount;
-            else
-                finalPaymentAmount = expectedAmount + request.TipAmount;
-
-            decimal calcTip = finalPaymentAmount - expectedAmount;
-            decimal finalTip;
-
-            if (calcTip > 0)
-            {
-                finalTip = calcTip;
-            }
-            else
-            {
-                finalTip = 0;
-            }
-
-            Payment payment = new Payment
-            {
-                PaymentMethod = request.PaymentMethod,
-                PaymentAmount = finalPaymentAmount,
-                BillId = billId,
-                PaymentTip = finalTip
-            };
-
-            int paymentId = _paymentRepository.SavePayment(payment);
-
-            if (!string.IsNullOrEmpty(request.FeedbackDescription))
-            {
-                Feedback feedback = new Feedback
-                {
-                    Type = request.FeedbackType,
-                    Description = request.FeedbackDescription,
-                    PaymentId = paymentId
-                };
-
-                _feedbackRepository.SaveFeedback(feedback);
-            }
-
-            decimal newTotalPaid = totalPaid + finalPaymentAmount;
-
-
-            bool isFullyPaid = newTotalPaid >= total;
-
-            if (isFullyPaid)
-            {
-                _billRepository.UpdateBillPaid(billId, true);
-                _visitRepository.CloseVisit(request.VisitId);
-            }
-
-
-            return isFullyPaid;
+            return _paymentRepository.GetBillById(billId);
         }
 
-        public bool VerifyPaymentSuccess(int tableNumber)
+        public int SaveBill(Bill bill)
         {
-            Visit activeVisit = _visitRepository.GetActiveVisitForTable(tableNumber);
-
-            if (activeVisit != null)
-            {
-                Bill bill = _billRepository.GetBillByVisitId(activeVisit.VisitId);
-
-                if (bill == null || bill.IsPaid == false)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return _paymentRepository.SaveBill(bill);
         }
-    
+
+        public void SaveFeedback(Payment payment)
+        {
+            _paymentRepository.SaveFeedback(payment);
+        }
+
+        public int SavePayment(Payment payment)
+        {
+            return _paymentRepository.SavePayment(payment);
+        }
+
+        public List<Payment> GetPaymentsByBillId(int billId)
+        {
+            return _paymentRepository.GetPaymentsByBillId(billId);
+        }
+
+        public decimal GetTotalPaidByBillId(int billId)
+        {
+            return _paymentRepository.GetTotalPaidByBillId(billId);
+        }
+
+        public Bill? GetBillByVisitId(int visitId)
+        {
+            return _paymentRepository.GetBillByVisitId(visitId);
+        }
+
+        public void UpdateBillPaid(Bill bill)
+        {
+            _paymentRepository.UpdateBillPaid(bill);
+        }
+
+        public bool IsBillFullyPaid(Bill bill)
+        {
+            //Er kunnen afrondings problemen zijn daarom gebruiken we >=, bijvoorbeeld € 50,00 / 3
+            if (_paymentRepository.GetTotalPaidByBillId(bill.BillId) >= bill.Total) return true;
+            return false;
+        }
     }
 }

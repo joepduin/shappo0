@@ -30,7 +30,7 @@ else
             @if (Model.Table.Status == true)
             {
                 <a href="/Order/TakeOrder?tableNumber=@Model.Table.TableNumber">Take order</a>
-                <a href="/Payment/Index?tableId=@Model.Table.TableNumber">Make payment</a>
+                <a href="/Payment/Index?tableNumber=@Model.Table.TableNumber">Make payment</a>
             }
 
         </div>
