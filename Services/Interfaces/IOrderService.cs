@@ -7,11 +7,12 @@ namespace shappo0.Services
     {
         public List<Order> GetOrdersByVisitId(int visitId);
         public List<Order> GetAllOrders();
-        public List<Order> GetRunningOrders(OrderStatus status);
+        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2);
 
         public List<Order> GetRunningOrdersByType(ProductType type);
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type);
+        public List<OrderLine> GetActiveOrderLinesByTableNumber(int orderNumber);
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines);
         void AddProductToCart(List<OrderLine> cart, Product selectedProduct);
         bool TryIncreaseQuantity(List<OrderLine> cart, int productId);
@@ -19,7 +20,7 @@ namespace shappo0.Services
         void RemoveLine(List<OrderLine> cart, int productId);
         void AddNote(List<OrderLine> cart, int productId, string note);
 
-        void UpdateOrderLineStatus(int orderLineId, OrderStatus status);
+        void UpdateOrderLineStatus(OrderLine orderLine, OrderStatus status);
         void UpdateOrderStatus(int orderNumber, OrderStatus status);
         void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status);
 

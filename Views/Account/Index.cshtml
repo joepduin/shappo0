@@ -1,0 +1,38 @@
+﻿@using shappo0.Models
+@model shappo0.Models.Staff
+@{
+    ViewData["Title"] = "Account";
+}
+
+<h1>Account</h1>
+
+<table>
+    <tbody>
+        <tr>
+            <th><strong>StaffId</strong></th>
+            <td>@Model.StaffId</td>
+        </tr>
+        <tr>
+            <th><strong>Name</strong></th>
+            <td>@(Model.Name ?? "No data ask a manager to change.")</td>
+        </tr>
+        <tr>
+            <th><strong>Phone number</strong></th>
+            <td>@(Model.PhoneNumber ?? "No data ask a manager to change.")</td>
+        </tr>
+        <tr>
+            <th><strong>Sex</strong></th>
+            <td>@(Model.Sex?.ToString() ?? "No data ask a manager to change.")</td>
+        </tr>
+        <tr>
+            <th><strong>Role</strong></th>
+            <td>@Model.Role</td>
+        </tr>
+        <tr>
+            <th><strong>Is employed</strong></th>
+            <td>@Model.IsEmployed</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>If you want to change some data, please ask a manager.</p>

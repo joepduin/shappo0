@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using shappo0.Enums;
 using shappo0.Models;
 using shappo0.Services;
 using System.Security.Claims;
 
 namespace shappo0.Controllers
 {
-    [Authorize]
     public class AccountController : Controller
     {
         private readonly IAccountService _accountService;
@@ -18,21 +18,15 @@ namespace shappo0.Controllers
             _accountService = accountService;
         }
 
-        //Stuurt door naar de inlog pagina
+        //account pagina
+        [Authorize]
         [HttpGet]
         public IActionResult Index()
         {
-            return RedirectToAction("Login", "Account");
-        }
+            int staffId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            Staff? staff = _accountService.GetStaff(staffId);
 
-        //Test om te kijken of de permissies werken.
-        //naar de table pagina = werkend
-        //naar accesdenied page = niet werkend
-        [Authorize(Roles = "Manager")]
-        [HttpGet]
-        public IActionResult Test()
-        {
-            return RedirectToAction("Index", "Table");
+            return View(staff);
         }
         
         //de inlog pagina
@@ -74,13 +68,13 @@ namespace shappo0.Controllers
             else
             {
                 SignInStaff(staff);
-                //je gaat nu gelijk naar de table page. later ga je naar de pagina waarvoor je rol geschikt is.
-                return RedirectToAction("Index", "Table");
+                return RedirectToAction("Index", "Home"); //als je naar deze pagina gaat ga je naar je eigen home page
             }
         }
 
-        //maakt een Claim van de user om Authorize te gebruiken
-        private void SignInStaff(Staff staff)
+
+    //maakt een Claim van de user om Authorize te gebruiken
+    private void SignInStaff(Staff staff)
         {
             List<Claim> claims = new List<Claim>
             {
