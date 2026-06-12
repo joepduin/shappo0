@@ -7,6 +7,8 @@
 
         public LoginModel()
         {
+                Name = string.Empty;
+                Password = string.Empty;
         }
 
         public LoginModel(string name, string password)
