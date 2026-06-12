@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
+using shappo0.ViewModels;
 
 namespace shappo0.Repositories
 {
@@ -134,7 +135,7 @@ namespace shappo0.Repositories
                 OnMenu = (bool)reader["onMenu"]
             };
 
-            Order attachedOrder = new Order
+            OrderViewModel attachedOrder = new OrderViewModel
             {
                 OrderNumber = (int)reader["orderNumber"],
                 TimeCreated = (DateTime)reader["timeCreated"],
