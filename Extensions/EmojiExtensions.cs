@@ -11,5 +11,6 @@ namespace shappo0.Extensions
             if (orderStatus == OrderStatus.ReadyToBeServed) return "🍽️";
             else return "💤";
         }
+
     }
 }

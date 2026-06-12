@@ -18,11 +18,13 @@ namespace shappo0.Models
         public Visit Visit { get; set; }
         public Staff Staff { get; set; }
         public List<OrderLine> OrderLines { get; set; }
-        
+
 
         public Order()
         {
-
+            Visit = new();
+            Staff = new();
+            OrderLines = [];
         }
 
         public Order(int orderNumber, DateTime timeCreated, OrderStatus status, Visit visit, Staff staff)

@@ -8,7 +8,6 @@ namespace shappo0.Services
         public List<Order> GetOrdersByVisitId(int visitId);
         public List<Order> GetAllOrders();
         public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2);
-
         public List<Order> GetRunningOrdersByType(ProductType type);
         public List<Order> GetFinishedOrdersByType(ProductType type);
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);

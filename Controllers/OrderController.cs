@@ -15,11 +15,13 @@ namespace shappo0.Controllers
     {
         private readonly IMenuService _menuService;
         private readonly IOrderService _orderService;
+        private readonly ITableService _tableService;
 
-        public OrderController(IMenuService menuService, IOrderService orderService)
+        public OrderController(IMenuService menuService, IOrderService orderService, ITableService tableService)
         {
             _menuService = menuService;
             _orderService = orderService;
+            _tableService = tableService;
         }
 
         private string GetCartKey(int tableNumber)
@@ -31,10 +33,21 @@ namespace shappo0.Controllers
         [Authorize]
         public IActionResult TakeOrder(int tableNumber, FilterItemsViewModel filters)
         {
-            if (tableNumber <= 0 || tableNumber > 10)
+
+            string cartId = GetCartKey(tableNumber);
+            List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
+
+            //checks if there are any orderLines for this table, if not it will check if the table is occupied, if the table is not occupied it will redirect the user back to the table overview with an error message,
+            //this is to prevent users from placing orders for tables that are not occupied and also to prevent users from seeing the order page for tables that are not occupied which could cause confusion
+            if (orderLines == null || orderLines.Count == 0)
             {
-                TempData["Error"] = "Please select an existing table.";
-                return RedirectToAction("Index", "Table");
+                Table? currentTable = _tableService.GetTableByNumber(tableNumber);
+
+                if (currentTable == null || currentTable.Status != true)
+                {
+                    TempData["Error"] = $"Table {tableNumber} is currently empty or non existent.";
+                    return RedirectToAction("Index", "Table");
+                }
             }
 
             TakeOrderViewModel model = new(tableNumber);
@@ -44,8 +57,7 @@ namespace shappo0.Controllers
             List<Product> products = _menuService.GetFilteredProducts(filters);
 
             //Grabs the unique cartId for this table so we have the correct orderLines for this table
-            string cartId = GetCartKey(tableNumber);
-            List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
+            
 
             if (orderLines != null)
             {
@@ -56,30 +68,33 @@ namespace shappo0.Controllers
 
             return View(model);
         }
-
-        public IActionResult AddToOrder(int tableNumber, int productId, string? productType, string? menuType)
+        
+        public IActionResult AddToOrder(OrderActionViewModel request)
         {
-            Product selectedProduct = _menuService.GetByProductId(productId);
+            Product? selectedProduct = _menuService.GetByProductId(request.ProductId);
 
-            //Grabs the exisiting orderLines from the cartId and if it's null it will create a new list
-            string cartId = GetCartKey(tableNumber);
-            List<OrderLine> cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId) ?? new List<OrderLine>();
+            if (selectedProduct != null)
+            {
+                //Grabs the exisiting orderLines from the cartId and if it's null it will create a new list
+                string cartId = GetCartKey(request.TableNumber);
+                List<OrderLine> cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId) ?? new List<OrderLine>();
 
-            _orderService.AddProductToCart(cart, selectedProduct);
+                _orderService.AddProductToCart(cart, selectedProduct);
 
-            HttpContext.Session.SetObject(cartId, cart);
-
-            return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, productType = productType, menuType = menuType });
+                HttpContext.Session.SetObject(cartId, cart);
+                
+            }
+            return RedirectToAction("TakeOrder", new { tableNumber = request.TableNumber, productType = request.ProductType, menuType = request.MenuType });
         }
 
-        public IActionResult IncreaseQuantity(int tableNumber, int productId, string? productType, string? menuType)
+        public IActionResult IncreaseQuantity(OrderActionViewModel request)
         {
-            string cartId = GetCartKey(tableNumber);
+            string cartId = GetCartKey(request.TableNumber);
             List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
             if (cart != null)
             {
-                bool wasSuccesful = _orderService.TryIncreaseQuantity(cart, productId);
+                bool wasSuccesful = _orderService.TryIncreaseQuantity(cart, request.ProductId);
 
                 if (wasSuccesful)
                 {
@@ -90,21 +105,21 @@ namespace shappo0.Controllers
                     TempData["Error"] = "Not enough stock to add this item";
                 }
             }
-            return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, productType = productType, menuType = menuType });
+            return RedirectToAction("TakeOrder", new { tableNumber = request.TableNumber, productType = request.ProductType, menuType = request.MenuType });
         }
 
-        public IActionResult DecreaseQuantity(int tableNumber, int productId, string? productType, string? menuType)
+        public IActionResult DecreaseQuantity(OrderActionViewModel request)
         {
-            string cartId = GetCartKey(tableNumber);
+            string cartId = GetCartKey(request.TableNumber);
             List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
             if (cart != null)
             {
-                _orderService.DecreaseQuantity(cart, productId);
+                _orderService.DecreaseQuantity(cart, request.ProductId);
                 HttpContext.Session.SetObject(cartId, cart);
             }
 
-            return RedirectToAction("TakeOrder", new { TableNumber = tableNumber, ProductType = productType, MenuType = menuType });
+            return RedirectToAction("TakeOrder", new { tableNumber = request.TableNumber, productType = request.ProductType, menuType = request.MenuType });
         }
 
         public IActionResult CancelOrder(int tableNumber)
@@ -115,33 +130,33 @@ namespace shappo0.Controllers
             return RedirectToAction("Index", "Table");
         }
 
-        public IActionResult RemoveLine(int tableNumber, int productId, string? productType, string? menuType)
+        public IActionResult RemoveLine(OrderActionViewModel request)
         {
-            string cartId = GetCartKey(tableNumber);
+            string cartId = GetCartKey(request.TableNumber);
             List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
             if (cart != null)
             {
-                _orderService.RemoveLine(cart, productId);
+                _orderService.RemoveLine(cart, request.ProductId);
                 HttpContext.Session.SetObject(cartId, cart);
             }
 
-            return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, menuType = menuType, productType = productType });
+            return RedirectToAction("TakeOrder", new { tableNumber = request.TableNumber, productType = request.ProductType, menuType = request.MenuType });
         }
 
         [HttpPost]
-        public IActionResult AddNote(int tableNumber, int productId, string note, string? productType, string? menuType)
+        public IActionResult AddNote(OrderActionViewModel request)
         {
-            string cartId = GetCartKey(tableNumber);
+            string cartId = GetCartKey(request.TableNumber);
             List<OrderLine>? cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
-            if (cart != null)
+            if (cart != null && request.Note != null)
             {
-                _orderService.AddNote(cart, productId, note);
+                _orderService.AddNote(cart, request.ProductId, request.Note);
                 HttpContext.Session.SetObject(cartId, cart);
             }
 
-            return RedirectToAction("TakeOrder", new { tableNumber = tableNumber, menuType = menuType, productType = productType });
+            return RedirectToAction("TakeOrder", new { tableNumber = request.TableNumber, productType = request.ProductType, menuType = request.MenuType });
         }
 
         public IActionResult SaveOrder(int tableNumber)
@@ -149,9 +164,26 @@ namespace shappo0.Controllers
             string cartId = GetCartKey(tableNumber);
             List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
-            int staffId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            string? staffIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            //Checks if the staffId can be parsed, if not it will redirect the user to the login page with an error message, this is to prevent orders being placed without a valid staffId which is required to link the order to the staff member who took it
+            if (!int.TryParse(staffIdString, out int staffId))
+            {
+                TempData["Error"] = "Could not verify your staff identity. Please log in again.";
+                return RedirectToAction("Login", "Account");
+            }
 
+            //Checks if the table is still occupied before saving the order, if not it will clear the cart and redirect the user to the table overview with an error message, this is to prevent orders being placed for tables that are no longer occupied
+            Table? currentTable = _tableService.GetTableByNumber(tableNumber);
+            if (currentTable == null || currentTable.Status != true)
+            {
+                // If the table is suddenly empty/invalid, clear their cart so they don't accidentally send it later!
+                HttpContext.Session.Remove(cartId);
+                TempData["Error"] = $"Table {tableNumber} is no longer occupied. The order was aborted.";
+                return RedirectToAction("Index", "Table");
+            }
+
+            //Checks if there are orderLines to be saved, if not it will just redirect back to the table overview with an error message, this is to prevent empty orders being placed
             if (orderLines != null && orderLines.Count > 0)
             {
                 _orderService.CreateOrder(tableNumber, staffId, orderLines);
