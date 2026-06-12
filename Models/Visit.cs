@@ -19,7 +19,9 @@
 
         public Visit()
         {
-
+            Staff = new();
+            Table = new();
+            Orders = [];
         }
     }
 

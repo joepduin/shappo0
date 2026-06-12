@@ -19,7 +19,7 @@ namespace shappo0.Services
         }
 
 
-        public Visit GetActiveVisitForTable(int tableNumber)
+        public Visit? GetActiveVisitForTable(int tableNumber)
         {
             return _visitRepository.GetActiveVisitForTable(tableNumber);
         }

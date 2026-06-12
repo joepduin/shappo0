@@ -10,7 +10,7 @@ namespace shappo0.Services
         public List<Product> GetFilteredProducts(FilterItemsViewModel? filters);
         public void AddMenuItem(Product product);
         public void EditMenuItem(Product product);
-
-        public void AdjustStock(int productId, int newStock);  
+        public void AdjustStock(int productId, int newStock);
+        public void BatchAdjustStock(List<OrderLine> orderLines);
     }
 }

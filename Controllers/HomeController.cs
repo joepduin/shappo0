@@ -21,7 +21,14 @@ namespace shappo0.Controllers
         [Authorize] //moet op authorize staan, want anders is het mogelijk dat er geen claim is
         public IActionResult Index()
         {
-            RoleType roleType = Enum.Parse<RoleType>(User.FindFirstValue(ClaimTypes.Role));
+            string? staffIdString = User.FindFirstValue(ClaimTypes.Role);
+
+            if(!Enum.TryParse<RoleType>(staffIdString, out RoleType roleType))
+            {
+                TempData["Error"] = "Could not verify your staff identity. Please log in again.";
+                RedirectToAction("Login", "Account");
+            }
+
             if (roleType == RoleType.Manager) return RedirectToAction("Index", "Finance");
             else if (roleType == RoleType.Bar) return RedirectToAction("Index", "Bar");
             else if (roleType == RoleType.Kitchen) return RedirectToAction("Index", "Kitchen");
