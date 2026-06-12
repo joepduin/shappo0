@@ -16,7 +16,6 @@ namespace shappo0.Controllers
         private readonly IMenuService _menuService;
         private readonly IOrderService _orderService;
         private readonly ITableService _tableService;
-        private const int amountOfTables = 10;
 
         public OrderController(IMenuService menuService, IOrderService orderService, ITableService tableService)
         {
