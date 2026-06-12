@@ -7,20 +7,23 @@ namespace shappo0.Models
         public int PaymentId { get; set; }
         public PaymentMethodType PaymentMethod { get; set; }
         public decimal PaymentAmount { get; set; }
-        public int BillId { get; set; }
+        public Bill Bill { get; set; }
         public decimal PaymentTip { get; set; }
+        public Feedback? Feedback { get; set; }
 
         public Payment()
         {
+
         }
 
-        public Payment(int paymentId, PaymentMethodType paymentMethod, decimal paymentAmount, int billId, decimal paymentTip)
+        public Payment(int paymentId, PaymentMethodType paymentMethod, decimal paymentAmount, Bill bill, decimal paymentTip, Feedback? feedback)
         {
             PaymentId = paymentId;
             PaymentMethod = paymentMethod;
             PaymentAmount = paymentAmount;
-            BillId = billId;
+            Bill = bill;
             PaymentTip = paymentTip;
+            Feedback = feedback;
         }
     }
 }
