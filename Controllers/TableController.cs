@@ -75,8 +75,9 @@ namespace shappo0.Controllers
                 }
                 return RedirectToAction("Index", "Table");
             }
+            
 
-            TempData["ErrorMessage"] = "Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
+                TempData["ErrorMessage"] = "Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
             return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
         }
 

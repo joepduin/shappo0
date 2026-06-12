@@ -9,18 +9,18 @@ namespace shappo0.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderLineRepository _orderLineRepository;
-        private readonly IMenuRepository _menuRepository;
-        private readonly IVisitRepository _visitRepository;
-        private readonly IStaffRepository _staffRepository;
+        private readonly IAccountService _accountService;
+        private readonly IMenuService _menuService;
+        private readonly IVisitService _visitService;
         
 
-        public OrderService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository, IMenuRepository menuRepository, IStaffRepository staffRepository)
+        public OrderService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitService visitService, IMenuService menuService, IAccountService accountService)
         {
             _orderRepository = orderRepository;
             _orderLineRepository = orderLineRepository;
-            _visitRepository = visitRepository;
-            _menuRepository = menuRepository;
-            _staffRepository = staffRepository;
+            _visitService = visitService;
+            _menuService = menuService;
+            _accountService = accountService;
         }
 
         
@@ -64,19 +64,51 @@ namespace shappo0.Services
             return _orderLineRepository.GetActiveOrderLinesByTableNumber(orderNumber);
         }
 
+        public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId)
+        {
+            List<OrderLine> groupedLines = new List<OrderLine>();
+            List<Order> orders = _orderRepository.GetOrdersByVisitId(visitId);
+            foreach (Order order in orders)
+            {
+                List<OrderLine> orderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
+                foreach (OrderLine orderLine in orderLines)
+                {
+                    bool itemExists = false;
+                    foreach (OrderLine groupLine in groupedLines)
+                    {
+                        if (groupLine.Product.ProductId == orderLine.Product.ProductId)
+                        {
+                            groupLine.Quantity += orderLine.Quantity;
+                            itemExists = true;
+                            break;
+                        }
+                    }
+                    if (itemExists == false) groupedLines.Add(new() { OrderLineId = orderLine.OrderLineId, Product = orderLine.Product, Quantity = orderLine.Quantity });
+                }
+            }
+            return groupedLines;
+        }
+
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines)
         {
-            Visit? activeVisit = _visitRepository.GetActiveVisitForTable(tableNumber);
-            Staff currentStaff = _staffRepository.GetStaff(staffId);
+            Visit? activeVisit = _visitService.GetActiveVisitForTable(tableNumber);
+            Staff? currentStaff = _accountService.GetStaff(staffId);
+
+            //If the staff member doesn't exist, return without creating an order
+            if (currentStaff == null)
+            {
+                return;
+            }
 
             //Create a new visit if this is the first order for this table
             if (activeVisit == null)
             {
                 activeVisit = new Visit { Table = new Table{ TableNumber = tableNumber }, Staff = currentStaff, IsActive = true };
                 
-                int newVisitId = _visitRepository.StartNewVisit(activeVisit);
+                int newVisitId = _visitService.StartNewVisit(activeVisit);
 
                 activeVisit.VisitId = newVisitId;
+  
             }
  
             OrderViewmodel newOrder = new OrderViewmodel
@@ -89,13 +121,14 @@ namespace shappo0.Services
 
             _orderRepository.CreateOrder(newOrder);
 
-            foreach(OrderLine line in orderLines)
+            //Link the order lines to the order and create them in the database, then adjust the stock for each ordered product
+            foreach (OrderLine line in orderLines)
             {
-                line.Order = newOrder;   
+                line.Order = newOrder;
             }
- 
+
             _orderLineRepository.CreateOrderLines(orderLines);
-            _menuRepository.BatchAdjustStock(orderLines);
+            _menuService.BatchAdjustStock(orderLines);
         }
 
         public void AddProductToCart(List<OrderLine> cart, Product selectedProduct)

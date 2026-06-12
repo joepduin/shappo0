@@ -40,5 +40,9 @@ namespace shappo0.Services
         {
             _menuRepository.AdjustStock(productId, newStock);
         }
+        public void BatchAdjustStock(List<OrderLine> orderLines)
+        {
+            _menuRepository.BatchAdjustStock(orderLines);
+        }
     }
 }

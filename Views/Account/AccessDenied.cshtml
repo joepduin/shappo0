@@ -1,6 +1,30 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Index";
 }
 
-<h1>Je hebt niet de juiste permissies voor deze pagina.</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="card shadow border-danger mt-5">
+                <div class="card-body p-5">
+
+                    <div class="mb-4">
+                        <span class="display-1 text-danger">🔒</span>
+                    </div>
+
+                    <h2 class="fw-bold text-dark mb-3">Toegang Geweigerd</h2>
+                    <p class="text-muted mb-4">
+                        Je hebt helaas niet de juiste permissies om deze pagina te bekijken.
+                    </p>
+
+                    <hr class="my-4 text-muted" />
+
+                    <a href="/Home/Index" class="btn btn-danger btn-lg w-100 shadow-sm fw-bold">
+                        ➔ Terug naar de Startpagina
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

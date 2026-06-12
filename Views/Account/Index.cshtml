@@ -4,35 +4,58 @@
     ViewData["Title"] = "Account";
 }
 
-<h1>Account</h1>
+<div class="container mt-4">
+    <div class="card mb-5 border-primary shadow-sm" style="max-width: 600px; margin: 0 auto;">
 
-<table>
-    <tbody>
-        <tr>
-            <th><strong>StaffId</strong></th>
-            <td>@Model.StaffId</td>
-        </tr>
-        <tr>
-            <th><strong>Name</strong></th>
-            <td>@(Model.Name ?? "No data ask a manager to change.")</td>
-        </tr>
-        <tr>
-            <th><strong>Phone number</strong></th>
-            <td>@(Model.PhoneNumber ?? "No data ask a manager to change.")</td>
-        </tr>
-        <tr>
-            <th><strong>Sex</strong></th>
-            <td>@(Model.Sex?.ToString() ?? "No data ask a manager to change.")</td>
-        </tr>
-        <tr>
-            <th><strong>Role</strong></th>
-            <td>@Model.Role</td>
-        </tr>
-        <tr>
-            <th><strong>Is employed</strong></th>
-            <td>@Model.IsEmployed</td>
-        </tr>
-    </tbody>
-</table>
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Account Details</h3>
+        </div>
 
-<p>If you want to change some data, please ask a manager.</p>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <tbody>
+                    <tr>
+                        <th class="w-25 ps-4 align-middle">Staff ID</th>
+                        <td class="align-middle">@Model.StaffId</td>
+                    </tr>
+                    <tr>
+                        <th class="ps-4 align-middle">Name</th>
+                        <td class="align-middle">@(Model.Name ?? "No data, ask a manager to change.")</td>
+                    </tr>
+                    <tr>
+                        <th class="ps-4 align-middle">Phone Number</th>
+                        <td class="align-middle">@(Model.PhoneNumber ?? "No data, ask a manager to change.")</td>
+                    </tr>
+                    <tr>
+                        <th class="ps-4 align-middle">Sex</th>
+                        <td class="align-middle">@(Model.Sex?.ToString() ?? "No data, ask a manager to change.")</td>
+                    </tr>
+                    <tr>
+                        <th class="ps-4 align-middle">Role</th>
+                        <td class="align-middle">
+                            <span class="badge bg-secondary fs-6">@Model.Role</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="ps-4 align-middle">Status</th>
+                        <td class="align-middle">
+                            @if (Model.IsEmployed)
+                            {
+                                <span class="text-success fw-bold">Active Employee</span>
+                            }
+                            else
+                            {
+                                <span class="text-danger fw-bold">Inactive</span>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer bg-light text-muted text-center py-3">
+            <small>If you want to change any of your data, please contact a manager.</small>
+        </div>
+
+    </div>
+</div>

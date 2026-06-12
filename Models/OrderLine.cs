@@ -24,7 +24,8 @@ namespace shappo0.Models
 
         public OrderLine()
         {
-
+            Product = new();
+            Order = new(); 
         }
 
         

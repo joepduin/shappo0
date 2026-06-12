@@ -21,7 +21,9 @@ namespace shappo0.Models
 
         public Visit()
         {
-
+            Staff = new();
+            Table = new();
+            Orders = [];
         }
     }
 
