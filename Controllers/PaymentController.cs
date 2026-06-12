@@ -28,16 +28,16 @@ namespace shappo0.Controllers
             Visit? visit = _visitService.GetActiveVisitForTable(tableNumber);
             if (visit == null)
             {
-                TempData["Error"] = $"No active visit found for table {tableNumber}.";
+                TempData["Error"] = "No active visit found for table.";
                 return RedirectToAction("Index", "Table"); //null error
             }
 
-            //Voodat de bill word gemaakt eerst even kijken of hij niet al gemaakt is.
+            //Voodat de bill wordt gemaakt eerst even kijken of hij niet al gemaakt is.
             Bill? existingBill = _paymentService.GetBillByVisitId(visit.VisitId);
             //Als de bill wel al gemaakt is ga dan gelijk door naar afrekenen.
             if (existingBill != null) return RedirectToAction("ProcessPayment", new { billId = existingBill.BillId });
 
-            //Genereerd de bill als er een actieve visit bij de tafel is.
+            //Genereert de bill als er een actieve visit bij de tafel is.
             Bill bill = _paymentService.GenerateBillByVisit(visit);
             return View(bill);
         }
@@ -127,47 +127,35 @@ namespace shappo0.Controllers
                 return RedirectToAction("Index", "Table"); //null error
             }
 
-            visit.Table.Status = false;
+            Table table = new Table
+            {
+                TableNumber = visit.Table.TableNumber,
+                Status = false
+            };
+
             _visitService.CloseVisit(visitId);
-            _tableService.UpdateTableStatus(visit.Table);
-            List<Payment> payments = _paymentService.GetPaymentsByBillId(bill.BillId);
-            bill.TotalTip = payments.Sum(p => p.PaymentTip);
+            _tableService.UpdateTableStatus(table);
+            bill.TotalTip = _paymentService.CalculateTotalTip(bill);
             _paymentService.UpdateBillPaid(bill);
             return View();
         }
 
-        //Ik moet nog even nadenken hoe ik dit aanpak, want een viewmodel mag niet in de services gemaakt worden en hier mogen geen berekeningen
         private PaymentViewModel CreatePaymentViewModel(Bill bill)
         {
-            List<Payment> payments = _paymentService.GetPaymentsByBillId(bill.BillId);
+            int numberOfPeoplePaid = _paymentService.CalculateNumberOfPeoplePaid(bill);
+            decimal outstandingAmount = _paymentService.CalculateOutstandingAmount(bill);
 
-            decimal amountToPay = 0;
-            decimal paymentTip = 0;
-            int numberOfPeople = 0;
-
-            if (bill.SplitChoice == SplitChoice.Equal && bill.NumberOfPeople != null)
-            {
-                amountToPay = bill.Total / (decimal)bill.NumberOfPeople;
-                paymentTip = bill.TotalTip / (decimal)bill.NumberOfPeople;
-                numberOfPeople = (int)bill.NumberOfPeople;
-            }
-            else
-            {
-                amountToPay = bill.Total;
-                paymentTip = bill.TotalTip;
-                if (bill.SplitChoice == SplitChoice.Single) numberOfPeople = 1;
-                else numberOfPeople = 0;  //er is nu geen idee wat de number numberOfPeople is, aangezien dat later pas word ingesteld. 
-            }
+            Payment payment = _paymentService.CalculatePaymentDetails(bill);
 
             return new PaymentViewModel
             {
-                BillId = bill.BillId,
-                TableNumber = bill.Visit.Table.TableNumber,
-                NumberOfPeoplePayed = payments.Count() + 1,
-                NumberOfPeople = numberOfPeople,
-                AmountToPay = amountToPay,
-                OutstandingAmount = bill.Total - _paymentService.GetTotalPaidByBillId(bill.BillId),
-                SplitChoice = bill.SplitChoice
+                BillId = payment.Bill.BillId,
+                TableNumber = payment.Bill.Visit.Table.TableNumber,
+                NumberOfPeoplePaid = numberOfPeoplePaid,
+                NumberOfPeople = payment.Bill.NumberOfPeople ?? 0,
+                AmountToPay = payment.PaymentAmount,
+                OutstandingAmount = outstandingAmount,
+                SplitChoice = payment.Bill.SplitChoice
             };
         }
     }

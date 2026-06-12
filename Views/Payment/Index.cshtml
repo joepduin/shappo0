@@ -53,14 +53,14 @@ else
 
         <div class="form-group mb-4">
             <label for="SplitChoice">Split choice</label>
-            <select name="SplitChoice" id="SplitChoiceSelect" class="form-control" required onchange="togglePeople()">
+            <select name="SplitChoice" id="SplitChoice" class="form-control" required onchange="togglePeople()">
                 <option value="Single">Single (Pay total)</option>
                 <option value="Equal">Equal split</option>
                 <option value="Custom">Custom split</option>
             </select>
         </div>
 
-        <div class="form-group mb-4" id="peopleInputDiv" style="display: none;">
+        <div class="form-group mb-4" id="NumberOfPeople" style="display: none;">
             <label for="NumberOfPeople">Number of people</label>
             <input type="number" name="NumberOfPeople" id="NumberOfPeople" class="form-control" value="2" min="2" />
         </div>
@@ -71,16 +71,16 @@ else
     <script>
         function togglePeople() 
         {
-            var SplitChoice = document.getElementById("SplitChoiceSelect");
-            var peopleDiv = document.getElementById("peopleInputDiv");
+            var SplitChoice = document.getElementById("SplitChoice");
+            var NumberOfPeople = document.getElementById("NumberOfPeople");
 
             if (SplitChoice.value == "Equal") 
             {
-                peopleDiv.style.display = "block";
+                NumberOfPeople.style.display = "block";
             } 
             else 
             {
-                peopleDiv.style.display = "none";
+                NumberOfPeople.style.display = "none";
             }
         }
     </script>

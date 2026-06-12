@@ -8,7 +8,7 @@ namespace shappo0.ViewModels
     {
         public int BillId { get; set; }
         public int TableNumber { get; set; }
-        public int NumberOfPeoplePayed { get; set; }
+        public int NumberOfPeoplePaid { get; set; }
         public int NumberOfPeople { get; set; }
         public decimal AmountToPay { get; set; }
         public decimal OutstandingAmount { get; set; }
@@ -19,11 +19,11 @@ namespace shappo0.ViewModels
 
         }
 
-        public PaymentViewModel(int billId, int tableNumber, int numberOfPeoplePayed, int numberOfPeople, decimal amountToPay, decimal outstandingAmount, SplitChoice splitChoice)
+        public PaymentViewModel(int billId, int tableNumber, int numberOfPeoplePaid, int numberOfPeople, decimal amountToPay, decimal outstandingAmount, SplitChoice splitChoice)
         {
             BillId = billId;
             TableNumber = tableNumber;
-            NumberOfPeoplePayed = numberOfPeoplePayed;
+            NumberOfPeoplePaid = numberOfPeoplePaid;
             NumberOfPeople = numberOfPeople;
             AmountToPay = amountToPay;
             OutstandingAmount = outstandingAmount;
