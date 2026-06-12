@@ -45,22 +45,26 @@
 							}
                         }
                     </ul>
+
                     <ul class="navbar-nav">
-                        @if (User.Identity.IsAuthenticated)
-                        {
+                        
+                            <!-- Checkt of de gebruiker ingelogd is, zo ja dan ziet de gebruiker de log off knop. De ==true staat hier erbij omdat er ook NULL uit kan komen, een if statement weet anders niet wat ie moet doen met de NULL -->
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index">Account</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="LogOff">Log off</a>
                             </li>
-                        }
+                            }
                         else
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             </li>
                         }
+                        
                     </ul>
                 </div>
             </div>
