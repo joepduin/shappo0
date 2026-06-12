@@ -12,6 +12,8 @@ namespace shappo0.ViewModels
 
         public TableViewModel()
         {
+            Table = new();
+            Orders = [];
         }
 
         public TableViewModel(Table table, OrderStatus drinkStatus, OrderStatus foodStatus)

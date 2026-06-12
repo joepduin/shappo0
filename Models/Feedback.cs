@@ -10,7 +10,7 @@ namespace shappo0.Models
 
         public Feedback()
         {
-
+            Description = string.Empty;
         }
 
         public Feedback(int feedbackId, FeedbackType type, string description)

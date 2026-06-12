@@ -17,7 +17,8 @@ namespace shappo0.Models
 
         public Bill()
         {
-
+            Visit = new();
+            OrderLines = [];
         }
 
         public Bill(decimal subTotal, decimal total, decimal vatLow, decimal vatHigh, bool isPaid, decimal totalTip, SplitChoice splitChoice, int? numberOfPeople, Visit visit, List<OrderLine> orderLines)

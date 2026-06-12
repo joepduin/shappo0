@@ -40,9 +40,9 @@ namespace shappo0.Repositories
             return tables;
         }
 
-        public Table GetTableByNumber(int tableNumber)
+        public Table? GetTableByNumber(int tableNumber)
         {
-            Table table = null;
+            Table? table = null;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {

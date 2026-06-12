@@ -13,7 +13,8 @@ namespace shappo0.Models
 
         public Payment()
         {
-
+            Bill = new();
+            Feedback = new();
         }
 
         public Payment(int paymentId, PaymentMethodType paymentMethod, decimal paymentAmount, Bill bill, decimal paymentTip, Feedback? feedback)
