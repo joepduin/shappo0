@@ -7,11 +7,11 @@ namespace shappo0.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IStaffRepository _usersRepository;
+        private readonly IStaffRepository _staffRepository;
 
-        public AccountService(IStaffRepository usersRepository)
+        public AccountService(IStaffRepository staffRepository)
         {
-            _usersRepository = usersRepository;
+            _staffRepository = staffRepository;
         }
 
         // Joep
@@ -19,18 +19,18 @@ namespace shappo0.Services
         {
 
             loginModel.Password = HashPassword(loginModel.Password);
-            return _usersRepository.GetStaffByCredentials(loginModel);
+            return _staffRepository.GetStaffByCredentials(loginModel);
         }
 
         // Ylvi
         public Staff? GetStaff(int? id)
         {
-            return _usersRepository.GetStaff(id);
+            return _staffRepository.GetStaff(id);
         }
 
         public List<Staff> GetAllStaff()
         {
-            return _usersRepository.GetAllStaff();
+            return _staffRepository.GetAllStaff();
         }
 
         public void AddStaff(Staff staff)
@@ -39,7 +39,7 @@ namespace shappo0.Services
             Staff copyStaff = new Staff(staff);
 
             copyStaff.Password = HashPassword(staff.Password);
-            _usersRepository.AddStaff(copyStaff);
+            _staffRepository.AddStaff(copyStaff);
 
             if(staff.StaffId != copyStaff.StaffId)
                 staff.StaffId = copyStaff.StaffId;
@@ -47,7 +47,7 @@ namespace shappo0.Services
 
         public void EditStaff(Staff staff)
         {
-            _usersRepository.EditStaff(staff);
+            _staffRepository.EditStaff(staff);
         }
 
         // Joep

@@ -132,8 +132,8 @@ namespace shappo0.Repositories
                 command.Parameters.AddWithValue("@staffId", staff.StaffId);
                 command.Parameters.AddWithValue("@name", staff.Name);
                 command.Parameters.AddWithValue("@phoneNumber", staff.PhoneNumber);
-                command.Parameters.AddWithValue("@sex", staff.Sex);
-                command.Parameters.AddWithValue("@role", staff.Role);
+                command.Parameters.AddWithValue("@sex", staff.Sex.ToString());
+                command.Parameters.AddWithValue("@role", staff.Role.ToString());
                 command.Parameters.AddWithValue("@password", staff.Password);
                 command.Parameters.AddWithValue("@isEmployed", staff.IsEmployed);
 

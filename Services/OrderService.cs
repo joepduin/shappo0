@@ -8,18 +8,18 @@ namespace shappo0.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderLineRepository _orderLineRepository;
-        private readonly IMenuRepository _menuRepository;
-        private readonly IVisitRepository _visitRepository;
-        private readonly IStaffRepository _staffRepository;
+        private readonly IAccountService _accountService;
+        private readonly IMenuService _menuService;
+        private readonly IVisitService _visitService;
         
 
-        public OrderService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository, IMenuRepository menuRepository, IStaffRepository staffRepository)
+        public OrderService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitService visitService, IMenuService menuService, IAccountService accountService)
         {
             _orderRepository = orderRepository;
             _orderLineRepository = orderLineRepository;
-            _visitRepository = visitRepository;
-            _menuRepository = menuRepository;
-            _staffRepository = staffRepository;
+            _visitService = visitService;
+            _menuService = menuService;
+            _accountService = accountService;
         }
 
         
@@ -41,6 +41,11 @@ namespace shappo0.Services
         public List<Order> GetRunningOrdersByType(ProductType type)
         {
             return _orderRepository.GetRunningOrdersByType(type);
+        }
+
+        public List<Order> GetFinishedOrdersByType(ProductType type)
+        {
+            return _orderRepository.GetFinishedOrdersByType(type);
         }
 
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type)
@@ -85,19 +90,27 @@ namespace shappo0.Services
 
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines)
         {
-            Visit? activeVisit = _visitRepository.GetActiveVisitForTable(tableNumber);
-            Staff currentStaff = _staffRepository.GetStaff(staffId);
+            Visit? activeVisit = _visitService.GetActiveVisitForTable(tableNumber);
+            Staff? currentStaff = _accountService.GetStaff(staffId);
+
+            //If the staff member doesn't exist, return without creating an order
+            if (currentStaff == null)
+            {
+                return;
+            }
 
             //Create a new visit if this is the first order for this table
             if (activeVisit == null)
             {
                 activeVisit = new Visit { Table = new Table{ TableNumber = tableNumber }, Staff = currentStaff, IsActive = true };
                 
-                int newVisitId = _visitRepository.StartNewVisit(activeVisit);
+                int newVisitId = _visitService.StartNewVisit(activeVisit);
 
                 activeVisit.VisitId = newVisitId;
+  
             }
- 
+
+            //Create the order and link it to the visit and staff member
             Order newOrder = new Order
             {
                 TimeCreated = DateTime.Now,
@@ -108,13 +121,14 @@ namespace shappo0.Services
 
             _orderRepository.CreateOrder(newOrder);
 
-            foreach(OrderLine line in orderLines)
+            //Link the order lines to the order and create them in the database, then adjust the stock for each ordered product
+            foreach (OrderLine line in orderLines)
             {
-                line.Order = newOrder;   
+                line.Order = newOrder;
             }
- 
+
             _orderLineRepository.CreateOrderLines(orderLines);
-            _menuRepository.BatchAdjustStock(orderLines);
+            _menuService.BatchAdjustStock(orderLines);
         }
 
         public void AddProductToCart(List<OrderLine> cart, Product selectedProduct)

@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using shappo0.Enums;
 using shappo0.Models;
 using shappo0.Repositories;
 using shappo0.Services;
-using shappo0.Enums;
+using shappo0.ViewModels;
 
 namespace shappo0.Controllers
 {
+   // [Authorize(Roles = "Bar")]
     public class BarController : Controller
     {
         private readonly IOrderService _orderService;
@@ -47,7 +50,7 @@ namespace shappo0.Controllers
 
         public IActionResult FinishedOrders()
         {
-            List<Order> orders= _orderService.GetRunningOrders(OrderStatus.ReadyToBeServed, OrderStatus.Served);
+            List<Order> orders= _orderService.GetFinishedOrdersByType(ProductType.Drink);
             return View(orders);
         }
     }
