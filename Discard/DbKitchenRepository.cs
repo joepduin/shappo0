@@ -113,7 +113,7 @@ namespace shappo0.Discard
 
                     };
 
-                    OrderViewmodel order = new OrderViewmodel
+                    OrderViewModel order = new OrderViewModel
                     {
                         OrderNumber = (int)reader["orderNumber"]
                     };

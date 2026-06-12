@@ -21,14 +21,14 @@ namespace shappo0.ViewModels
         public List<OrderLine> OrderLines { get; set; }
 
 
-        public OrderViewmodel()
+        public OrderViewModel()
         {
             Visit = new();
             Staff = new();
             OrderLines = [];
         }
 
-        public OrderViewmodel(int orderNumber, DateTime timeCreated, OrderStatus status, Visit visit, Staff staff)
+        public OrderViewModel(int orderNumber, DateTime timeCreated, OrderStatus status, Visit visit, Staff staff)
         {
             OrderNumber = orderNumber;
             TimeCreated = timeCreated;

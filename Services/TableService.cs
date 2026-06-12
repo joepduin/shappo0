@@ -36,11 +36,11 @@ namespace shappo0.Services
 
             if (visit != null)
             {
-                List<OrderViewmodel> orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
+                List<OrderViewModel> orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
                 if (orders != null)
                 {
                     bool allOrdersServed = true;
-                    foreach (OrderViewmodel order in orders)
+                    foreach (OrderViewModel order in orders)
                     {
                         if (order.Status != OrderStatus.Served) allOrdersServed = false;
                     }
