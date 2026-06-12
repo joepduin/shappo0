@@ -43,6 +43,11 @@ namespace shappo0.Services
             return _orderRepository.GetRunningOrdersByType(type);
         }
 
+        public List<Order> GetFinishedOrdersByType(ProductType type)
+        {
+            return _orderRepository.GetFinishedOrdersByType(type);
+        }
+
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type)
         {
             return _orderLineRepository.GetOrderLinesByType(orderNumber, type);

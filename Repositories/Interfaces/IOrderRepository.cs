@@ -13,6 +13,8 @@ namespace shappo0.Repositories
 
         public List<Order> GetRunningOrdersByType(ProductType type);
 
+        public List<Order> GetFinishedOrdersByType(ProductType type);
+
         public int CreateOrder(Order order);
 
         public void UpdateOrderStatus(int orderNumber, OrderStatus status);
