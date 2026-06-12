@@ -16,9 +16,9 @@ namespace shappo0.Repositories
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        public List<OrderViewmodel> GetAllOrders()
+        public List<OrderViewModel> GetAllOrders()
         {
-            List<OrderViewmodel> orders = new List<OrderViewmodel>();
+            List<OrderViewModel> orders = new List<OrderViewModel>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -40,7 +40,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewmodel order = ReadOrder(reader);
+                    OrderViewModel order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -48,9 +48,9 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<OrderViewmodel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
+        public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
-            List<OrderViewmodel> orders = new List<OrderViewmodel>();
+            List<OrderViewModel> orders = new List<OrderViewModel>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -79,7 +79,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewmodel order = ReadOrder(reader);
+                    OrderViewModel order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -87,9 +87,9 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<OrderViewmodel> GetRunningOrdersByType(ProductType type)
+        public List<OrderViewModel> GetRunningOrdersByType(ProductType type)
         {
-            List<OrderViewmodel> orders = new List<OrderViewmodel>();
+            List<OrderViewModel> orders = new List<OrderViewModel>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -126,7 +126,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewmodel order = ReadOrder(reader);
+                    OrderViewModel order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -134,9 +134,9 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<OrderViewmodel> GetFinishedOrdersByType(ProductType type)
+        public List<OrderViewModel> GetFinishedOrdersByType(ProductType type)
         {
-            List<OrderViewmodel> orders = new List<OrderViewmodel>();
+            List<OrderViewModel> orders = new List<OrderViewModel>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -169,7 +169,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewmodel order = ReadOrder(reader);
+                    OrderViewModel order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -177,9 +177,9 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<OrderViewmodel> GetOrdersByVisitId(int visitId)
+        public List<OrderViewModel> GetOrdersByVisitId(int visitId)
         {
-            List<OrderViewmodel> orders = new List<OrderViewmodel>();
+            List<OrderViewModel> orders = new List<OrderViewModel>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -203,7 +203,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewmodel order = ReadOrder(reader);
+                    OrderViewModel order = ReadOrder(reader);
                     orders.Add(order);
                 }
 
@@ -214,7 +214,7 @@ namespace shappo0.Repositories
 
 
 
-        private OrderViewmodel ReadOrder(SqlDataReader reader)
+        private OrderViewModel ReadOrder(SqlDataReader reader)
         {
             Staff orderStaff = new Staff
             {
@@ -247,10 +247,10 @@ namespace shappo0.Repositories
             DateTime timeCreated = (DateTime)reader["timeCreated"];
             OrderStatus status = Enum.Parse<OrderStatus>((string)reader["OrderStatus"], true);
 
-            return new OrderViewmodel(orderNumber, timeCreated, status, attachedVisit, orderStaff);
+            return new OrderViewModel(orderNumber, timeCreated, status, attachedVisit, orderStaff);
         }
 
-        public int CreateOrder(OrderViewmodel order)
+        public int CreateOrder(OrderViewModel order)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {

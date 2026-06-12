@@ -5,17 +5,17 @@ namespace shappo0.Repositories
 {
     public interface IOrderRepository
     {
-        public List<OrderViewmodel> GetOrdersByVisitId(int visitId);
+        public List<OrderViewModel> GetOrdersByVisitId(int visitId);
 
-        public List<OrderViewmodel> GetAllOrders();
+        public List<OrderViewModel> GetAllOrders();
 
-        public List<OrderViewmodel> GetRunningOrders(OrderStatus status, OrderStatus? status2);
+        public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2);
 
-        public List<OrderViewmodel> GetRunningOrdersByType(ProductType type);
+        public List<OrderViewModel> GetRunningOrdersByType(ProductType type);
 
-        public List<OrderViewmodel> GetFinishedOrdersByType(ProductType type);
+        public List<OrderViewModel> GetFinishedOrdersByType(ProductType type);
 
-        public int CreateOrder(OrderViewmodel order);
+        public int CreateOrder(OrderViewModel order);
 
         public void UpdateOrderStatus(int orderNumber, OrderStatus status);
     }

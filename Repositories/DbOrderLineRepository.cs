@@ -135,7 +135,7 @@ namespace shappo0.Repositories
                 OnMenu = (bool)reader["onMenu"]
             };
 
-            OrderViewmodel attachedOrder = new OrderViewmodel
+            OrderViewModel attachedOrder = new OrderViewModel
             {
                 OrderNumber = (int)reader["orderNumber"],
                 TimeCreated = (DateTime)reader["timeCreated"],

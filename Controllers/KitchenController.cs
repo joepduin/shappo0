@@ -20,7 +20,7 @@ namespace shappo0.Controllers
 
         public IActionResult Index()
         {
-            List<OrderViewmodel> orders = _orderService.GetRunningOrdersByType(ProductType.Main);
+            List<OrderViewModel> orders = _orderService.GetRunningOrdersByType(ProductType.Main);
             return View(orders);
         }
 
@@ -49,7 +49,7 @@ namespace shappo0.Controllers
 
         public IActionResult FinishedOrders()
         {
-            List<OrderViewmodel> orders = _orderService.GetFinishedOrdersByType(ProductType.Main);
+            List<OrderViewModel> orders = _orderService.GetFinishedOrdersByType(ProductType.Main);
             return View(orders);
         }
 

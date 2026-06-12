@@ -24,27 +24,27 @@ namespace shappo0.Services
         }
 
         
-        public List<OrderViewmodel> GetOrdersByVisitId(int visitId)
+        public List<OrderViewModel> GetOrdersByVisitId(int visitId)
         {
             return _orderRepository.GetOrdersByVisitId(visitId);
         }
 
-        public List<OrderViewmodel> GetAllOrders()
+        public List<OrderViewModel> GetAllOrders()
         {
             return _orderRepository.GetAllOrders();
         }
 
-        public List<OrderViewmodel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
+        public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
             return _orderRepository.GetRunningOrders(status, status2);
         }
 
-        public List<OrderViewmodel> GetRunningOrdersByType(ProductType type)
+        public List<OrderViewModel> GetRunningOrdersByType(ProductType type)
         {
             return _orderRepository.GetRunningOrdersByType(type);
         }
 
-        public List<OrderViewmodel> GetFinishedOrdersByType(ProductType type)
+        public List<OrderViewModel> GetFinishedOrdersByType(ProductType type)
         {
             return _orderRepository.GetFinishedOrdersByType(type);
         }
@@ -67,8 +67,8 @@ namespace shappo0.Services
         public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId)
         {
             List<OrderLine> groupedLines = new List<OrderLine>();
-            List<Order> orders = _orderRepository.GetOrdersByVisitId(visitId);
-            foreach (Order order in orders)
+            List<OrderViewModel> orders = _orderRepository.GetOrdersByVisitId(visitId);
+            foreach (OrderViewModel order in orders)
             {
                 List<OrderLine> orderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
                 foreach (OrderLine orderLine in orderLines)
@@ -110,8 +110,8 @@ namespace shappo0.Services
                 activeVisit.VisitId = newVisitId;
   
             }
- 
-            OrderViewmodel newOrder = new OrderViewmodel
+
+            OrderViewModel newOrder = new OrderViewModel
             {
                 TimeCreated = DateTime.Now,
                 Status = OrderStatus.Ordered,

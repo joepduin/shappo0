@@ -4,7 +4,7 @@ using shappo0.Models;
 
 namespace shappo0.ViewModels
 {
-    public class OrderViewmodel
+    public class OrderViewModel
     {
         public int OrderNumber { get; set; }
         public DateTime TimeCreated { get; set; }
