@@ -104,7 +104,7 @@ namespace shappo0.Services
 
         public int CalculateNumberOfPeoplePaid(Bill bill)
         {
-            List<Payment> payments = GetPaymentsByBillId(bill);
+            List<Payment> payments = GetPaymentsByBill(bill);
             return payments.Count();
         }
 
@@ -116,11 +116,11 @@ namespace shappo0.Services
 
         public decimal CalculateTotalTip(Bill bill)
         {
-            List<Payment> payments = GetPaymentsByBillId(bill);
+            List<Payment> payments = GetPaymentsByBill(bill);
             return payments.Sum(p => p.PaymentTip); //linq
         }
 
-        private List<Payment> GetPaymentsByBillId(Bill bill)
+        private List<Payment> GetPaymentsByBill(Bill bill)
         {
             return _paymentRepository.GetPaymentsByBillId(bill.BillId);
         }
