@@ -66,27 +66,7 @@ namespace shappo0.Services
 
         public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId)
         {
-            List<OrderLine> groupedLines = new List<OrderLine>();
-            List<OrderViewModel> orders = _orderRepository.GetOrdersByVisitId(visitId);
-            foreach (OrderViewModel order in orders)
-            {
-                List<OrderLine> orderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
-                foreach (OrderLine orderLine in orderLines)
-                {
-                    bool itemExists = false;
-                    foreach (OrderLine groupLine in groupedLines)
-                    {
-                        if (groupLine.Product.ProductId == orderLine.Product.ProductId)
-                        {
-                            groupLine.Quantity += orderLine.Quantity;
-                            itemExists = true;
-                            break;
-                        }
-                    }
-                    if (itemExists == false) groupedLines.Add(new() { OrderLineId = orderLine.OrderLineId, Product = orderLine.Product, Quantity = orderLine.Quantity });
-                }
-            }
-            return groupedLines;
+            return _orderLineRepository.GetGroupedOrderLinesByVisitId(visitId);
         }
 
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines)

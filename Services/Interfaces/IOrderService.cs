@@ -13,6 +13,7 @@ namespace shappo0.Services
         public List<OrderViewModel> GetRunningOrdersByType(ProductType type);
         public List<OrderViewModel> GetFinishedOrdersByType(ProductType type);
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
+        public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId);
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type);
         public List<OrderLine> GetActiveOrderLinesByTableNumber(int orderNumber);
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines);
@@ -25,6 +26,5 @@ namespace shappo0.Services
         void UpdateOrderLineStatus(OrderLine orderLine, OrderStatus status);
         void UpdateOrderStatus(int orderNumber, OrderStatus status);
         void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status);
-        List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId);
     }
 }

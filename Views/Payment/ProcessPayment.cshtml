@@ -6,7 +6,7 @@
 }
 
 <h2>
-    Checkout Table @Model.TableNumber - Payment @Model.NumberOfPeoplePayed /
+    Checkout Table @Model.TableNumber - Payment @(Model.NumberOfPeoplePaid + 1) /
     @if (Model.NumberOfPeople == 0)
     {
         @:?
@@ -57,7 +57,7 @@
 
     <div class="mb-4">
         <label>Feedback type:</label>
-        <select name="Feedback.Type" id="FeedbackSelect" class="form-control" onchange="toggleFeedback()">
+        <select name="Feedback.Type" id="Feedback.Type" class="form-control" onchange="toggleFeedback()">
             <option>No feedback</option>
             <option value="Compliment">Compliment</option>
             <option value="Complaint">Complaint</option>
@@ -65,9 +65,9 @@
         </select>
     </div>
 
-    <div class="mb-4" id="DescriptionDiv" style="display: none;">
+    <div class="mb-4" id="Description" style="display: none;">
         <label>Comment:</label>
-        <textarea name="Feedback.Description" id="DescriptionInput" class="form-control" rows="2"></textarea>
+        <textarea name="Feedback.Description" id="FeedbackDescription" class="form-control" rows="2"></textarea>
     </div>
 
     <button type="submit" class="btn btn-success">Process Payment</button>
@@ -76,18 +76,18 @@
 <script>
     function toggleFeedback()
     {
-        var FeedbackType = document.getElementById("FeedbackSelect");
-        var DescriptionDiv = document.getElementById("DescriptionDiv");
+        var FeedbackType = document.getElementById("Feedback.Type");
+        var Description = document.getElementById("Description");
 
         if (FeedbackType.value == "Compliment" || FeedbackType.value == "Complaint" || FeedbackType.value == "Comment")
         {
-            DescriptionDiv.style.display = "block";
-            DescriptionInput.required = true; //feedback description is nu verplicht
+            Description.style.display = "block";
+            FeedbackDescription.required = true; //feedback description is nu verplicht
         }
         else
         {
-            DescriptionDiv.style.display = "none";
-            DescriptionInput.required = false;
+            Description.style.display = "none";
+            FeedbackDescription.required = false;
         }
     }
 </script>
