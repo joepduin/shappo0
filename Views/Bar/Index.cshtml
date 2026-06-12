@@ -1,5 +1,6 @@
-﻿@model List<shappo0.Models.Order>
+﻿@model List<OrderViewmodel>
 @using shappo0.Enums;
+@using shappo0.ViewModels
 @{
 	ViewData["Title"] = "Bar";
 }
@@ -16,6 +17,7 @@
 		<tr>
 			<th>Order number</th>
 			<th>Table number</th>
+			<th>staff name</th>
 			<th>Status</th>
 			<th>Time created</th>
 			<th>Waiting time</th>
@@ -25,13 +27,14 @@
 	</thead>
 	<tbody>
 		@{
-			foreach (Order order in Model)
+			foreach (OrderViewmodel order in Model)
 			{
 				var rowStyle = "";
 
 				<tr @rowStyle>
 					<td>@order.OrderNumber</td>
 					<td>@order.Visit.Table.TableNumber</td>
+					<td>@order.Staff.Name</td>
 					<td>@order.Status</td>
 					<td>@order.TimeCreated</td>
 					<td>@order.WaitingTimeMinutes</td>

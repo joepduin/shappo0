@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using shappo0.Models;
 using shappo0.Enums;
+using shappo0.ViewModels;
 
 namespace shappo0.Discard
 {
@@ -112,7 +113,7 @@ namespace shappo0.Discard
 
                     };
 
-                    Order order = new Order
+                    OrderViewmodel order = new OrderViewmodel
                     {
                         OrderNumber = (int)reader["orderNumber"]
                     };

@@ -1,6 +1,7 @@
 ﻿using shappo0.Enums;
 using shappo0.Models;
 using shappo0.Repositories;
+using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
@@ -23,27 +24,27 @@ namespace shappo0.Services
         }
 
         
-        public List<Order> GetOrdersByVisitId(int visitId)
+        public List<OrderViewmodel> GetOrdersByVisitId(int visitId)
         {
             return _orderRepository.GetOrdersByVisitId(visitId);
         }
 
-        public List<Order> GetAllOrders()
+        public List<OrderViewmodel> GetAllOrders()
         {
             return _orderRepository.GetAllOrders();
         }
 
-        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
+        public List<OrderViewmodel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
             return _orderRepository.GetRunningOrders(status, status2);
         }
 
-        public List<Order> GetRunningOrdersByType(ProductType type)
+        public List<OrderViewmodel> GetRunningOrdersByType(ProductType type)
         {
             return _orderRepository.GetRunningOrdersByType(type);
         }
 
-        public List<Order> GetFinishedOrdersByType(ProductType type)
+        public List<OrderViewmodel> GetFinishedOrdersByType(ProductType type)
         {
             return _orderRepository.GetFinishedOrdersByType(type);
         }
@@ -78,7 +79,7 @@ namespace shappo0.Services
                 activeVisit.VisitId = newVisitId;
             }
  
-            Order newOrder = new Order
+            OrderViewmodel newOrder = new OrderViewmodel
             {
                 TimeCreated = DateTime.Now,
                 Status = OrderStatus.Ordered,

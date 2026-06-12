@@ -38,7 +38,7 @@ else
 
     @if (Model.Orders.Count > 0)
     {
-        @foreach (Order order in Model.Orders)
+        @foreach (OrderViewmodel order in Model.Orders)
         {
             <h3>Order: @order.OrderNumber, Status: @order.Status</h3>
 

@@ -102,11 +102,11 @@ namespace shappo0.Controllers
         private TableViewModel BuildTableDetailModel(Table table)
         {
             Visit? visit = _visitService.GetActiveVisitForTable(table.TableNumber);
-            List<Order> orders = new List<Order>();
+            List<OrderViewmodel> orders = new List<OrderViewmodel>();
             if (visit != null)
             {
                 orders = _orderService.GetOrdersByVisitId(visit.VisitId);
-                foreach (Order order in orders)
+                foreach (OrderViewmodel order in orders)
                 {
                     order.OrderLines = _orderService.GetOrderLinesByOrderNumber(order.OrderNumber);
                 }

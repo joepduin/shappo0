@@ -39,14 +39,14 @@ namespace shappo0.Services
 
             viewModel.VisitId = activeVisit.VisitId;
 
-            List<Order> visitOrders = _orderRepository.GetOrdersByVisitId(activeVisit.VisitId);
+            List<OrderViewmodel> visitOrders = _orderRepository.GetOrdersByVisitId(activeVisit.VisitId);
 
             if (visitOrders == null || visitOrders.Count == 0)
                 return viewModel;
 
             List<OrderLine> groupedItems = new List<OrderLine>();
 
-            foreach (Order order in visitOrders)
+            foreach (OrderViewmodel order in visitOrders)
             {
                 order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
 
@@ -113,11 +113,11 @@ namespace shappo0.Services
             decimal vatLow = 0;
             decimal vatHigh = 0;
 
-            List<Order> visitOrders = _orderRepository.GetOrdersByVisitId(submission.VisitId);
+            List<OrderViewmodel> visitOrders = _orderRepository.GetOrdersByVisitId(submission.VisitId);
 
             if (visitOrders != null)
             {
-                foreach (Order order in visitOrders)
+                foreach (OrderViewmodel order in visitOrders)
                 {
                     order.OrderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
 

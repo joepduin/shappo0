@@ -8,7 +8,7 @@ using shappo0.ViewModels;
 
 namespace shappo0.Controllers
 {
-   // [Authorize(Roles = "Bar")]
+    [Authorize]
     public class BarController : Controller
     {
         private readonly IOrderService _orderService;
@@ -21,7 +21,7 @@ namespace shappo0.Controllers
         
         public IActionResult Index()
         {
-            List<Order> orders = _orderService.GetRunningOrdersByType(ProductType.Drink);
+            List<OrderViewmodel> orders = _orderService.GetRunningOrdersByType(ProductType.Drink);
             return View(orders);
         }
 
@@ -50,7 +50,7 @@ namespace shappo0.Controllers
 
         public IActionResult FinishedOrders()
         {
-            List<Order> orders= _orderService.GetFinishedOrdersByType(ProductType.Drink);
+            List<OrderViewmodel> orders= _orderService.GetFinishedOrdersByType(ProductType.Drink);
             return View(orders);
         }
     }
