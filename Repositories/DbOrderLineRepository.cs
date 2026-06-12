@@ -63,11 +63,11 @@ namespace shappo0.Repositories
                                WHERE OL.orderNumber = @orderNumber AND ";
                 if (type == ProductType.Drink)
                 {
-                    query += "ProductType = 'Drink'";
+                    query += "P.ProductType = 'Drink'";
                 }
                 else
                 {
-                    query += "ProductType != 'Drink'";
+                    query += "P.ProductType != 'Drink'";
                 }
 
                 SqlCommand command = new SqlCommand(query, connection);
@@ -243,7 +243,7 @@ namespace shappo0.Repositories
         }
 
         public void UpdateOrderStatus(int orderNumber, OrderStatus status)
-        { // updates the whole status order from running to finished
+        { // updates the whole status order from running to served
             using SqlConnection connection = new SqlConnection(_connectionString);
 
             string query =
