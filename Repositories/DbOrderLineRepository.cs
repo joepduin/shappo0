@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
+using shappo0.ViewModels;
 
 namespace shappo0.Repositories
 {
@@ -11,6 +12,44 @@ namespace shappo0.Repositories
         public DbOrderLineRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("shappo0");
+        }
+
+        public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId)
+        {
+            List<OrderLine> orderLines = new List<OrderLine>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"SELECT 
+                                    P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu, 
+                                    OT.quantity, OT.orderLineId, OT.orderNumber, OT.timeCreated, OT.OrderStatus, OT.OrderLineStatus, OT.note
+                                 FROM (
+                                     SELECT 
+                                         OL.productId, 
+                                         SUM(OL.quantity) AS quantity, MAX(OL.orderLineId) AS orderLineId, MAX(O.orderNumber) AS orderNumber, MAX(O.timeCreated) AS timeCreated, 
+                                         MAX(O.[status]) AS OrderStatus, MAX(OL.[status]) AS OrderLineStatus, MAX(OL.note) AS note
+                                     FROM [VISIT] AS V
+                                     JOIN [ORDER] AS O ON O.visitId = V.visitId
+                                     JOIN [ORDER_LINE] AS OL ON OL.orderNumber = O.orderNumber
+                                     WHERE V.visitId = @visitId
+                                     GROUP BY OL.productId
+                                 ) AS OT
+                                 JOIN [Product] AS P ON P.productId = OT.productId;";
+                //OT = OrderTotal :)
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@visitId", visitId);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    orderLines.Add(ReadOrderLine(reader));
+                }
+                reader.Close();
+            }
+            return orderLines;
         }
 
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber)
@@ -63,11 +102,11 @@ namespace shappo0.Repositories
                                WHERE OL.orderNumber = @orderNumber AND ";
                 if (type == ProductType.Drink)
                 {
-                    query += "ProductType = 'Drink'";
+                    query += "P.ProductType = 'Drink'";
                 }
                 else
                 {
-                    query += "ProductType != 'Drink'";
+                    query += "P.ProductType != 'Drink'";
                 }
 
                 SqlCommand command = new SqlCommand(query, connection);
@@ -134,7 +173,7 @@ namespace shappo0.Repositories
                 OnMenu = (bool)reader["onMenu"]
             };
 
-            Order attachedOrder = new Order
+            OrderViewModel attachedOrder = new OrderViewModel
             {
                 OrderNumber = (int)reader["orderNumber"],
                 TimeCreated = (DateTime)reader["timeCreated"],
@@ -243,7 +282,7 @@ namespace shappo0.Repositories
         }
 
         public void UpdateOrderStatus(int orderNumber, OrderStatus status)
-        { // updates the whole status order from running to finished
+        { // updates the whole status order from running to served
             using SqlConnection connection = new SqlConnection(_connectionString);
 
             string query =

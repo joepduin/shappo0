@@ -1,3 +1,4 @@
+using shappo0.Enums;
 namespace shappo0.Models
 {
     public class Bill
@@ -8,21 +9,30 @@ namespace shappo0.Models
         public decimal VatLow { get; set; }
         public decimal VatHigh { get; set; }
         public bool IsPaid { get; set; }
-        public int VisitId { get; set; }
+        public decimal TotalTip { get; set; }
+        public SplitChoice SplitChoice { get; set; }
+        public int? NumberOfPeople { get; set; }
+        public Visit Visit { get; set; }
+        public List<OrderLine> OrderLines { get; set; }
 
         public Bill()
         {
+            Visit = new();
+            OrderLines = [];
         }
 
-        public Bill(int billId, decimal subTotal, decimal total, decimal vatLow, decimal vatHigh, bool isPaid, int visitId)
+        public Bill(decimal subTotal, decimal total, decimal vatLow, decimal vatHigh, bool isPaid, decimal totalTip, SplitChoice splitChoice, int? numberOfPeople, Visit visit, List<OrderLine> orderLines)
         {
-            BillId = billId;
             SubTotal = subTotal;
             Total = total;
             VatLow = vatLow;
             VatHigh = vatHigh;
             IsPaid = isPaid;
-            VisitId = visitId;
+            TotalTip = totalTip;
+            Visit = visit;
+            OrderLines = orderLines;
+            SplitChoice = splitChoice;
+            NumberOfPeople = numberOfPeople;
         }
     }
 }

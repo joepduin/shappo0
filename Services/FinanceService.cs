@@ -28,10 +28,12 @@ namespace shappo0.Services
 
         public DateRange CalculateRange(DateRange? range, string? quickFilter)
         {
+            // Initializes the start and end date variables, which will be overwritten later
             DateTime today = DateTime.Today;
             DateTime finalStart;
             DateTime finalEnd = today; // In case of custom selection this variable is overwritten later on, otherwise today is used 
 
+            // Uses a switch for the different choices
             switch (quickFilter?.ToLower())
             {
                 case "month":

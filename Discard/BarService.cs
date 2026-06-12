@@ -37,6 +37,7 @@ namespace shappo0.Discard
         public void UpdateOrderLineStatus(int orderNumber, OrderStatus status)
         {
             _barRepository.UpdateOrderLineStatus(orderNumber, status);
+
         }
 
         public List<Bar> FinishedOrders()

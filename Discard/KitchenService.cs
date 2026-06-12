@@ -1,5 +1,6 @@
-﻿using shappo0.Models;
+﻿using System.Collections.Generic;
 using shappo0.Enums;
+using shappo0.Models;
 
 namespace shappo0.Discard
 {
@@ -36,6 +37,10 @@ namespace shappo0.Discard
         public void UpdateOrderLineStatus(int orderNumber, OrderStatus status)
         {
             _kitchenRepository.UpdateOrderLineStatus(orderNumber, status);
+
+
+           
+
         }
 
        public List<Kitchen> FinishedOrders()

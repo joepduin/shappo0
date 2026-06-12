@@ -5,6 +5,7 @@ namespace shappo0.Repositories
 {
     public interface IOrderLineRepository
     {
+        public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId);
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type);
 

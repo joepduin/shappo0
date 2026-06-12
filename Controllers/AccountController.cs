@@ -23,7 +23,15 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            int staffId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            //safely fetch the staffId from the claim, if it fails, redirect to login
+            string? roleString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if(!int.TryParse(roleString, out int staffId))
+            {
+                ViewData["Error"] = "User not logged in, please log in to view your account.";
+                return RedirectToAction("Login", "Account");
+            }
+
             Staff? staff = _accountService.GetStaff(staffId);
 
             return View(staff);

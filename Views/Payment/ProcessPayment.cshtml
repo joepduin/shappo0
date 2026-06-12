@@ -1,0 +1,93 @@
+@using shappo0.Enums
+@model shappo0.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Process Payment";
+}
+
+<h2>
+    Checkout Table @Model.TableNumber - Payment @(Model.NumberOfPeoplePaid + 1) /
+    @if (Model.NumberOfPeople == 0)
+    {
+        @:?
+    }
+    else
+    {
+        @Model.NumberOfPeople
+    }
+</h2>
+
+<div class="alert alert-info">
+    Outstanding amount: &euro; @Model.OutstandingAmount.ToString("0.00")
+</div>
+
+<form asp-action="CreatePayment" asp-controller="Payment" method="post">
+
+    <input type="hidden" name="Bill.BillId" value="@Model.BillId" />
+
+    <div class="mb-4">
+        <label>Amount to pay:</label>
+        @if (Model.SplitChoice == SplitChoice.Custom)
+        {
+            <input type="number" id="PaymentAmount" name="PaymentAmount" value="0.00" min="0.01" max="@Model.AmountToPay" step="0.01" class="form-control" />
+        }
+        else
+        {
+            <input type="hidden" name="PaymentAmount" value="@Model.AmountToPay" />
+            <input type="number" value="@Model.AmountToPay.ToString("0.00")" class="form-control" disabled /> //je kan dit niet editen omdat het bedrag al berekent is.
+        }
+    </div>
+
+    <div class="form-group mb-4">
+        <label for="PaymentTip">Add tip (optional):</label>
+        <input type="number" id="PaymentTip" name="PaymentTip" value="0.00" min="0.00" step="0.01" class="form-control" />
+    </div>
+
+    <div class="mb-4">
+        <label>Payment method:</label>
+        <select name="PaymentMethod" id="PaymentMethod" class="form-control" required">
+            <option value="CreditCard">CreditCard</option>
+            <option value="DebitCard">DebitCard</option>
+            <option value="Cash">Cash</option>
+        </select>
+    </div>
+
+    <hr />
+    <h4>Feedback (Optional)</h4>
+
+    <div class="mb-4">
+        <label>Feedback type:</label>
+        <select name="Feedback.Type" id="Feedback.Type" class="form-control" onchange="toggleFeedback()">
+            <option>No feedback</option>
+            <option value="Compliment">Compliment</option>
+            <option value="Complaint">Complaint</option>
+            <option value="Comment">Comment</option>
+        </select>
+    </div>
+
+    <div class="mb-4" id="Description" style="display: none;">
+        <label>Comment:</label>
+        <textarea name="Feedback.Description" id="FeedbackDescription" class="form-control" rows="2"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Process Payment</button>
+</form>
+
+<script>
+    function toggleFeedback()
+    {
+        var FeedbackType = document.getElementById("Feedback.Type");
+        var Description = document.getElementById("Description");
+
+        if (FeedbackType.value == "Compliment" || FeedbackType.value == "Complaint" || FeedbackType.value == "Comment")
+        {
+            Description.style.display = "block";
+            FeedbackDescription.required = true; //feedback description is nu verplicht
+        }
+        else
+        {
+            Description.style.display = "none";
+            FeedbackDescription.required = false;
+        }
+    }
+</script>

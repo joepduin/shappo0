@@ -4,8 +4,16 @@ namespace shappo0.Repositories
 {
     public interface IPaymentRepository
     {
-        int SaveBill(Bill bill);
-        int SavePayment(Payment payment);
-        void SaveFeedback(Feedback feedback);
+        public int SavePayment(Payment payment);
+        public decimal GetTotalPaidByBillId(int billId);
+        public List<Payment> GetPaymentsByBillId(int billId);
+
+        public Bill? GetBillByVisitId(int visitId);
+        public int SaveBill(Bill bill);
+        public Bill? GetBillByVisitId(int? visitId);
+        public Bill? GetBillById(int? billId);
+        public void UpdateBillPaid(Bill bill);
+
+        public void SaveFeedback(Payment payment);
     }
 }

@@ -1,20 +1,21 @@
 using shappo0.Enums;
-using shappo0.Models;
+using shappo0.ViewModels;
 
 namespace shappo0.Repositories
 {
     public interface IOrderRepository
     {
-        public List<Order> GetOrdersByVisitId(int visitId);
+        public List<OrderViewModel> GetOrdersByVisitId(int visitId);
 
-        public List<Order> GetAllOrders();
+        public List<OrderViewModel> GetAllOrders();
 
-        public List<Order> GetRunningOrders();
-        public List<Order> GetFinishedOrders();
+        public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2);
 
-        public List<Order> GetRunningOrdersByType(ProductType type);
+        public List<OrderViewModel> GetRunningOrdersByType(ProductType type);
 
-        public int CreateOrder(Order order);
+        public List<OrderViewModel> GetFinishedOrdersByType(ProductType type);
+
+        public int CreateOrder(OrderViewModel order);
 
         public void UpdateOrderStatus(int orderNumber, OrderStatus status);
     }

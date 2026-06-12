@@ -1,6 +1,7 @@
 ﻿using shappo0.Enums;
 using shappo0.Models;
 using shappo0.Repositories;
+using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
@@ -8,44 +9,44 @@ namespace shappo0.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderLineRepository _orderLineRepository;
-        private readonly IMenuRepository _menuRepository;
-        private readonly IVisitRepository _visitRepository;
-        private readonly IStaffRepository _staffRepository;
+        private readonly IAccountService _accountService;
+        private readonly IMenuService _menuService;
+        private readonly IVisitService _visitService;
         
 
-        public OrderService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitRepository visitRepository, IMenuRepository menuRepository, IStaffRepository staffRepository)
+        public OrderService(IOrderRepository orderRepository, IOrderLineRepository orderLineRepository, IVisitService visitService, IMenuService menuService, IAccountService accountService)
         {
             _orderRepository = orderRepository;
             _orderLineRepository = orderLineRepository;
-            _visitRepository = visitRepository;
-            _menuRepository = menuRepository;
-            _staffRepository = staffRepository;
+            _visitService = visitService;
+            _menuService = menuService;
+            _accountService = accountService;
         }
 
         
-        public List<Order> GetOrdersByVisitId(int visitId)
+        public List<OrderViewModel> GetOrdersByVisitId(int visitId)
         {
             return _orderRepository.GetOrdersByVisitId(visitId);
         }
 
-        public List<Order> GetAllOrders()
+        public List<OrderViewModel> GetAllOrders()
         {
             return _orderRepository.GetAllOrders();
         }
 
-        public List<Order> GetRunningOrders()
+        public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
-            return _orderRepository.GetRunningOrders();
+            return _orderRepository.GetRunningOrders(status, status2);
         }
 
-        public List<Order> GetFinishedOrders()
-        {
-            return _orderRepository.GetFinishedOrders();
-        }
-
-        public List<Order> GetRunningOrdersByType(ProductType type)
+        public List<OrderViewModel> GetRunningOrdersByType(ProductType type)
         {
             return _orderRepository.GetRunningOrdersByType(type);
+        }
+
+        public List<OrderViewModel> GetFinishedOrdersByType(ProductType type)
+        {
+            return _orderRepository.GetFinishedOrdersByType(type);
         }
 
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type)
@@ -63,22 +64,34 @@ namespace shappo0.Services
             return _orderLineRepository.GetActiveOrderLinesByTableNumber(orderNumber);
         }
 
+        public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId)
+        {
+            return _orderLineRepository.GetGroupedOrderLinesByVisitId(visitId);
+        }
+
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines)
         {
-            Visit? activeVisit = _visitRepository.GetActiveVisitForTable(tableNumber);
-            Staff currentStaff = _staffRepository.GetStaff(staffId);
+            Visit? activeVisit = _visitService.GetActiveVisitForTable(tableNumber);
+            Staff? currentStaff = _accountService.GetStaff(staffId);
+
+            //If the staff member doesn't exist, return without creating an order
+            if (currentStaff == null)
+            {
+                return;
+            }
 
             //Create a new visit if this is the first order for this table
             if (activeVisit == null)
             {
                 activeVisit = new Visit { Table = new Table{ TableNumber = tableNumber }, Staff = currentStaff, IsActive = true };
                 
-                int newVisitId = _visitRepository.StartNewVisit(activeVisit);
+                int newVisitId = _visitService.StartNewVisit(activeVisit);
 
                 activeVisit.VisitId = newVisitId;
+  
             }
- 
-            Order newOrder = new Order
+
+            OrderViewModel newOrder = new OrderViewModel
             {
                 TimeCreated = DateTime.Now,
                 Status = OrderStatus.Ordered,
@@ -88,13 +101,14 @@ namespace shappo0.Services
 
             _orderRepository.CreateOrder(newOrder);
 
-            foreach(OrderLine line in orderLines)
+            //Link the order lines to the order and create them in the database, then adjust the stock for each ordered product
+            foreach (OrderLine line in orderLines)
             {
-                line.Order = newOrder;   
+                line.Order = newOrder;
             }
- 
+
             _orderLineRepository.CreateOrderLines(orderLines);
-            _menuRepository.BatchAdjustStock(orderLines);
+            _menuService.BatchAdjustStock(orderLines);
         }
 
         public void AddProductToCart(List<OrderLine> cart, Product selectedProduct)

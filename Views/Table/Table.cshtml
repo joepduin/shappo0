@@ -5,83 +5,149 @@
 @model TableViewModel
 
 @{
-    ViewData["Title"] = "Table Status";
+    ViewData["Title"] = $"Table {Model?.Table?.TableNumber} Status";
+}
+
+<div class="container mt-4">
     <partial name="_ErrorMessage" />
     <partial name="_SuccessMessage" />
-}
 
-@if (Model == null)
-{
-    <div class="alert alert-danger">Tafel bestaat niet.</div>
-}
-else
-{
-    <h2>Table @Model.Table.TableNumber</h2>
-
-    <form action="/Table/UpdateTableStatus" method="POST">
-        <input type="hidden" name="TableNumber" value="@Model.Table.TableNumber" />
-        <div class="mb-4">
-            <input type="radio" class="btn-check" name="Status" id="false" value="false" @(!Model.Table.Status ? "checked" : "")>
-            <label class="btn btn-outline-success" for="false">Vrij</label>
-            <input type="radio" class="btn-check" name="Status" id="true" value="true" @(Model.Table.Status ? "checked" : "")>
-            <label class="btn btn-outline-danger" for="true">Bezet</label>
-            <button type="submit" class="btn btn-primary">Save changes</button>
-
-            @if (Model.Table.Status == true)
-            {
-                <a href="/Order/TakeOrder?tableNumber=@Model.Table.TableNumber">Take order</a>
-                <a href="/Payment/Index?tableId=@Model.Table.TableNumber">Make payment</a>
-            }
-
-        </div>
-    </form>
-
-    @if (Model.Orders.Count > 0)
+    @if (Model == null)
     {
-        @foreach (Order order in Model.Orders)
-        {
-            <h3>Order: @order.OrderNumber, Status: @order.Status</h3>
-
-            <table class="table table-sm" style="table-layout: fixed;">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Aantal</th>
-                        <th>Opmerking</th>
-                        <th>Item status</th>
-                        <th>Verander status</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach (OrderLine orderLine in order.OrderLines)
-                    {
-                        <tr>
-                            <td>@orderLine.Product.Name</td>
-                            <td>@orderLine.Quantity</td>
-                            <td>@orderLine.Note</td>
-                            <td>@orderLine.Status</td>
-                            <td>
-                                @if (orderLine.Status == OrderStatus.ReadyToBeServed)
-                                {
-                                    <form action="/Table/UpdateOrderLineStatus" method="POST">
-                                        <input type="hidden" name="OrderLineId" value="@orderLine.OrderLineId" />
-                                        <input type="hidden" name="Order.OrderNumber" value="@orderLine.Order.OrderNumber" />
-                                        <input type="hidden" name="tableNumber" value="@Model.Table.TableNumber" />
-                                        <button type="submit">
-                                            Zet als Served
-                                        </button>
-                                    </form>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+        <div class="alert alert-danger shadow-sm d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+            <div>
+                <strong>Fout:</strong> Deze tafel bestaat niet.
+            </div>
+        </div>
     }
     else
     {
-        <div class="alert alert-info">Geen orders voor deze tafel.</div>
+        <!-- CONTROL PANEL CARD -->
+        <div class="card shadow-sm border-0 mb-4 bg-light">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+
+                <div class="mb-3 mb-md-0">
+                    <h2 class="fw-bold mb-1">Table @Model.Table.TableNumber</h2>
+                    <span class="text-muted">Manage table status and actions</span>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3 align-items-center">
+                    <!-- Status Toggle Form -->
+                    <form action="/Table/UpdateTableStatus" method="POST" class="m-0">
+                        <input type="hidden" name="TableNumber" value="@Model.Table.TableNumber" />
+
+                        <div class="btn-group shadow-sm" role="group" aria-label="Table Status Toggle">
+                            <input type="radio" class="btn-check" name="Status" id="false" value="false" @(!Model.Table.Status ? "checked" : "") onchange="this.form.submit()">
+                            <label class="btn btn-outline-success fw-bold px-4" for="false">Vrij</label>
+
+                            <input type="radio" class="btn-check" name="Status" id="true" value="true" @(Model.Table.Status ? "checked" : "") onchange="this.form.submit()">
+                            <label class="btn btn-outline-danger fw-bold px-4" for="true">Bezet</label>
+                        </div>
+                    </form>
+
+                    <!-- Action Buttons (Only show if table is Occupied) -->
+                    @if (Model.Table.Status)
+                    {
+                        <div class="border-start ps-3 ms-1 d-flex gap-2">
+                            <a href="/Order/TakeOrder?tableNumber=@Model.Table.TableNumber" class="btn btn-primary shadow-sm fw-bold">
+                                <i class="bi bi-plus-circle me-1"></i> Take Order
+                            </a>
+                            <a href="/Payment/Index?tableNumber=@Model.Table.TableNumber" class="btn btn-dark shadow-sm fw-bold">
+                                <i class="bi bi-credit-card me-1"></i> Payment
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <h4 class="fw-bold mb-3">Active Orders</h4>
+
+        <!-- ORDERS LIST -->
+        @if (Model.Orders != null && Model.Orders.Count > 0)
+        {
+            <div class="row row-cols-1 g-4">
+                @foreach (OrderViewModel order in Model.Orders)
+                {
+                    <div class="col">
+                        <div class="card shadow-sm border-primary">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold">Order #@order.OrderNumber</h5>
+                                <span class="badge bg-light text-primary fs-6">@order.Status</span>
+                            </div>
+
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="ps-4 w-25">Product</th>
+                                                <th class="text-center">Aantal</th>
+                                                <th class="w-25">Opmerking</th>
+                                                <th>Status</th>
+                                                <th class="text-end pe-4">Actie</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (OrderLine orderLine in order.OrderLines)
+                                            {
+                                                <tr>
+                                                    <td class="ps-4 fw-bold">@orderLine.Product.Name</td>
+                                                    <td class="text-center fs-5">@orderLine.Quantity</td>
+                                                    <td>
+                                                        <em class="text-muted small">@(string.IsNullOrEmpty(orderLine.Note) ? "-" : orderLine.Note)</em>
+                                                    </td>
+                                                    <td>
+                                                        <!-- Styling the badge based on status -->
+                                                        @if (orderLine.Status == OrderStatus.ReadyToBeServed)
+                                                        {
+                                                            <span class="badge bg-warning text-dark">@orderLine.Status</span>
+                                                        }
+                                                        else if (orderLine.Status == OrderStatus.Served)
+                                                        {
+                                                            <span class="badge bg-success">@orderLine.Status</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-secondary">@orderLine.Status</span>
+                                                        }
+                                                    </td>
+                                                    <td class="text-end pe-4">
+                                                        @if (orderLine.Status == OrderStatus.ReadyToBeServed)
+                                                        {
+                                                            <form action="/Table/UpdateOrderLineStatus" method="POST" class="m-0">
+                                                                <input type="hidden" name="OrderLineId" value="@orderLine.OrderLineId" />
+                                                                <input type="hidden" name="Order.OrderNumber" value="@orderLine.Order.OrderNumber" />
+                                                                <input type="hidden" name="tableNumber" value="@Model.Table.TableNumber" />
+
+                                                                <button type="submit" class="btn btn-sm btn-success shadow-sm fw-bold">
+                                                                    <i class="bi bi-check2-all"></i> Serve
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted small">No action</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info shadow-sm d-flex align-items-center mt-3">
+                <i class="bi bi-info-circle fs-4 me-3"></i>
+                <div>Er zijn momenteel geen actieve orders voor deze tafel.</div>
+            </div>
+        }
     }
-}
+</div>

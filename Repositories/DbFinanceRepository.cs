@@ -16,6 +16,13 @@ namespace shappo0.Repositories
         {
             List<Finance> finances = new List<Finance>();
 
+            DateTime startDate = range?.Start ?? DateTime.MinValue;
+            DateTime endDate = DateTime.MaxValue;
+            if (range?.End != null)
+            {
+                endDate = range.End.Value.AddDays(1);
+            }
+
             // Query selects by group based on menutype, sums the amount of items ordered within that group and calculates the revenue per group
             // Also includes the filter option if date is selected
             string query = @"SELECT p.menuType, SUM(ol.quantity) AS total_items_ordered, ROUND((SUM(ol.quantity * (p.price * (p.VATPercentage + 100) / 100))), 2) AS total_revenue " +
@@ -29,8 +36,8 @@ namespace shappo0.Repositories
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@StartDate", range?.Start);
-                    command.Parameters.AddWithValue("@EndDate", range?.End);
+                    command.Parameters.AddWithValue("@StartDate", startDate);
+                    command.Parameters.AddWithValue("@EndDate", endDate);
 
                     connection.Open();
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -52,6 +59,13 @@ namespace shappo0.Repositories
         {
             decimal totalTips = 0;
 
+            DateTime startDate = range?.Start ?? DateTime.MinValue;
+            DateTime endDate = DateTime.MaxValue;
+            if (range?.End != null)
+            {
+                endDate = range.End.Value.AddDays(1);
+            }
+
             // ORDER is joined from VISIT to BILL, since the timeCreated column (ORDER) is required for the date filter and tips are located in BILL
             string query = @"SELECT ISNULL(SUM(b.totalTip), 0) AS total_tips " +
                 "FROM BILL AS b " +
@@ -63,8 +77,8 @@ namespace shappo0.Repositories
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@StartDate", range?.Start);
-                    command.Parameters.AddWithValue("@EndDate", range?.End);
+                    command.Parameters.AddWithValue("@StartDate", startDate);
+                    command.Parameters.AddWithValue("@EndDate", endDate);
 
                     connection.Open();
                     totalTips = (decimal)command.ExecuteScalar();

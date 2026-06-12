@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using shappo0.Models;
 using shappo0.Enums;
+using shappo0.ViewModels;
 
 namespace shappo0.Discard
 {
@@ -35,7 +36,7 @@ namespace shappo0.Discard
                 string query = "SELECT DISTINCT o.orderNumber, o.staffId, t.tableNumber, o.status, o.timeCreated FROM [ORDER] AS o " +
                     " INNER JOIN VISIT AS v ON o.visitId = v.visitId INNER JOIN [TABLE] AS t ON v.tableNumber = t.tableNumber " +
                     "INNER JOIN ORDER_LINE AS ol ON ol.orderNumber = o.orderNumber INNER JOIN PRODUCT AS p ON ol.productId = p.productId " +
-                    "WHERE o.status = 'Ordered' and p.ProductType = 'Drink' " +
+                    "WHERE o.status != 'Served' and p.ProductType = 'Drink' " +
                     "ORDER BY timeCreated"
 ;
 
@@ -112,7 +113,7 @@ namespace shappo0.Discard
                         Name = (string)reader["name"]
                     };
 
-                    Order order = new Order
+                    OrderViewModel order = new OrderViewModel
                     {
                         OrderNumber = (int)reader["orderNumber"]
                     };

@@ -75,8 +75,9 @@ namespace shappo0.Controllers
                 }
                 return RedirectToAction("Index", "Table");
             }
+            
 
-            TempData["ErrorMessage"] = "Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
+                TempData["ErrorMessage"] = "Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
             return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
         }
 
@@ -102,11 +103,11 @@ namespace shappo0.Controllers
         private TableViewModel BuildTableDetailModel(Table table)
         {
             Visit? visit = _visitService.GetActiveVisitForTable(table.TableNumber);
-            List<Order> orders = new List<Order>();
+            List<OrderViewModel> orders = new List<OrderViewModel>();
             if (visit != null)
             {
                 orders = _orderService.GetOrdersByVisitId(visit.VisitId);
-                foreach (Order order in orders)
+                foreach (OrderViewModel order in orders)
                 {
                     order.OrderLines = _orderService.GetOrderLinesByOrderNumber(order.OrderNumber);
                 }

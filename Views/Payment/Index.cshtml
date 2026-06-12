@@ -1,88 +1,87 @@
-﻿@model shappo0.ViewModels.PaymentSubmissionViewModel
-@using shappo0.Enums
+﻿@model shappo0.Models.Bill
+
 @{
-    var overview = ViewBag.PaymentOverview as shappo0.ViewModels.PaymentViewModel;
+    ViewData["Title"] = "Checkout";
 }
 
-<h2>Afrekenen Tafel @Model.TableId</h2>
+<h2>Checkout Table @Model.Visit.Table.TableNumber</h2>
 
-@if (overview == null || overview.Items == null || overview.Items.Count == 0)
+@if (Model == null || Model.OrderLines.Count == 0)
 {
-    <div class="alert alert-warning" role="alert">
-        Er is geen openstaande bestelling gevonden voor deze tafel. Zorg dat er producten zijn toegevoegd aan deze tafel.
-    </div>
+    <div class="alert alert-info">No orders were found for this table.</div>
 }
 else
 {
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
-                <th>Aantal</th>
-                <th>Item</th>
-                <th>Prijs per stuk</th>
-                <th>Totaal</th>
+                <th>Quantity</th>
+                <th>Product</th>
+                <th>Price per piece</th>
+                <th>Subtotal</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in overview.Items)
+            @foreach (var line in Model.OrderLines)
             {
                 <tr>
-                    <td>@item.Quantity x</td>
-                    <td>@item.Product.Name</td>
-                    <td>€ @(item.Product.Price.ToString("0.00"))</td>
-                    <td>€ @((item.Product.Price * item.Quantity).ToString("0.00"))</td>
+                    <td>@line.Quantity x</td>
+                    <td>@line.Product.Name</td>
+                    <td>&euro; @line.Product.PriceIncludingTax.ToString("0.00")</td>
+                    <td>&euro; @((line.Product.PriceIncludingTax * line.Quantity).ToString("0.00"))</td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <hr />
-    <div>
-        <p>BTW 9% (Eten/Fris): € @overview.VatLow.ToString("0.00")</p>
-        <p>BTW 21% (Eten/Alcohol): € @overview.VatHigh.ToString("0.00")</p>
-        <h3>Te betalen: € @overview.TotalAmount.ToString("0.00")</h3>
+    <div class="mb-4">
+        <p><strong>Subtotal:</strong> &euro; @Model.SubTotal.ToString("0.00")</p>
+        <p><strong>VAT Low (9%):</strong> &euro; @Model.VatLow.ToString("0.00")</p>
+        <p><strong>VAT High (21%):</strong> &euro; @Model.VatHigh.ToString("0.00")</p>
+        <h3><strong>Total:</strong> &euro; @Model.Total.ToString("0.00")</h3>
     </div>
 
     <hr />
 
-    <form method="post" asp-action="ProcessPayment">
-        <input type="hidden" name="TableId" value="@Model.TableId" />
-        <input type="hidden" name="VisitId" value="@Model.VisitId" />
+    <form asp-action="CreateBill" method="post">
+        <input type="hidden" name="Visit.VisitId" value="@Model.Visit.VisitId" />
+        <input type="hidden" name="Visit.Table.TableNumber" value="@Model.Visit.Table.TableNumber" />
+        <input type="hidden" name="SubTotal" value="@Model.SubTotal" />
+        <input type="hidden" name="Total" value="@(Model.Total)" />
+        <input type="hidden" name="VatLow" value="@Model.VatLow" />
+        <input type="hidden" name="VatHigh" value="@Model.VatHigh" />
 
-        <div class="mb-3">
-            <label for="PaymentAmount" class="form-label">Totaal betaald door gasten (€) (optioneel)</label>
-            <input type="number" step="0.01" id="PaymentAmount" name="PaymentAmount" class="form-control" value="0" />
-            <small class="form-text text-muted">Vul dit in als gasten het totaal zelf betalen. Laat 0 om fooi te gebruiken.</small>
-        </div>
-
-        <div class="mb-3">
-            <label for="TipAmount" class="form-label">Fooi (€)</label>
-            <input type="number" step="0.01" id="TipAmount" name="TipAmount" class="form-control" value="0" />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Betaalmethode</label>
-            <div>
-                <input type="radio" id="credit" name="PaymentMethod" value="@PaymentMethodType.CreditCard" checked /> <label for="credit">Credit card</label>
-                <input type="radio" id="debit" name="PaymentMethod" value="@PaymentMethodType.DebitCard" /> <label for="debit">Debit card</label>
-                <input type="radio" id="cash" name="PaymentMethod" value="@PaymentMethodType.Cash" /> <label for="cash">Cash</label>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Feedback type</label>
-            <select name="FeedbackType" class="form-select">
-                <option value="@FeedbackCategory.Compliment">Compliment</option>
-                <option value="@FeedbackCategory.Klacht">Klacht</option>
-                <option value="@FeedbackCategory.Opmerking">Opmerking</option>
+        <div class="form-group mb-4">
+            <label for="SplitChoice">Split choice</label>
+            <select name="SplitChoice" id="SplitChoice" class="form-control" required onchange="togglePeople()">
+                <option value="Single">Single (Pay total)</option>
+                <option value="Equal">Equal split</option>
+                <option value="Custom">Custom split</option>
             </select>
         </div>
 
-        <div class="mb-3">
-            <label for="FeedbackDescription" class="form-label">Feedback</label>
-            <textarea id="FeedbackDescription" name="FeedbackDescription" class="form-control" rows="3"></textarea>
+        <div class="form-group mb-4" id="NumberOfPeople" style="display: none;">
+            <label for="NumberOfPeople">Number of people</label>
+            <input type="number" name="NumberOfPeople" id="NumberOfPeople" class="form-control" value="2" min="2" />
         </div>
 
-        <button type="submit" class="btn btn-primary">Afrekenen</button>
+        <button type="submit" class="btn btn-success">Create Bill & Proceed to Payment</button>
     </form>
+
+    <script>
+        function togglePeople() 
+        {
+            var SplitChoice = document.getElementById("SplitChoice");
+            var NumberOfPeople = document.getElementById("NumberOfPeople");
+
+            if (SplitChoice.value == "Equal") 
+            {
+                NumberOfPeople.style.display = "block";
+            } 
+            else 
+            {
+                NumberOfPeople.style.display = "none";
+            }
+        }
+    </script>
 }

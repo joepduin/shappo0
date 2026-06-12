@@ -1,15 +1,10 @@
 @{
-    ViewData["Title"] = "Betaling voltooid";
+    ViewData["Title"] = "Payment completed";
 }
 
-<div class="container mt-4">
+<div class="alert alert-success">
+    <h4>Payment completed</h4>
+    <p>Order for table @ViewBag.TableId has been successfully completed and the table is set to free.</p>
 </div>
 
-<div class="container mt-4">
-    <div class="alert alert-success" role="alert">
-        <h4 class="alert-heading">Betaling voltooid</h4>
-        <p>Order voor tafel @ViewBag.TableId is succesvol afgerond en de tafel is vrijgezet.</p>
-    </div>
-
-    <a href="/" class="btn btn-secondary">Terug naar dashboard</a>
-</div>
+<a href="/Table" class="btn btn-secondary">Back to dashboard</a>
