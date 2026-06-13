@@ -55,7 +55,7 @@ namespace shappo0.Controllers
         {
             _orderService.UpdateOrderLineStatus(orderLine, OrderStatus.Served);
 
-            return RedirectToAction("Table", "Table", new { tableNumber = tableNumber });
+            return RedirectToAction("Table", new { tableNumber = tableNumber });
         }
 
         [HttpPost]
@@ -64,14 +64,14 @@ namespace shappo0.Controllers
             if (!_tableService.UpdateTableStatus(table))
             {
                 TempData["ErrorMessage"] = "Status cannot be changed, still has unserved orders.";
-                return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
+                return RedirectToAction("Table", new { tableNumber = table.TableNumber });
             }
 
             TempData["ConfirmMessage"] = "Table has been changed successfully.";
 
             if (table.Status)
             {
-                return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
+                return RedirectToAction("Table", new { tableNumber = table.TableNumber });
             }
 
             return RedirectToAction("Index", "Table");
