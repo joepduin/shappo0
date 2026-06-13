@@ -68,7 +68,7 @@ namespace shappo0.Controllers
 
             if (staff == null)
             {
-                TempData["ErrorMessage"] = "Incorrect username or password.";
+                ViewBag.ErrorMessage = "Incorrect username or password.";
                 loginModel.Password = string.Empty;
                 return View(loginModel); 
             }
