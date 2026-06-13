@@ -33,7 +33,7 @@ namespace shappo0.Repositories
                     JOIN [Staff] AS VS ON V.staffId = VS.staffId " +
                     "INNER JOIN [Order_Line] AS OL ON O.orderNumber = OL.orderNumber " +
                     "INNER JOIN [Product] AS P ON OL.productId = P.productId " +
-                    "WHERE O.[status] IN(@Ordered, @BeingPrepared, @ReadyToBeServed) AND ";
+                    "WHERE O.[status] IN(@Ordered, @BeingPrepared) AND ";
 
                 if (type == ProductType.Drink)
                 {
@@ -48,7 +48,6 @@ namespace shappo0.Repositories
 
                 command.Parameters.AddWithValue("@Ordered", OrderStatus.Ordered.ToString());
                 command.Parameters.AddWithValue("@BeingPrepared", OrderStatus.BeingPrepared.ToString());
-                command.Parameters.AddWithValue("@ReadyToBeServed", OrderStatus.ReadyToBeServed.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
@@ -80,7 +79,7 @@ namespace shappo0.Repositories
                     JOIN [Staff] AS VS ON V.staffId = VS.staffId " +
                     "INNER JOIN [Order_Line] AS OL ON O.orderNumber = OL.orderNumber " +
                     "INNER JOIN [Product] AS P ON OL.productId = P.productId " +
-                    "WHERE O.[status] = 'Served' AND ";
+                    "WHERE O.[status] IN(@ReadyToBeServed, @Served) AND ";
 
                 if (type == ProductType.Drink)
                 {
@@ -91,7 +90,10 @@ namespace shappo0.Repositories
                     query += "P.ProductType != 'Drink'";
                 }
 
-                SqlCommand command = new SqlCommand(query, connection); 
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@ReadyToBeServed", OrderStatus.ReadyToBeServed.ToString());
+                command.Parameters.AddWithValue("@Served", OrderStatus.Served.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
