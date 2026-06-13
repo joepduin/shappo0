@@ -80,7 +80,7 @@ namespace shappo0.Repositories
                     JOIN [Staff] AS VS ON V.staffId = VS.staffId " +
                     "INNER JOIN [Order_Line] AS OL ON O.orderNumber = OL.orderNumber " +
                     "INNER JOIN [Product] AS P ON OL.productId = P.productId " +
-                    "WHERE O.[status] IN(@Served, @ReadyToBeServed) AND ";
+                    "WHERE O.[status] IN(@ReadyToBeServedServed, @Served) AND ";
 
                 if (type == ProductType.Drink)
                 {
