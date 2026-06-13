@@ -12,13 +12,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: .NET instellen
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Afhankelijkheden herstellen
+    - name: Restore dependencies
       run: dotnet restore
-    - name: Project bouwen
+    - name: Build project
       run: dotnet build --no-restore
-    - name: Tests uitvoeren
+    - name: Run tests
       run: dotnet test --no-build --verbosity normal
+
+  check-warnings:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Check for warnings
+      run: |
+        OUTPUT=$(dotnet build)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -iq "warning CS"; then
+          echo "::error::Attention, there is a warning here!"
+          exit 1
+        fi
