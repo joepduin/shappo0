@@ -32,13 +32,13 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Kitchen" asp-action="Index">Kitchen</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Index">Staff</a>
-                        </li>
                         @{
-							// Only shows the finance page button to managers, since only they can access the page
+							// Only shows the finance page and staff buttons to managers, since only they can access the page
                             if (User.IsInRole("Manager"))
                             {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Index">Staff</a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Finance" asp-action="Index">Finances</a>
                                 </li>
