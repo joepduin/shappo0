@@ -7,8 +7,6 @@ namespace shappo0.Repositories
     {
         public List<OrderViewModel> GetOrdersByVisitId(int visitId);
 
-        public List<OrderViewModel> GetAllOrders();
-
         public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2);
 
         public List<OrderViewModel> GetRunningOrdersByType(ProductType type);

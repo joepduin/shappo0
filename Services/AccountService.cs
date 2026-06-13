@@ -1,5 +1,6 @@
 using shappo0.Models;
 using shappo0.Repositories;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -12,6 +13,16 @@ namespace shappo0.Services
         public AccountService(IStaffRepository staffRepository)
         {
             _staffRepository = staffRepository;
+        }
+
+        public List<Claim> GetUserClaims(Staff staff)
+        {
+            return new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, staff.StaffId.ToString()),
+                new Claim(ClaimTypes.Name, staff.Name ?? string.Empty),
+                new Claim(ClaimTypes.Role, staff.Role.ToString())
+            };
         }
 
         // Joep

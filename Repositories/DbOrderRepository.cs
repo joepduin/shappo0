@@ -16,38 +16,6 @@ namespace shappo0.Repositories
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        public List<OrderViewModel> GetAllOrders()
-        {
-            List<OrderViewModel> orders = new List<OrderViewModel>();
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"
-                    SELECT 
-                        O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
-                        V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
-                        OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
-                        VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
-                    FROM [Order] AS O
-                    JOIN [Visit] AS V ON O.visitId = V.visitId
-                    JOIN [Staff] AS OS ON O.staffId = OS.staffId
-                    JOIN [Staff] AS VS ON V.staffId = VS.staffId ";
-
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    OrderViewModel order = ReadOrder(reader);
-                    orders.Add(order);
-                }
-                reader.Close();
-            }
-            return orders;
-        }
-
         public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
             List<OrderViewModel> orders = new List<OrderViewModel>();

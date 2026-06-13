@@ -7,7 +7,6 @@ namespace shappo0.Services
     public interface IOrderService
     {
         public List<OrderViewModel> GetOrdersByVisitId(int visitId);
-        public List<OrderViewModel> GetAllOrders();
         public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2);
 
         public List<OrderViewModel> GetRunningOrdersByType(ProductType type);
@@ -15,7 +14,6 @@ namespace shappo0.Services
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
         public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId);
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type);
-        public List<OrderLine> GetActiveOrderLinesByTableNumber(int orderNumber);
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines);
         void AddProductToCart(List<OrderLine> cart, Product selectedProduct);
         bool TryIncreaseQuantity(List<OrderLine> cart, int productId);
@@ -26,5 +24,6 @@ namespace shappo0.Services
         void UpdateOrderLineStatus(OrderLine orderLine, OrderStatus status);
         void UpdateOrderStatus(int orderNumber, OrderStatus status);
         void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status);
+        public OrderStatus GetOrderStatusByVisit(Visit visit, ProductType productType);
     }
 }

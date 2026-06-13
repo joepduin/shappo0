@@ -126,39 +126,6 @@ namespace shappo0.Repositories
             return orderLines;
         }
 
-        public List<OrderLine> GetActiveOrderLinesByTableNumber(int tableNumber)
-        {
-            List<OrderLine> orderLines = new List<OrderLine>();
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"SELECT 
-                                    OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
-                                    O.orderNumber, O.timeCreated, O.[Status] AS OrderStatus, 
-                                    P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu 
-                               FROM [Visit] AS V
-                               JOIN [Order] AS O ON O.visitId = V.visitId
-                               JOIN [Order_Line] AS OL ON OL.orderNumber = O.orderNumber
-                               JOIN [Product] AS P ON P.productId = OL.productId
-                               WHERE V.TableNumber = @tableNumber AND V.isActive = 1";
-
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Parameters.AddWithValue("@tableNumber", tableNumber);
-
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    OrderLine orderLine = ReadOrderLine(reader);
-                    orderLines.Add(orderLine);
-                }
-                reader.Close();
-            }
-            return orderLines;
-        }
-
         private OrderLine ReadOrderLine(SqlDataReader reader)
         {
             Product attachedProduct = new Product

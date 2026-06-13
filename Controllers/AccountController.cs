@@ -33,7 +33,6 @@ namespace shappo0.Controllers
             }
 
             Staff? staff = _accountService.GetStaff(staffId);
-
             return View(staff);
         }
         
@@ -65,35 +64,26 @@ namespace shappo0.Controllers
         [HttpPost]
         public ActionResult Login(LoginModel loginModel)
         {
-            LoginModel CopyLoginModel = new LoginModel(loginModel.Name, loginModel.Password);
-            Staff? staff = _accountService.GetStaffByCredentials(CopyLoginModel);
+            Staff? staff = _accountService.GetStaffByCredentials(loginModel);
 
             if (staff == null)
             {
-                ViewBag.Message = "Onjuiste gebruikersnaam of wachtwoord.";
+                ViewBag.Message = "Incorrect username or password.";
+                loginModel.Password = string.Empty;
                 return View(loginModel); 
             }
-            else
-            {
-                SignInStaff(staff);
-                return RedirectToAction("Index", "Home"); //als je naar deze pagina gaat ga je naar je eigen home page
-            }
+            
+            SignInStaff(staff);
+            return RedirectToAction("Index", "Home"); //als je naar deze pagina gaat ga je naar je eigen home page
         }
 
 
-    //maakt een Claim van de user om Authorize te gebruiken
-    private void SignInStaff(Staff staff)
+        //haalt de Claim op van de user om Authorize te gebruiken
+        private void SignInStaff(Staff staff)
         {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, staff.StaffId.ToString()),
-                new Claim(ClaimTypes.Name, staff?.Name ?? string.Empty),
-                new Claim(ClaimTypes.Role, staff?.Role.ToString() ?? string.Empty)
-            };
+            List<Claim> claims = _accountService.GetUserClaims(staff);
 
-            ClaimsIdentity identity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
+            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
             HttpContext.SignInAsync(principal);

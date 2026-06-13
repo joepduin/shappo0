@@ -29,11 +29,6 @@ namespace shappo0.Services
             return _orderRepository.GetOrdersByVisitId(visitId);
         }
 
-        public List<OrderViewModel> GetAllOrders()
-        {
-            return _orderRepository.GetAllOrders();
-        }
-
         public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
             return _orderRepository.GetRunningOrders(status, status2);
@@ -57,11 +52,6 @@ namespace shappo0.Services
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber)
         {
             return _orderLineRepository.GetOrderLinesByOrderNumber(orderNumber);
-        }
-
-        public List<OrderLine> GetActiveOrderLinesByTableNumber(int orderNumber)
-        {
-            return _orderLineRepository.GetActiveOrderLinesByTableNumber(orderNumber);
         }
 
         public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId)
@@ -216,6 +206,22 @@ namespace shappo0.Services
         public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
         {
             _orderLineRepository.UpdateCourseStatus(orderNumber, productType, status);
+        }
+
+        public OrderStatus GetOrderStatusByVisit(Visit visit, ProductType productType)
+        {
+            List<OrderViewModel> orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
+            List<OrderLine> orderLines = new List<OrderLine>();
+
+            foreach (OrderViewModel order in orders)
+            {
+                orderLines.AddRange(_orderLineRepository.GetOrderLinesByType(order.OrderNumber, productType));
+            }
+
+            return orderLines
+                .Select(ol => ol.Status)
+                .DefaultIfEmpty(OrderStatus.Served)
+                .Max();
         }
     }
 }
