@@ -3,7 +3,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using shappo0.Enums;
 using shappo0.Models;
-using shappo0.ViewModels;
 
 namespace shappo0.Repositories
 {
@@ -16,9 +15,9 @@ namespace shappo0.Repositories
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
+        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
-            List<OrderViewModel> orders = new List<OrderViewModel>();
+            List<Order> orders = new List<Order>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -47,7 +46,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewModel order = ReadOrder(reader);
+                    Order order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -55,9 +54,9 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<OrderViewModel> GetRunningOrdersByType(ProductType type)
+        public List<Order> GetRunningOrdersByType(ProductType type)
         {
-            List<OrderViewModel> orders = new List<OrderViewModel>();
+            List<Order> orders = new List<Order>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -94,7 +93,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewModel order = ReadOrder(reader);
+                    Order order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -102,9 +101,9 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<OrderViewModel> GetFinishedOrdersByType(ProductType type)
+        public List<Order> GetFinishedOrdersByType(ProductType type)
         {
-            List<OrderViewModel> orders = new List<OrderViewModel>();
+            List<Order> orders = new List<Order>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -137,7 +136,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewModel order = ReadOrder(reader);
+                    Order order = ReadOrder(reader);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -145,9 +144,9 @@ namespace shappo0.Repositories
             return orders;
         }
 
-        public List<OrderViewModel> GetOrdersByVisitId(int visitId)
+        public List<Order> GetOrdersByVisitId(int visitId)
         {
-            List<OrderViewModel> orders = new List<OrderViewModel>();
+            List<Order> orders = new List<Order>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -171,7 +170,7 @@ namespace shappo0.Repositories
 
                 while (reader.Read())
                 {
-                    OrderViewModel order = ReadOrder(reader);
+                    Order order = ReadOrder(reader);
                     orders.Add(order);
                 }
 
@@ -182,7 +181,7 @@ namespace shappo0.Repositories
 
 
 
-        private OrderViewModel ReadOrder(SqlDataReader reader)
+        private Order ReadOrder(SqlDataReader reader)
         {
             Staff orderStaff = new Staff
             {
@@ -215,10 +214,10 @@ namespace shappo0.Repositories
             DateTime timeCreated = (DateTime)reader["timeCreated"];
             OrderStatus status = Enum.Parse<OrderStatus>((string)reader["OrderStatus"], true);
 
-            return new OrderViewModel(orderNumber, timeCreated, status, attachedVisit, orderStaff);
+            return new Order(orderNumber, timeCreated, status, attachedVisit, orderStaff);
         }
 
-        public int CreateOrder(OrderViewModel order)
+        public int CreateOrder(Order order)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {

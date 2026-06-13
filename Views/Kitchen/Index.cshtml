@@ -1,5 +1,5 @@
 ﻿@using shappo0.ViewModels
-@model List<OrderViewModel>
+@model List<Order>
 @using shappo0.Enums;
 
 @{
@@ -26,7 +26,7 @@
 	</thead>
 	<tbody>
 		@{
-			foreach (OrderViewModel order in Model)
+			foreach (Order order in Model)
 			{
 				var rowStyle = "";
 

@@ -1,7 +1,6 @@
 ﻿using shappo0.Enums;
 using shappo0.Models;
 using shappo0.Repositories;
-using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
@@ -24,22 +23,22 @@ namespace shappo0.Services
         }
 
         
-        public List<OrderViewModel> GetOrdersByVisitId(int visitId)
+        public List<Order> GetOrdersByVisitId(int visitId)
         {
             return _orderRepository.GetOrdersByVisitId(visitId);
         }
 
-        public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2)
+        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
         {
             return _orderRepository.GetRunningOrders(status, status2);
         }
 
-        public List<OrderViewModel> GetRunningOrdersByType(ProductType type)
+        public List<Order> GetRunningOrdersByType(ProductType type)
         {
             return _orderRepository.GetRunningOrdersByType(type);
         }
 
-        public List<OrderViewModel> GetFinishedOrdersByType(ProductType type)
+        public List<Order> GetFinishedOrdersByType(ProductType type)
         {
             return _orderRepository.GetFinishedOrdersByType(type);
         }
@@ -81,7 +80,7 @@ namespace shappo0.Services
   
             }
 
-            OrderViewModel newOrder = new OrderViewModel
+            Order newOrder = new()
             {
                 TimeCreated = DateTime.Now,
                 Status = OrderStatus.Ordered,
@@ -114,7 +113,7 @@ namespace shappo0.Services
             //Otherwise it creates a new product and adds it to the cart
             else
             {
-                OrderLine newOrderLine = new OrderLine
+                OrderLine newOrderLine = new()
                 {
                     Product = selectedProduct,
                     Status = OrderStatus.Ordered,
@@ -210,10 +209,10 @@ namespace shappo0.Services
 
         public OrderStatus GetOrderStatusByVisit(Visit visit, ProductType productType)
         {
-            List<OrderViewModel> orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
-            List<OrderLine> orderLines = new List<OrderLine>();
+            List<Order> orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
+            List<OrderLine> orderLines = [];
 
-            foreach (OrderViewModel order in orders)
+            foreach (Order order in orders)
             {
                 orderLines.AddRange(_orderLineRepository.GetOrderLinesByType(order.OrderNumber, productType));
             }

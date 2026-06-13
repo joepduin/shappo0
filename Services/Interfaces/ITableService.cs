@@ -6,7 +6,7 @@ namespace shappo0.Services
 {
     public interface ITableService
     {
-        Table GetTableByNumber(int tableNumber);
+        Table? GetTableByNumber(int tableNumber);
         List<Table> GetAllTables();
         bool UpdateTableStatus(Table table);
     }

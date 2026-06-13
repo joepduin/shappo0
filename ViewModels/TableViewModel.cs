@@ -8,12 +8,12 @@ namespace shappo0.ViewModels
         public Table Table { get; set; }
         public OrderStatus DrinkStatus { get; set; }
         public OrderStatus FoodStatus { get; set; }
-        public List<OrderViewModel> Orders { get; set; }
+        public List<Order> Orders { get; set; }
 
         public TableViewModel()
         {
             Table = new Table();
-            Orders = new List<OrderViewModel>();
+            Orders = new List<Order>();
         }
 
         public TableViewModel(Table table, OrderStatus drinkStatus, OrderStatus foodStatus)
@@ -21,10 +21,10 @@ namespace shappo0.ViewModels
             Table = table;
             DrinkStatus = drinkStatus;
             FoodStatus = foodStatus;
-            Orders = new List<OrderViewModel>();
+            Orders = new List<Order>();
         }
 
-        public TableViewModel(Table table, List<OrderViewModel> orders)
+        public TableViewModel(Table table, List<Order> orders)
         {
             Table = table;
             Orders = orders;

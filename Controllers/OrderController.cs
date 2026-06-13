@@ -24,7 +24,7 @@ namespace shappo0.Controllers
             _tableService = tableService;
         }
 
-        private string GetCartKey(int tableNumber)
+        private static string GetCartKey(int tableNumber)
         {
             return $"WaiterCart_Table_{tableNumber}";
         }
@@ -77,7 +77,7 @@ namespace shappo0.Controllers
             {
                 //Grabs the exisiting orderLines from the cartId and if it's null it will create a new list
                 string cartId = GetCartKey(request.TableNumber);
-                List<OrderLine> cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId) ?? new List<OrderLine>();
+                List<OrderLine> cart = HttpContext.Session.GetObject<List<OrderLine>>(cartId) ?? [];
 
                 _orderService.AddProductToCart(cart, selectedProduct);
 
