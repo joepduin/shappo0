@@ -48,7 +48,6 @@ namespace shappo0.Repositories
 
                 command.Parameters.AddWithValue("@Ordered", OrderStatus.Ordered.ToString());
                 command.Parameters.AddWithValue("@BeingPrepared", OrderStatus.BeingPrepared.ToString());
-                command.Parameters.AddWithValue("@ReadyToBeServed", OrderStatus.ReadyToBeServed.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
