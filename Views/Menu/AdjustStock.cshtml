@@ -13,11 +13,11 @@
 	<a href="/Menu/Index" class="btn btn-secondary">Return to Menu</a>
 </div>
 
-@if (Model.Any(p => p.Stock < 10 && p.OnMenu))
+@if (Model.Any(p => p.Stock <= 10 && p.OnMenu))
 {
 	<div class="alert alert-danger" role="alert">
 		<h3>⚠️ Low Stock Warning</h3>
-		<p>The following items have less than 10 units remaining:</p>
+		<p>The following items have 10 or less units remaining:</p>
 
 		<table class="table table-bordered bg-white">
 			<thead>
@@ -30,7 +30,7 @@
 			<tbody>
 				@foreach (Product product in Model)
 				{
-					if (product.Stock < 10 && product.OnMenu)
+					if (product.Stock <= 10 && product.OnMenu)
 					{
 						<tr>
 							<td>@product.ProductId</td>
