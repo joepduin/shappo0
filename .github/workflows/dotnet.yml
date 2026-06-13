@@ -12,13 +12,42 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: .NET instellen
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Afhankelijkheden herstellen
+    - name: Restore dependencies
       run: dotnet restore
-    - name: Project bouwen
+    - name: Build project
       run: dotnet build --no-restore
-    - name: Tests uitvoeren
+    - name: Run tests
       run: dotnet test --no-build --verbosity normal
+
+  check-warnings:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Check for warnings and comment
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        OUTPUT=$(dotnet build)
+        if echo "$OUTPUT" | grep -iq "warning CS"; then
+          echo "::error::Attention, there is a warning here!"
+          WARNING_LINES=$(echo "$OUTPUT" | grep -i "warning CS")
+          gh pr comment ${{ github.event.pull_request.number }} --body "Attention, there is a warning here!
+          
+          \`\`\`text
+          $WARNING_LINES
+          \`\`\`"
+          exit 1
+        fi
