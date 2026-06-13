@@ -8,7 +8,7 @@ namespace shappo0.Models
         public Table Table { get; set; }
         public Staff Staff { get; set; }
         public bool IsActive { get; set; }
-        public List<OrderViewModel> Orders { get; set; }
+        public List<Order> Orders { get; set; }
 
         public Visit(int visitId, Table table, Staff staff, bool isActive)
         {
@@ -16,7 +16,7 @@ namespace shappo0.Models
             Table = table;
             Staff = staff;
             IsActive = isActive;
-            Orders = new List<OrderViewModel>();
+            Orders = [];
         }
 
         public Visit()

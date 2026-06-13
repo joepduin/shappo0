@@ -1,16 +1,15 @@
 using shappo0.Enums;
 using shappo0.Models;
-using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
     public interface IOrderService
     {
-        public List<OrderViewModel> GetOrdersByVisitId(int visitId);
-        public List<OrderViewModel> GetRunningOrders(OrderStatus status, OrderStatus? status2);
+        public List<Order> GetOrdersByVisitId(int visitId);
+        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2);
 
-        public List<OrderViewModel> GetRunningOrdersByType(ProductType type);
-        public List<OrderViewModel> GetFinishedOrdersByType(ProductType type);
+        public List<Order> GetRunningOrdersByType(ProductType type);
+        public List<Order> GetFinishedOrdersByType(ProductType type);
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
         public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId);
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type);

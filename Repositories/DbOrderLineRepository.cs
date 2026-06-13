@@ -126,7 +126,7 @@ namespace shappo0.Repositories
             return orderLines;
         }
 
-        private OrderLine ReadOrderLine(SqlDataReader reader)
+        private static OrderLine ReadOrderLine(SqlDataReader reader)
         {
             Product attachedProduct = new Product
             {
@@ -140,7 +140,7 @@ namespace shappo0.Repositories
                 OnMenu = (bool)reader["onMenu"]
             };
 
-            OrderViewModel attachedOrder = new OrderViewModel
+            Order attachedOrder = new Order
             {
                 OrderNumber = (int)reader["orderNumber"],
                 TimeCreated = (DateTime)reader["timeCreated"],

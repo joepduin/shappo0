@@ -38,7 +38,7 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Table(int tableNumber)
         {
-            Table table = _tableService.GetTableByNumber(tableNumber);
+            Table? table = _tableService.GetTableByNumber(tableNumber);
 
             if (table == null)
             {
@@ -91,11 +91,11 @@ namespace shappo0.Controllers
         private TableViewModel BuildTableDetailModel(Table table)
         {
             Visit? visit = _visitService.GetActiveVisitForTable(table.TableNumber);
-            List<OrderViewModel> orders = new List<OrderViewModel>();
+            List<Order> orders = new List<Order>();
             if (visit != null)
             {
                 orders = _orderService.GetOrdersByVisitId(visit.VisitId);
-                foreach (OrderViewModel order in orders)
+                foreach (Order order in orders)
                 {
                     order.OrderLines = _orderService.GetOrderLinesByOrderNumber(order.OrderNumber);
                 }

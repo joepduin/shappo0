@@ -1,6 +1,6 @@
 ﻿@using shappo0.Models
 @using shappo0.ViewModels
-@model List<OrderViewModel>
+@model List<Order>
 @{
 	ViewData["Title"] = "Finished Orders";
 }
@@ -25,7 +25,7 @@
 	</thead>
 	<tbody>
 		@{
-			foreach (OrderViewModel order in Model)
+			foreach (Order order in Model)
 			{
 				var rowStyle = "";
 

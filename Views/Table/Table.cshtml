@@ -55,7 +55,7 @@
                             </a>
                             @{
                                 bool allServed = true;
-                                foreach (OrderViewModel order in Model.Orders)
+                                foreach (Order order in Model.Orders)
                                 {
                                     if (order.Status != OrderStatus.Served)
                                     {
@@ -81,7 +81,7 @@
         @if (Model.Orders != null && Model.Orders.Count > 0)
         {
             <div class="row row-cols-1 g-4">
-                @foreach (OrderViewModel order in Model.Orders)
+                @foreach (Order order in Model.Orders)
                 {
                     <div class="col">
                         <div class="card shadow-sm border-primary">
