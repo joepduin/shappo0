@@ -25,7 +25,7 @@ namespace shappo0.Controllers
 
             if(!Enum.TryParse<RoleType>(staffIdString, out RoleType roleType))
             {
-                TempData["Error"] = "Could not verify your staff identity. Please log in again.";
+                TempData["ErrorMessage"] = "Could not verify your staff identity. Please log in again.";
                 RedirectToAction("Login", "Account");
             }
 

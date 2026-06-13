@@ -28,7 +28,7 @@ namespace shappo0.Controllers
 
             if(!int.TryParse(roleString, out int staffId))
             {
-                ViewData["Error"] = "User not logged in, please log in to view your account.";
+                TempData["ErrorMessage"] = "User not logged in, please log in to view your account.";
                 return RedirectToAction("Login", "Account");
             }
 
@@ -68,7 +68,7 @@ namespace shappo0.Controllers
 
             if (staff == null)
             {
-                ViewBag.Message = "Incorrect username or password.";
+                TempData["ErrorMessage"] = "Incorrect username or password.";
                 loginModel.Password = string.Empty;
                 return View(loginModel); 
             }
