@@ -25,6 +25,9 @@ jobs:
 
   check-warnings:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
 
     steps:
     - uses: actions/checkout@v4
@@ -32,11 +35,18 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Check for warnings
+    - name: Check for warnings and comment
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         OUTPUT=$(dotnet build)
-        echo "$OUTPUT"
         if echo "$OUTPUT" | grep -iq "warning CS"; then
           echo "::error::Attention, there is a warning here!"
+          WARNING_LINES=$(echo "$OUTPUT" | grep -i "warning CS")
+          gh pr comment ${{ github.event.pull_request.number }} --body "Attention, there is a warning here!
+          
+          \`\`\`text
+          $WARNING_LINES
+          \`\`\`"
           exit 1
         fi
