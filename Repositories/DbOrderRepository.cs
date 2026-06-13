@@ -91,7 +91,10 @@ namespace shappo0.Repositories
                     query += "P.ProductType != 'Drink'";
                 }
 
-                SqlCommand command = new SqlCommand(query, connection); 
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@ReadyToBeServed", OrderStatus.ReadyToBeServed.ToString());
+                command.Parameters.AddWithValue("@Served", OrderStatus.Served.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
