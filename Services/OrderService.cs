@@ -28,11 +28,6 @@ namespace shappo0.Services
             return _orderRepository.GetOrdersByVisitId(visitId);
         }
 
-        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
-        {
-            return _orderRepository.GetRunningOrders(status, status2);
-        }
-
         public List<Order> GetRunningOrdersByType(ProductType type)
         {
             return _orderRepository.GetRunningOrdersByType(type);

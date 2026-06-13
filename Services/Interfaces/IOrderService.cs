@@ -6,7 +6,6 @@ namespace shappo0.Services
     public interface IOrderService
     {
         public List<Order> GetOrdersByVisitId(int visitId);
-        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2);
 
         public List<Order> GetRunningOrdersByType(ProductType type);
         public List<Order> GetFinishedOrdersByType(ProductType type);
