@@ -54,19 +54,22 @@
                                 <i class="bi bi-plus-circle me-1"></i> Take Order
                             </a>
                             @{
-                                bool allServed = true;
-                                foreach (Order order in Model.Orders)
+                                if (Model.Orders.Count != 0)
                                 {
-                                    if (order.Status != OrderStatus.Served)
+                                    bool allServed = true;
+                                    foreach (Order order in Model.Orders)
                                     {
-                                        allServed = false;
+                                        if (order.Status != OrderStatus.Served)
+                                        {
+                                            allServed = false;
+                                        }
                                     }
-                                }
-                                if (allServed)
-                                {
-                                    <a href="/Payment/Index?tableNumber=@Model.Table.TableNumber" class="btn btn-dark shadow-sm fw-bold">
-                                        <i class="bi bi-credit-card me-1"></i> Payment
-                                    </a>
+                                    if (allServed)
+                                    {
+                                        <a href="/Payment/Index?tableNumber=@Model.Table.TableNumber" class="btn btn-dark shadow-sm fw-bold">
+                                            <i class="bi bi-credit-card me-1"></i> Payment
+                                        </a>
+                                    }
                                 }
                             }
                         </div>
