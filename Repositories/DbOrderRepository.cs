@@ -44,6 +44,8 @@ namespace shappo0.Repositories
                     query += "P.ProductType != 'Drink'";
                 }
 
+                query += " ORDER BY O.timeCreated ASC";
+
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Parameters.AddWithValue("@Ordered", OrderStatus.Ordered.ToString());
