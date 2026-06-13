@@ -29,10 +29,17 @@ namespace shappo0.Controllers
                 RedirectToAction("Login", "Account");
             }
 
-            if (roleType == RoleType.Manager) return RedirectToAction("Index", "Finance");
-            else if (roleType == RoleType.Bar) return RedirectToAction("Index", "Bar");
-            else if (roleType == RoleType.Kitchen) return RedirectToAction("Index", "Kitchen");
-            else return RedirectToAction("Index", "Table");
+            switch (roleType)
+            {
+                case RoleType.Manager:
+                    return RedirectToAction("Index", "Finance");
+                case RoleType.Bar:
+                    return RedirectToAction("Index", "Bar");
+                case RoleType.Kitchen:
+                    return RedirectToAction("Index", "Kitchen");
+                default:
+                    return RedirectToAction("Index", "Table");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

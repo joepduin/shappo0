@@ -9,8 +9,6 @@ namespace shappo0.Repositories
         public List<OrderLine> GetOrderLinesByOrderNumber(int orderNumber);
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type);
 
-        public List<OrderLine> GetActiveOrderLinesByTableNumber(int tableNumber);
-
         public void CreateOrderLine(OrderLine orderLine);
 
         public void CreateOrderLines(List<OrderLine> orderLines);

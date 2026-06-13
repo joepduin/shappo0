@@ -53,9 +53,22 @@
                             <a href="/Order/TakeOrder?tableNumber=@Model.Table.TableNumber" class="btn btn-primary shadow-sm fw-bold">
                                 <i class="bi bi-plus-circle me-1"></i> Take Order
                             </a>
-                            <a href="/Payment/Index?tableNumber=@Model.Table.TableNumber" class="btn btn-dark shadow-sm fw-bold">
-                                <i class="bi bi-credit-card me-1"></i> Payment
-                            </a>
+                            @{
+                                bool allServed = true;
+                                foreach (OrderViewModel order in Model.Orders)
+                                {
+                                    if (order.Status != OrderStatus.Served)
+                                    {
+                                        allServed = false;
+                                    }
+                                }
+                                if (allServed)
+                                {
+                                    <a href="/Payment/Index?tableNumber=@Model.Table.TableNumber" class="btn btn-dark shadow-sm fw-bold">
+                                        <i class="bi bi-credit-card me-1"></i> Payment
+                                    </a>
+                                }
+                            }
                         </div>
                     }
                 </div>
@@ -93,7 +106,16 @@
                                             @foreach (OrderLine orderLine in order.OrderLines)
                                             {
                                                 <tr>
-                                                    <td class="ps-4 fw-bold">@orderLine.Product.Name</td>
+                                                    <td class="ps-4 fw-bold">
+                                                        @if (orderLine.Product.ProductType == ProductType.Drink)
+                                                        {
+                                                            <a href="/Bar/ViewOrder?orderNumber=@order.OrderNumber">@orderLine.Product.Name</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="/Kitchen/ViewOrder?orderNumber=@order.OrderNumber">@orderLine.Product.Name</a>
+                                                        }
+                                                    </td>
                                                     <td class="text-center fs-5">@orderLine.Quantity</td>
                                                     <td>
                                                         <em class="text-muted small">@(string.IsNullOrEmpty(orderLine.Note) ? "-" : orderLine.Note)</em>
