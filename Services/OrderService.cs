@@ -83,7 +83,8 @@ namespace shappo0.Services
                 Staff = currentStaff
             };
 
-            _orderRepository.CreateOrder(newOrder);
+            int orderNumber = _orderRepository.CreateOrder(newOrder);
+            newOrder.OrderNumber = orderNumber;
 
             //Link the order lines to the order and create them in the database, then adjust the stock for each ordered product
             foreach (OrderLine line in orderLines)

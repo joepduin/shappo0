@@ -7,6 +7,8 @@ namespace shappo0.ViewModels
         public int TableNumber { get; set; }
         public List<Product> AllProducts  { get; set; }
         public List<OrderLine> OrderLines { get; set; }
+        public string? ProductType { get; set; }
+        public string? MenuType { get; set; }
 
         public TakeOrderViewModel(int tableNumber)
         {

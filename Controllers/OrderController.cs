@@ -31,7 +31,7 @@ namespace shappo0.Controllers
 
 
         [Authorize]
-        public IActionResult TakeOrder(int tableNumber, FilterItems filters)
+        public IActionResult TakeOrder(int tableNumber, string? productType, string? menuType)
         {
             //Grabs the unique cartId for this table so we have the correct orderLines for this table
             string cartId = GetCartKey(tableNumber);
@@ -49,22 +49,17 @@ namespace shappo0.Controllers
                 }
             }
 
-            TakeOrderViewModel model = new(tableNumber);
+            FilterItems filters = new FilterItems(productType, menuType, true);
 
-            filters.OnMenu = true;
-
-            List<Product> products = _menuService.GetFilteredProducts(filters, false);
-
-            //Grabs the unique cartId for this table so we have the correct orderLines for this table
-            
-
-            if (orderLines != null)
+            TakeOrderViewModel model = new(tableNumber)
             {
-                model.OrderLines = orderLines;
-            }
+                ProductType = productType,
+                MenuType = menuType,
+                AllProducts = _menuService.GetFilteredProducts(filters, false)
+            };
 
-            model.AllProducts = products;
-
+            if (orderLines != null) model.OrderLines = orderLines;
+            
             return View(model);
         }
         
@@ -104,6 +99,7 @@ namespace shappo0.Controllers
                     TempData["Error"] = "Not enough stock to add this item";
                 }
             }
+
             return RedirectToAction("TakeOrder", new { tableNumber = request.TableNumber, productType = request.ProductType, menuType = request.MenuType });
         }
 
@@ -121,14 +117,6 @@ namespace shappo0.Controllers
             return RedirectToAction("TakeOrder", new { tableNumber = request.TableNumber, productType = request.ProductType, menuType = request.MenuType });
         }
 
-        public IActionResult CancelOrder(int tableNumber)
-        {
-            string cartId = GetCartKey(tableNumber);
-            HttpContext.Session.Remove(cartId);
-            TempData["Success"] = $"Order for table {tableNumber} has been cancelled";
-            return RedirectToAction("Index", "Table");
-        }
-
         public IActionResult RemoveLine(OrderActionViewModel request)
         {
             string cartId = GetCartKey(request.TableNumber);
@@ -141,6 +129,14 @@ namespace shappo0.Controllers
             }
 
             return RedirectToAction("TakeOrder", new { tableNumber = request.TableNumber, productType = request.ProductType, menuType = request.MenuType });
+        }
+
+        public IActionResult CancelOrder(int tableNumber)
+        {
+            string cartId = GetCartKey(tableNumber);
+            HttpContext.Session.Remove(cartId);
+            TempData["Success"] = $"Order for table {tableNumber} has been cancelled";
+            return RedirectToAction("Index", "Table");
         }
 
         [HttpPost]

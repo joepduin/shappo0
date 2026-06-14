@@ -2,9 +2,6 @@
 
 @{
     ViewData["Title"] = $"Order - Table {Model.TableNumber}";
-
-    string? currentProductType = Context.Request.Query["productType"];
-    string? currentMenuType = Context.Request.Query["menuType"];
 }
 
 <div class="container mt-4">
@@ -38,24 +35,24 @@
                                 <td class="align-middle fw-bold">@item.Product.Name</td>
 
                                 <td class="align-middle text-center">
-                                    <a href="/Order/DecreaseQuantity?productId=@item.Product.ProductId&tableNumber=@Model.TableNumber" class="btn btn-sm btn-outline-danger px-2">-</a>
+                                    <a href="/Order/DecreaseQuantity?productId=@item.Product.ProductId&tableNumber=@Model.TableNumber&productType=@Model.ProductType&menuType=@Model.MenuType" class="btn btn-sm btn-outline-danger px-2">-</a>
                                     <span class="mx-2 fs-5">@item.Quantity</span>
-                                    <a href="/Order/IncreaseQuantity?productId=@item.Product.ProductId&tableNumber=@Model.TableNumber" class="btn btn-sm btn-outline-success px-2">+</a>
+                                    <a href="/Order/IncreaseQuantity?productId=@item.Product.ProductId&tableNumber=@Model.TableNumber&productType=@Model.ProductType&menuType=@Model.MenuType" class="btn btn-sm btn-outline-success px-2">+</a>
                                 </td>
 
                                 <td class="align-middle">
                                     <form action="/Order/AddNote" method="post" class="d-flex">
                                         <input type="hidden" name="tableNumber" value="@Model.TableNumber" />
                                         <input type="hidden" name="productId" value="@item.Product.ProductId" />
-                                        <input type="hidden" name="productType" value="@currentProductType" />
-                                        <input type="hidden" name="menuType" value="@currentMenuType" />
+                                        <input type="hidden" name="productType" value="@Model.ProductType" />
+                                        <input type="hidden" name="menuType" value="@Model.MenuType" />
                                         <input type="text" name="note" class="form-control form-control-sm me-2" placeholder="e.g. no salt" value="@item.Note" />
                                         <button type="submit" class="btn btn-sm btn-secondary">Save</button>
                                     </form>
                                 </td>
 
                                 <td class="align-middle text-end">
-                                    <a href="/Order/RemoveLine?productId=@item.Product.ProductId&tableNumber=@Model.TableNumber" class="btn btn-sm btn-danger">X</a>
+                                    <a href="/Order/RemoveLine?productId=@item.Product.ProductId&tableNumber=@Model.TableNumber&productType=@Model.ProductType&menuType=@Model.MenuType" class="btn btn-sm btn-danger">X</a>
                                 </td>
                             </tr>
                         }
@@ -80,28 +77,28 @@
             <div class="mb-3">
                 <span class="fw-bold me-2">Menu:</span>
                 <div class="btn-group" role="group">
-                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=@currentProductType"
-                       class="btn btn-sm @(string.IsNullOrEmpty(currentMenuType) ? "btn-primary" : "btn-outline-primary")">All</a>
-                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&menuType=Lunch&productType=@currentProductType"
-                       class="btn btn-sm @(currentMenuType == "Lunch" ? "btn-primary" : "btn-outline-primary")">Lunch</a>
-                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&menuType=Dinner&productType=@currentProductType"
-                       class="btn btn-sm @(currentMenuType == "Dinner" ? "btn-primary" : "btn-outline-primary")">Dinner</a>
+                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=@Model.ProductType"
+                       class="btn btn-sm @(string.IsNullOrEmpty(Model.MenuType) ? "btn-primary" : "btn-outline-primary")">All</a>
+                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&menuType=Lunch&productType=@Model.ProductType"
+                       class="btn btn-sm @(Model.MenuType == "Lunch" ? "btn-primary" : "btn-outline-primary")">Lunch</a>
+                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&menuType=Dinner&productType=@Model.ProductType"
+                       class="btn btn-sm @(Model.MenuType == "Dinner" ? "btn-primary" : "btn-outline-primary")">Dinner</a>
                 </div>
             </div>
 
             <div>
                 <span class="fw-bold me-2">Category:</span>
                 <div class="btn-group flex-wrap" role="group">
-                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&menuType=@currentMenuType"
-                       class="btn btn-sm @(string.IsNullOrEmpty(currentProductType) ? "btn-primary" : "btn-outline-primary")">All</a>
-                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=Starter&menuType=@currentMenuType"
-                       class="btn btn-sm @(currentProductType == "Starter" ? "btn-primary" : "btn-outline-primary")">Starters</a>
-                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=Main&menuType=@currentMenuType"
-                       class="btn btn-sm @(currentProductType == "Main" ? "btn-primary" : "btn-outline-primary")">Mains</a>
-                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=Dessert&menuType=@currentMenuType"
-                       class="btn btn-sm @(currentProductType == "Dessert" ? "btn-primary" : "btn-outline-primary")">Desserts</a>
-                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=Drink&menuType=@currentMenuType"
-                       class="btn btn-sm @(currentProductType == "Drink" ? "btn-primary" : "btn-outline-primary")">Drinks</a>
+                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&menuType=@Model.MenuType"
+                       class="btn btn-sm @(string.IsNullOrEmpty(Model.ProductType) ? "btn-primary" : "btn-outline-primary")">All</a>
+                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=Starter&menuType=@Model.MenuType"
+                       class="btn btn-sm @(Model.ProductType == "Starter" ? "btn-primary" : "btn-outline-primary")">Starters</a>
+                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=Main&menuType=@Model.MenuType"
+                       class="btn btn-sm @(Model.ProductType == "Main" ? "btn-primary" : "btn-outline-primary")">Mains</a>
+                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=Dessert&menuType=@Model.MenuType"
+                       class="btn btn-sm @(Model.ProductType == "Dessert" ? "btn-primary" : "btn-outline-primary")">Desserts</a>
+                    <a href="/Order/TakeOrder?tableNumber=@Model.TableNumber&productType=Drink&menuType=@Model.MenuType"
+                       class="btn btn-sm @(Model.ProductType == "Drink" ? "btn-primary" : "btn-outline-primary")">Drinks</a>
                 </div>
             </div>
         </div>
@@ -138,7 +135,7 @@
 
                                 @if (product.Stock > 0)
                                 {
-                                    <a href="/Order/AddToOrder?productId=@product.ProductId&tableNumber=@Model.TableNumber&productType=@currentProductType&menuType=@currentMenuType"
+                                    <a href="/Order/AddToOrder?productId=@product.ProductId&tableNumber=@Model.TableNumber&productType=@Model.ProductType&menuType=@Model.MenuType"
                                        class="btn btn-primary w-100 mt-2">Add to Order</a>
                                 }
                                 else
