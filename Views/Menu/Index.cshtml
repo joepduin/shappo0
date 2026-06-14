@@ -1,8 +1,10 @@
-﻿@using shappo0.Models
-@model List<shappo0.Models.Product>
+﻿@using shappo0.ViewModels
+@model ProductsViewModel
 
 @{
 	ViewData["Title"] = "Products";
+
+	FilterItemsViewModel? activeFilters = ViewData["ActiveFilter"] as FilterItemsViewModel;
 
 	// Displays a banner with a confirm message if redirected to this page from either add or edit
 	<partial name="_SuccessMessage" />
@@ -10,6 +12,7 @@
 
 <h1 class="mb-4">Products</h1>
 
+<!-- Only displays the CRU(D) actions if the logged in user is a Manager -->
 @if (User.IsInRole("Manager"))
 {
 	<div class="d-flex justify-content-between align-items-center mb-3">
@@ -22,6 +25,8 @@
 		</div>
 	</div>
 }
+
+<!-- Filters -->
 <form method="GET" action="/Menu/Index" class="row g-3 mb-4 p-3 bg-light border rounded">
 	<h5>Filter Menu Items</h5>
 
@@ -29,11 +34,11 @@
 		<label class="form-label">Product Type</label>
 		<select name="productType" class="form-select">
 			<option value="">All Types</option>
-			<option value="Drink">Drink</option>
-			<option value="Starter">Starter</option>
-			<option value="Intermediary">Intermediary</option>
-			<option value="Main">Main Course</option>
-			<option value="Dessert">Dessert</option>
+			<option value="Drink" selected="@(activeFilters?.ProductType == "Drink" ? "selected" : null)">Drink</option>
+			<option value="Starter" selected="@(activeFilters?.ProductType == "Starter" ? "selected" : null)">Starter</option>
+			<option value="Intermediary" selected="@(activeFilters?.ProductType == "Intermediary" ? "selected" : null)">Intermediary</option>
+			<option value="Main" selected="@(activeFilters?.ProductType == "Main" ? "selected" : null)">Main Course</option>
+			<option value="Dessert" selected="@(activeFilters?.ProductType == "Dessert" ? "selected" : null)">Dessert</option>
 		</select>
 	</div>
 
@@ -41,17 +46,17 @@
 		<label class="form-label">Menu Type</label>
 		<select name="menuType" class="form-select">
 			<option value="">All Menus</option>
-			<option value="Lunch">Lunch</option>
-			<option value="Dinner">Dinner</option>
+			<option value="Lunch" selected="@(activeFilters?.MenuType == "Lunch" ? "selected" : null)">Lunch</option>
+			<option value="Dinner" selected="@(activeFilters?.MenuType == "Dinner" ? "selected" : null)">Dinner</option>
 		</select>
 	</div>
 
 	<div class="col-md-3">
 		<label class="form-label">On menu?</label>
 		<select name="onMenu" class="form-select">
-			<option value="">Any status</option>
-			<option value="True">On menu</option>
-			<option value="False">Off menu</option>
+			<option value=null>Any status</option>
+			<option value="true" selected="@(activeFilters?.OnMenu == true ? "selected" : null)">On menu</option>
+			<option value="false" selected="@(activeFilters?.OnMenu == false ? "selected" : null)">Off menu</option>
 		</select>
 	</div>
 
@@ -62,7 +67,8 @@
 	</div>
 </form>
 
-@if (Model.Any(p => p.Stock < 10 && p.OnMenu))
+<!-- Low Stock alert -->
+@if (Model.LowStockProducts.Any())
 {
 	<div class="alert alert-danger" role="alert">
 		<h3>⚠️ Low Stock Warning</h3>
@@ -81,9 +87,9 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (Product product in Model)
+				@foreach (Product product in Model.LowStockProducts)
 				{
-					if (product.Stock < 10 && product.OnMenu)
+					if (product.OnMenu)
 					{
 						<tr>
 							<td>@product.ProductId</td>
@@ -103,6 +109,7 @@
 	</div>
 }
 
+<!-- Products table -->
 <table class="table">
 	<thead>
 		<tr>
@@ -122,15 +129,12 @@
 
 	<tbody>
 		@{
-			foreach (Product product in Model)
+			foreach (Product product in Model.AllProducts)
 			{
-				decimal vat = (product.VATPercentage + 100) / 100;
-				decimal price = Math.Round((product.Price * vat), 2);
-
 				<tr>
 					<td>@product.ProductId</td>
 					<td>@product.Name</td>
-					<td>€@price</td>
+					<td>€@Math.Round(product.PriceIncludingTax, 2)</td>
 					<td>@product.Stock</td>
 					<td>@product.ProductType</td>
 					<td>@product.MenuType</td>
