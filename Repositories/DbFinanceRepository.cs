@@ -26,7 +26,7 @@ namespace shappo0.Repositories
 
             // Query selects by group based on menutype, sums the amount of items ordered within that group and calculates the revenue per group
             // Also includes the filter option if date is selected, otherwise uses the default
-            string query = @"SELECT p.menuType, SUM(ol.quantity) AS total_items_ordered, ROUND((SUM(ol.quantity * (p.price * (p.VATPercentage + 100) / 100))), 2) AS total_revenue " +
+            string query = @"SELECT p.menuType, SUM(ol.quantity) AS total_items_ordered, ROUND((SUM(ol.quantity * (p.price * ((p.VATPercentage + 100) / 100)))), 2) AS total_revenue " +
                 "FROM ORDER_LINE AS ol " +
                 "JOIN PRODUCT AS p ON ol.productId = p.productId " +
                 "JOIN [ORDER] AS o ON ol.orderNumber = o.orderNumber " +

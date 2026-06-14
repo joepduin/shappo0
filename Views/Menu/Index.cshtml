@@ -4,7 +4,7 @@
 @{
 	ViewData["Title"] = "Products";
 
-	FilterItemsViewModel? activeFilters = ViewData["ActiveFilter"] as FilterItemsViewModel;
+	FilterItems? activeFilters = ViewData["ActiveFilter"] as FilterItems;
 
 	// Displays a banner with a confirm message if redirected to this page from either add or edit
 	<partial name="_SuccessMessage" />
@@ -70,7 +70,7 @@ Uses 'IsInRole()', which is a default Method from ASP.NET using the RolePrincipa
 </form>
 
 <!-- Low Stock alert -->
-@if (Model.LowStockProducts.Any())
+@if (Model.LowStockProducts.Any(p => p.OnMenu))
 {
 	<div class="alert alert-danger" role="alert">
 		<h3>⚠️ Low Stock Warning</h3>

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
-using shappo0.ViewModels;
 
 namespace shappo0.Repositories
 {
@@ -62,7 +61,7 @@ namespace shappo0.Repositories
         }
 
         // Applies the filters to the query. Includes 6 important steps
-        public List<Product> GetFilteredProducts(FilterItemsViewModel? filters, bool lowStock)
+        public List<Product> GetFilteredProducts(FilterItems? filters, bool lowStock)
         {
             // 1. Base query
             string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu " +
@@ -199,6 +198,7 @@ namespace shappo0.Repositories
             }
         }
 
+        // Laurens
         //Method to batch adjust the stock so the connection doesn't need to reopen for as many times as there are orderlines
         // Uses OrderLine objects
         public void BatchAdjustStockForOrders(List<OrderLine> orderLines)
