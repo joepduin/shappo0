@@ -1,5 +1,5 @@
-﻿using shappo0.Models;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using shappo0.Models;
 using shappo0.Repositories.Interfaces;
 
 namespace shappo0.Repositories

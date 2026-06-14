@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
-using shappo0.ViewModels;
 
 namespace shappo0.Repositories
 {
@@ -91,7 +90,7 @@ namespace shappo0.Repositories
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                
+
                 string query = @"SELECT     
                                     OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
                                     O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 

@@ -62,7 +62,7 @@
 	</div>
 </form>
 
-@if (Model.Any(p => p.Stock < 10 && p.OnMenu))
+@if (Model.Any(p => p.Stock <= 10 && p.OnMenu))
 {
 	<div class="alert alert-danger" role="alert">
 		<h3>⚠️ Low Stock Warning</h3>

@@ -33,12 +33,11 @@ namespace shappo0.Controllers
         [Authorize]
         public IActionResult TakeOrder(int tableNumber, FilterItemsViewModel filters)
         {
-
+            //Grabs the unique cartId for this table so we have the correct orderLines for this table
             string cartId = GetCartKey(tableNumber);
             List<OrderLine>? orderLines = HttpContext.Session.GetObject<List<OrderLine>>(cartId);
 
-            //checks if there are any orderLines for this table, if not it will check if the table is occupied, if the table is not occupied it will redirect the user back to the table overview with an error message,
-            //this is to prevent users from placing orders for tables that are not occupied and also to prevent users from seeing the order page for tables that are not occupied which could cause confusion
+            //if there are no orderlines for this table, it will check the table status to make sure that it exists or is occupied. If not it will redirect the user back to the table overview page
             if (orderLines == null || orderLines.Count == 0)
             {
                 Table? currentTable = _tableService.GetTableByNumber(tableNumber);
@@ -55,8 +54,6 @@ namespace shappo0.Controllers
             filters.OnMenu = "true";
 
             List<Product> products = _menuService.GetFilteredProducts(filters);
-
-            //Grabs the unique cartId for this table so we have the correct orderLines for this table
             
 
             if (orderLines != null)

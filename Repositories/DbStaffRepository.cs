@@ -1,8 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace shappo0.Repositories
 {

@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.Endpoints;
+﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
-using Microsoft.Data.SqlClient;
 using shappo0.ViewModels;
 
 namespace shappo0.Repositories
@@ -70,7 +69,7 @@ namespace shappo0.Repositories
             List<string> conditions = new List<string>();
 
 
-            if (!string.IsNullOrEmpty(filters?.ProductType)) 
+            if (!string.IsNullOrEmpty(filters?.ProductType))
             {
                 conditions.Add("productType = @productType");
             }
@@ -93,7 +92,7 @@ namespace shappo0.Repositories
 
             query += " ORDER BY onMenu DESC, menuType, productType, name";
 
-                List<Product> products = new List<Product>();
+            List<Product> products = new List<Product>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
@@ -165,8 +164,8 @@ namespace shappo0.Repositories
                 command.Parameters.AddWithValue("@price", product.Price);
                 command.Parameters.AddWithValue("@vatPercentage", product.VATPercentage);
                 command.Parameters.AddWithValue("@stock", product.Stock);
-                command.Parameters.AddWithValue("@productType", product.ProductType);
-                command.Parameters.AddWithValue("@menuType", product.MenuType);
+                command.Parameters.AddWithValue("@productType", product.ProductType.ToString());
+                command.Parameters.AddWithValue("@menuType", product.MenuType.ToString());
                 command.Parameters.AddWithValue("@onMenu", product.OnMenu);
 
                 command.Connection.Open();
@@ -221,17 +220,17 @@ namespace shappo0.Repositories
             {
                 string query = $"UPDATE [PRODUCT] SET stock = stock - @quantity WHERE productId = @productId AND stock >= @quantity";
 
-                using (SqlCommand command = new SqlCommand(query, connection)) 
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Connection.Open();
 
-                    foreach(OrderLine line in orderLines)
+                    foreach (OrderLine line in orderLines)
                     {
                         command.Parameters.Clear();
                         command.Parameters.AddWithValue("@quantity", line.Quantity);
                         command.Parameters.AddWithValue("@productId", line.Product.ProductId);
                         command.ExecuteNonQuery();
-                    }  
+                    }
                 }
             }
         }

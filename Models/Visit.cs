@@ -1,6 +1,4 @@
-﻿using shappo0.ViewModels;
-
-namespace shappo0.Models
+﻿namespace shappo0.Models
 {
     public class Visit
     {
@@ -12,7 +10,7 @@ namespace shappo0.Models
 
         public Visit(int visitId, Table table, Staff staff, bool isActive)
         {
-            VisitId = visitId; 
+            VisitId = visitId;
             Table = table;
             Staff = staff;
             IsActive = isActive;
