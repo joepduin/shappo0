@@ -32,13 +32,13 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Kitchen" asp-action="Index">Kitchen</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Index">Staff</a>
-                        </li>
                         @{
-							// Only shows the finance page button to managers, since only they can access the page
+							// Only shows the finance page and staff buttons to managers, since only they can access the page
                             if (User.IsInRole("Manager"))
                             {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Staff" asp-action="Index">Staff</a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Finance" asp-action="Index">Finances</a>
                                 </li>
@@ -51,19 +51,19 @@
                             <!-- Checkt of de gebruiker ingelogd is, zo ja dan ziet de gebruiker de log off knop. De ==true staat hier erbij omdat er ook NULL uit kan komen, een if statement weet anders niet wat ie moet doen met de NULL -->
                             @if (User.Identity?.IsAuthenticated == true)
                             {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index">Account</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="LogOff">Log off</a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index">Account</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="LogOff">Log off</a>
+                                </li>
                             }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                        }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                                </li>
+                            }
                         
                     </ul>
                 </div>
@@ -96,7 +96,7 @@
     </div>
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - shappo0 - <a asp-area="" asp-controller="Account" asp-action="LogOff">Log off</a>
+            &copy; 2026 shappo0
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
