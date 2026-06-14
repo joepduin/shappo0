@@ -9,5 +9,6 @@ namespace shappo0.Services
         Table? GetTableByNumber(int tableNumber);
         List<Table> GetAllTables();
         bool UpdateTableStatus(Table table);
+        public bool CanTablePay(List<Order> orders);
     }
 }

@@ -4,13 +4,20 @@ namespace shappo0.Extensions
 {
     public static class EmojiExtensions
     {
+        //Zet de enum om naar emoji voor het tafel overzicht.
         public static string ToEmoji(this OrderStatus orderStatus)
         {
-            if (orderStatus == OrderStatus.Ordered) return "🧾";
-            if (orderStatus == OrderStatus.BeingPrepared) return "👨‍🍳";
-            if (orderStatus == OrderStatus.ReadyToBeServed) return "🍽️";
-            else return "💤";
+            switch (orderStatus)
+            {
+                case OrderStatus.Ordered:
+                    return "🧾";
+                case OrderStatus.BeingPrepared:
+                    return "👨‍🍳";
+                case OrderStatus.ReadyToBeServed:
+                    return "🍽️";
+                default:
+                    return "💤";
+            }
         }
-
     }
 }

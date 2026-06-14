@@ -15,7 +15,7 @@ namespace shappo0.Repositories
 
         private Visit ReadVisit(SqlDataReader reader)
         {
- 
+
             Table attachedTable = new Table
             {
                 TableNumber = (int)reader["tableNumber"],

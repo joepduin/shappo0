@@ -21,12 +21,12 @@ namespace shappo0.Controllers
         [Authorize] //moet op authorize staan, want anders is het mogelijk dat er geen claim is
         public IActionResult Index()
         {
-            string? staffIdString = User.FindFirstValue(ClaimTypes.Role);
+            string? roleString = User.FindFirstValue(ClaimTypes.Role);
 
-            if(!Enum.TryParse<RoleType>(staffIdString, out RoleType roleType))
+            if(!Enum.TryParse<RoleType>(roleString, out RoleType roleType))
             {
-                TempData["Error"] = "Could not verify your staff identity. Please log in again.";
-                RedirectToAction("Login", "Account");
+                TempData["ErrorMessage"] = "Could not verify your staff identity. Please log in again.";
+                return RedirectToAction("LogOff", "Account");
             }
 
             switch (roleType)

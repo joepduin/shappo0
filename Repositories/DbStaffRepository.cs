@@ -1,8 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace shappo0.Repositories
 {
@@ -20,20 +18,18 @@ namespace shappo0.Repositories
         public Staff? GetStaffByCredentials(LoginModel loginModel)
         {
             Staff? staff = null;
-
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                connection.Open();
-
                 string query = @"SELECT staffId, [name], phoneNumber, sex, [role], [password], isEmployed
                                  FROM Staff
-                                 WHERE [password] = @Password AND [name] = @Name";
+                                 WHERE [password] = @Password AND [name] = @Name AND isEmployed = 1";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Password", loginModel.Password);
                     command.Parameters.AddWithValue("@Name", loginModel.Name);
 
+                    connection.Open();
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read())
@@ -149,26 +145,16 @@ namespace shappo0.Repositories
         // Leest een Staff object uit een SqlDataReader
         private Staff ReadStaff(SqlDataReader reader)
         {
-            Staff staff = new Staff();
-            staff.StaffId = (int)reader["staffId"];
-            staff.Name = (string)reader["Name"];
-            staff.PhoneNumber = reader["phoneNumber"] != DBNull.Value ? (string)reader["phoneNumber"] : null;
-            if (reader["sex"] != DBNull.Value)
+            return new Staff
             {
-                string sexString = (string)reader["sex"];
-                staff.Sex = Enum.Parse<SexType>(sexString);
-            }
-            else
-            {
-                staff.Sex = null;
-            }
-            string roleString = (string)reader["role"];
-            staff.Role = Enum.Parse<RoleType>(roleString);
-
-            staff.Password = (string)reader["password"];
-            staff.IsEmployed = (bool)reader["isEmployed"];
-
-            return staff;
+                StaffId = (int)reader["staffId"],
+                Name = (string)reader["name"],
+                PhoneNumber = (string)reader["phoneNumber"],
+                Password = (string)reader["password"],
+                IsEmployed = (bool)reader["isEmployed"],
+                Sex = Enum.Parse<SexType>((string)reader["sex"], true),
+                Role = Enum.Parse<RoleType>((string)reader["role"], true)
+            };
         }
     }
 }

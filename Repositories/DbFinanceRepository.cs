@@ -1,5 +1,5 @@
-﻿using shappo0.Models;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using shappo0.Models;
 using shappo0.Repositories.Interfaces;
 
 namespace shappo0.Repositories
@@ -16,6 +16,7 @@ namespace shappo0.Repositories
         {
             List<Finance> finances = new List<Finance>();
 
+            // Sets the Start and End date, using a default min and max value if none are sent along
             DateTime startDate = range?.Start ?? DateTime.MinValue;
             DateTime endDate = DateTime.MaxValue;
             if (range?.End != null)
@@ -24,7 +25,7 @@ namespace shappo0.Repositories
             }
 
             // Query selects by group based on menutype, sums the amount of items ordered within that group and calculates the revenue per group
-            // Also includes the filter option if date is selected
+            // Also includes the filter option if date is selected, otherwise uses the default
             string query = @"SELECT p.menuType, SUM(ol.quantity) AS total_items_ordered, ROUND((SUM(ol.quantity * (p.price * (p.VATPercentage + 100) / 100))), 2) AS total_revenue " +
                 "FROM ORDER_LINE AS ol " +
                 "JOIN PRODUCT AS p ON ol.productId = p.productId " +
@@ -50,7 +51,6 @@ namespace shappo0.Repositories
                     }
                 }
             }
-
             return finances;
         }
 
@@ -59,6 +59,7 @@ namespace shappo0.Repositories
         {
             decimal totalTips = 0;
 
+            // Sets the Start and End date, using a default min and max value if none are sent along
             DateTime startDate = range?.Start ?? DateTime.MinValue;
             DateTime endDate = DateTime.MaxValue;
             if (range?.End != null)
@@ -67,6 +68,7 @@ namespace shappo0.Repositories
             }
 
             // ORDER is joined from VISIT to BILL, since the timeCreated column (ORDER) is required for the date filter and tips are located in BILL
+            // ISNULL(expression, value): will returns 0 (value) if the expression (SUM()) is null
             string query = @"SELECT ISNULL(SUM(b.totalTip), 0) AS total_tips " +
                 "FROM BILL AS b " +
                 "JOIN VISIT AS v ON b.visitId = v.visitId " +
