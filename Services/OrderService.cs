@@ -171,6 +171,8 @@ namespace shappo0.Services
             }
         }
 
+        // Joep
+        //Update de orderline status en checkt of de order status ook veranderd moet worden.
         public void UpdateOrderLineStatus(OrderLine orderLine, OrderStatus status)
         {
             _orderLineRepository.UpdateOrderLineStatus(orderLine.OrderLineId, status);
@@ -180,12 +182,18 @@ namespace shappo0.Services
 
             foreach (OrderLine newOrderLine in orderLines)
             {
-                if (newOrderLine.Status != status) allLinesStatus = false;
+                if (newOrderLine.Status != status)
+                {
+                    allLinesStatus = false;
+                    break;
+                }
             }
 
             if (allLinesStatus) _orderRepository.UpdateOrderStatus(orderLine.Order.OrderNumber, status);
         }
 
+        //Joep
+        //Update de order status en checkt of de orderline status ook veranderd moet worden.
         public void UpdateOrderStatus(int orderNumber, OrderStatus status)
         {
             _orderRepository.UpdateOrderStatus(orderNumber, status);
@@ -202,10 +210,12 @@ namespace shappo0.Services
             _orderLineRepository.UpdateCourseStatus(orderNumber, productType, status);
         }
 
+        //Joep
+        //Geeft de hoogste orderstatus terug voor een product type
         public OrderStatus GetOrderStatusByVisit(Visit visit, ProductType productType)
         {
             List<Order> orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
-            List<OrderLine> orderLines = [];
+            List<OrderLine> orderLines = new List<OrderLine>();
 
             foreach (Order order in orders)
             {

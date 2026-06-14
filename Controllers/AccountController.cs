@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using shappo0.Enums;
 using shappo0.Models;
 using shappo0.Services;
 using System.Security.Claims;
@@ -23,10 +22,9 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            //safely fetch the staffId from the claim, if it fails, redirect to login
-            string? roleString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? staffIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if(!int.TryParse(roleString, out int staffId))
+            if(!int.TryParse(staffIdString, out int staffId))
             {
                 TempData["ErrorMessage"] = "User not logged in, please log in to view your account.";
                 return RedirectToAction("Login", "Account");

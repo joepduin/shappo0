@@ -15,6 +15,8 @@ namespace shappo0.Services
             _staffRepository = staffRepository;
         }
 
+        //Joep
+        //Maakt de claims voor de staff
         public List<Claim> GetUserClaims(Staff staff)
         {
             return new List<Claim>
@@ -26,9 +28,9 @@ namespace shappo0.Services
         }
 
         // Joep
+        //Checkt of de ingevoerde combinatie goed is.
         public Staff? GetStaffByCredentials(LoginModel loginModel)
         {
-
             loginModel.Password = HashPassword(loginModel.Password);
             return _staffRepository.GetStaffByCredentials(loginModel);
         }
@@ -65,8 +67,7 @@ namespace shappo0.Services
         //maakt een hash van het wachtwoord
         private string HashPassword(string? password)
         {
-            if(password == null)
-                return string.Empty;
+            if(password == null) return string.Empty;
 
             using (SHA256 sha256 = SHA256.Create())
             {
