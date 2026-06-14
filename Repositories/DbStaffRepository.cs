@@ -22,7 +22,7 @@ namespace shappo0.Repositories
             {
                 string query = @"SELECT staffId, [name], phoneNumber, sex, [role], [password], isEmployed
                                  FROM Staff
-                                 WHERE [password] = @Password AND [name] = @Name";
+                                 WHERE [password] = @Password AND [name] = @Name AND isEmployed = 1";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
