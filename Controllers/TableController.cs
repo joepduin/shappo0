@@ -106,7 +106,9 @@ namespace shappo0.Controllers
                     order.OrderLines = _orderService.GetOrderLinesByOrderNumber(order.OrderNumber);
                 }
             }
-            return new(table, orders);
+
+            bool canPay = _tableService.CanTablePay(orders);
+            return new(table, orders, canPay);
         }
     }
 }

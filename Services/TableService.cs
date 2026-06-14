@@ -64,5 +64,12 @@ namespace shappo0.Services
 
             return false;
         }
+
+        //Checkt of de payment knop zichtbaar moet zijn.
+        public bool CanTablePay(List<Order> orders)
+        {
+            if (orders == null || orders.Count == 0) return false;
+            return orders.All(o => o.Status == OrderStatus.Served);
+        }
     }
 }

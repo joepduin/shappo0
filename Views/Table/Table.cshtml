@@ -53,24 +53,11 @@
                             <a href="/Order/TakeOrder?tableNumber=@Model.Table.TableNumber" class="btn btn-primary shadow-sm fw-bold">
                                 <i class="bi bi-plus-circle me-1"></i> Take Order
                             </a>
-                            @{
-                                if (Model.Orders.Count != 0)
-                                {
-                                    bool allServed = true;
-                                    foreach (Order order in Model.Orders)
-                                    {
-                                        if (order.Status != OrderStatus.Served)
-                                        {
-                                            allServed = false;
-                                        }
-                                    }
-                                    if (allServed)
-                                    {
-                                        <a href="/Payment/Index?tableNumber=@Model.Table.TableNumber" class="btn btn-dark shadow-sm fw-bold">
-                                            <i class="bi bi-credit-card me-1"></i> Payment
-                                        </a>
-                                    }
-                                }
+                            @if (Model.CanPay)
+                            {
+                                <a href="/Payment/Index?tableNumber=@Model.Table.TableNumber" class="btn btn-dark shadow-sm fw-bold">
+                                    <i class="bi bi-credit-card me-1"></i> Payment
+                                </a>
                             }
                         </div>
                     }
