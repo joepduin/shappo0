@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using shappo0.Models;
 using shappo0.Services.Interfaces;
+using shappo0.ViewModels;
 
 namespace shappo0.Controllers
 {
@@ -35,15 +36,13 @@ namespace shappo0.Controllers
             // Retrieves the income data and total tips based on the provided date range and quick filter
             List<Finance> incomeData = _financeService.GetIncomeByDate(range, filter);
             decimal totalTips = _financeService.GetTipsByDate(range, filter);
-            // Retrievves the selected range so it can be used in the view
+            // Retrieves the selected range so it can be used in the view
             DateRange? resolvedRange = _financeService.CalculateRange(range, filter);
 
-            // Adds the start date, end date, and total tips to the ViewBag so they can be displayed in the view
-            ViewBag.StartDate = resolvedRange?.Start?.ToString("yyyy-MM-dd");
-            ViewBag.EndDate = resolvedRange?.End?.ToString("yyyy-MM-dd");
-            ViewBag.TotalTips = totalTips;
+            // Creates ViewModel: start & end date, total tips and a list with the income data
+            FinanceViewModel viewModel = new FinanceViewModel(incomeData, resolvedRange, totalTips);
 
-            return View(incomeData);
+            return View(viewModel);
         }
     }
 }

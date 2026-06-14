@@ -20,8 +20,9 @@
                 <input type="text" id="name" name="name" class="form-control" required value="@Model?.Name" />
             </div>
             <div class="col-md-3">
-                <label for="price" class="form-label">Price excluding VAT (€):</label>
-                <input type="number" step="0.01" id="price" name="price" class="form-control" required value="@Model?.Price" />
+                <label for="price" class="form-label">Price including VAT (€):</label>
+                <!-- The 'Math.Round()' is not allowed when there's possibly a null reference, so it has to be used when only when the value is not null (if statement) -->
+                <input type="number" step="0.01" id="price" name="price" class="form-control" required value="@(Model?.PriceIncludingTax != null ? Math.Round(Model.PriceIncludingTax, 2) : "")" />
             </div>
             <div class="col-md-3">
                 <label for="stock" class="form-label">Stock:</label>
@@ -54,11 +55,13 @@
 
         <div class="mb-4">
             <label class="form-label d-block">On Menu?</label>
-            <div class="btn-group" role="group">
-                <input type="radio" class="btn-check" name="onMenu" id="foodTrue" value="true" checked autocomplete="off">
+            <div class="btn-group" role="group" required>
+                <!-- Chekcs if Model is null: if not, uses the value of OnMenu, if yes defaults to true -->
+                <input type="radio" class="btn-check" name="onMenu" id="foodTrue" value="true" checked="@(Model?.OnMenu ?? true)" autocomplete="off">
                 <label class="btn btn-outline-success" for="foodTrue">True</label>
 
-                <input type="radio" class="btn-check" name="onMenu" id="foodFalse" value="false" autocomplete="off">
+                <!-- Returns false if the Model is not null and the OnMenu property is false -->
+                <input type="radio" class="btn-check" name="onMenu" id="foodFalse" value="false" checked="@(Model != null && !Model.OnMenu)" autocomplete="off">
                 <label class="btn btn-outline-danger" for="foodFalse">False</label>
             </div>
         </div>

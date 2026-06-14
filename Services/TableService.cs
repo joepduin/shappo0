@@ -1,4 +1,3 @@
-using shappo0.ViewModels;
 using shappo0.Models;
 using shappo0.Repositories;
 using shappo0.Enums;
@@ -18,18 +17,21 @@ namespace shappo0.Services
             _orderRepository = orderRepository;
         }
 
+        //Geeft het tafel object
         public Table? GetTableByNumber(int tableNumber)
         {
             Table? table = _tablesRepository.GetTableByNumber(tableNumber);
             return table;
         }
 
+        //Geeft alle tafels
         public List<Table> GetAllTables()
         {
             List<Table> tables = _tablesRepository.GetAllTables();
             return tables;
         }
 
+        //Past de tafel status aan, maar checkt of er ongeserveerde orders zijn.
         public bool UpdateTableStatus(Table table)
         {
             Visit? visit = _visitRepository.GetActiveVisitForTable(table.TableNumber);
@@ -42,7 +44,11 @@ namespace shappo0.Services
                     bool allOrdersServed = true;
                     foreach (Order order in orders)
                     {
-                        if (order.Status != OrderStatus.Served) allOrdersServed = false;
+                        if (order.Status != OrderStatus.Served)
+                        {
+                            allOrdersServed = false;
+                            break;
+                        }
                     }
 
                     if (allOrdersServed)
@@ -60,6 +66,13 @@ namespace shappo0.Services
             }
 
             return false;
+        }
+
+        //Checkt of de payment knop zichtbaar moet zijn.
+        public bool CanTablePay(List<Order> orders)
+        {
+            if (orders == null || orders.Count == 0) return false;
+            return orders.All(o => o.Status == OrderStatus.Served);
         }
     }
 }

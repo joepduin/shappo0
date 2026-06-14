@@ -51,9 +51,11 @@ namespace shappo0.Controllers
 
             TakeOrderViewModel model = new(tableNumber);
 
-            filters.OnMenu = "true";
+            filters.OnMenu = true;
 
-            List<Product> products = _menuService.GetFilteredProducts(filters);
+            List<Product> products = _menuService.GetFilteredProducts(filters, false);
+
+            //Grabs the unique cartId for this table so we have the correct orderLines for this table
             
 
             if (orderLines != null)

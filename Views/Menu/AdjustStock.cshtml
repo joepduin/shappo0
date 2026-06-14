@@ -1,6 +1,7 @@
 ﻿@using shappo0.Models
 @model List<shappo0.Models.Product>
 
+<!-- This page is used for adjusting stock in bulk -->
 @{
 	ViewData["Title"] = "Adjust Stock";
 
@@ -44,7 +45,6 @@
 	</div>
 }
 
-<!-- Form wraps the entire adjustment table -->
 <form action="/Menu/AdjustStock" method="POST">
 	<table class="table align-middle">
 		<thead>
@@ -57,11 +57,13 @@
 		</thead>
 
 		<tbody>
+			<!-- A 'foreach' loop doesn't work in this scenario -->
 			@for (int i = 0; i < Model.Count; i++)
 			{
 				<tr>
 					<td>
 						@Model[i].ProductId
+						<!-- Uses a hidden field to add the ProductId along when making a POST request -->
 						<input type="hidden" name="[@i].ProductId" value="@Model[i].ProductId" />
 					</td>
 					<td>@Model[i].Name</td>
@@ -74,6 +76,7 @@
 		</tbody>
 	</table>
 
+	<!-- Submits a list with all products and their adjusted stock -->
 	<div class="mt-4 mb-5">
 		<button type="submit" class="btn btn-primary btn-lg">Save All Changes</button>
 	</div>

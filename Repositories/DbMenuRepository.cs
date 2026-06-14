@@ -61,59 +61,61 @@ namespace shappo0.Repositories
             return product;
         }
 
-        public List<Product> GetFilteredProducts(FilterItemsViewModel? filters)
+        // Applies the filters to the query. Includes 6 important steps
+        public List<Product> GetFilteredProducts(FilterItemsViewModel? filters, bool lowStock)
         {
+            // 1. Base query
             string query = "SELECT productId, name, price, vatPercentage, stock, productType, menuType, onMenu " +
                 "FROM product";
 
+            // 2. Creates a list to hold conditions which will later be added
             List<string> conditions = new List<string>();
 
-
+            // 3. Goes over each of the filters and adds them to the conditions List
             if (!string.IsNullOrEmpty(filters?.ProductType))
             {
                 conditions.Add("productType = @productType");
             }
-
-            //Add the menutype to the query BUT if the productType is set to 'Drink' then it doesn't matter what the menuType is
             if (!string.IsNullOrEmpty(filters?.MenuType))
             {
-                conditions.Add("(menuType = @menuType OR productType = 'Drink')");
+                conditions.Add("menuType = @menuType");
             }
-
-            if (!string.IsNullOrEmpty(filters?.OnMenu))
+            if (filters?.OnMenu.HasValue == true)
             {
                 conditions.Add("onMenu = @onMenu");
             }
+            // Uses the lowStock boolean to add a condition to the query if it is true
+            if (lowStock)
+            {
+                conditions.Add("stock < 10");
+            }
 
+            // 4. If there are any conditions, adds them to the query with a WHERE clause
             if (conditions.Count > 0)
             {
+                // Uses Join method: first parameter is used as a separator between elements, the second parameter is the List which contain the actual elements
+                // Uses following syntax: x AND y AND z
                 query += " WHERE " + string.Join(" AND ", conditions);
             }
 
+            // 5. Adds an ORDER BY clause, since that has to be after the WHERE clause
             query += " ORDER BY onMenu DESC, menuType, productType, name";
 
+            // 6. Does the "regular" database logic
             List<Product> products = new List<Product>();
+
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    // Makes sure to introduce the parameters within the written query AS strings, not as enums!
-                    //!!!!!!!!!!!!
-                    //NOTITIE VAN LAURENS: Ik heb hier de Enum.Parse weggehaald omdat het juist het tegenovergestelde deed en de objecten als getallen opsloeg
-                    //hierdoor werkte de filter methode niet meer
-                    //!!!!!!!!!!!!!
-
+                    // CHANGE: make sure to introduce the parameters within the written query as STRINGS, not as ENUMS (changed in database)!
                     if (!string.IsNullOrEmpty(filters?.ProductType))
-                        command.Parameters.AddWithValue("@productType", filters?.ProductType);
+                        command.Parameters.AddWithValue("@productType", filters.ProductType);
                     if (!string.IsNullOrEmpty(filters?.MenuType))
-                        command.Parameters.AddWithValue("@menuType", filters?.MenuType);
-                    // Since onMenu is a boolean, we need to convert the string value to a boolean before adding it as a parameter
-                    if (!string.IsNullOrEmpty(filters?.OnMenu))
-                    {
-                        bool isOnMenu = filters?.OnMenu.ToLower() == "true";
-                        command.Parameters.AddWithValue("@onMenu", isOnMenu);
-                    }
+                        command.Parameters.AddWithValue("@menuType", filters.MenuType);
+                    if (filters?.OnMenu.HasValue == true)
+                        command.Parameters.AddWithValue("@onMenu", filters.OnMenu.Value);
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -176,6 +178,7 @@ namespace shappo0.Repositories
             }
         }
 
+        // Method for singular stock adjustment
         public void AdjustStock(int productId, int newStock)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -195,26 +198,10 @@ namespace shappo0.Repositories
                     throw new Exception("No records updated..");
             }
         }
-        public static Product ReadProduct(SqlDataReader reader)
-        {
-            int productId = (int)reader["productId"];
-            string name = (string)reader["name"];
-            decimal price = (decimal)reader["price"];
-            decimal vatPercentage = (decimal)reader["vatPercentage"];
-            int stock = (int)reader["stock"];
-            string productTypeString = (string)reader["productType"];
-            string menuTypeString = (string)reader["menuType"];
-
-            ProductType productType = Enum.Parse<ProductType>(productTypeString, true);
-            MenuType menuType = Enum.Parse<MenuType>(menuTypeString, true);
-
-            bool onMenu = (bool)reader["onMenu"];
-
-            return new Product(productId, name, price, vatPercentage, stock, productType, menuType, onMenu);
-        }
 
         //Method to batch adjust the stock so the connection doesn't need to reopen for as many times as there are orderlines
-        public void BatchAdjustStock(List<OrderLine> orderLines)
+        // Uses OrderLine objects
+        public void BatchAdjustStockForOrders(List<OrderLine> orderLines)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -233,6 +220,44 @@ namespace shappo0.Repositories
                     }
                 }
             }
+        }
+        // Uses Product objects
+        public void BatchAdjustStockForProducts(List<Product> adjustedProducts)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = $"UPDATE [PRODUCT] SET stock = @stock WHERE productId = @productId";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Connection.Open();
+                    foreach (Product product in adjustedProducts)
+                    {
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@stock", product.Stock);
+                        command.Parameters.AddWithValue("@productId", product.ProductId);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        public static Product ReadProduct(SqlDataReader reader)
+        {
+            int productId = (int)reader["productId"];
+            string name = (string)reader["name"];
+            decimal price = (decimal)reader["price"];
+            decimal vatPercentage = (decimal)reader["vatPercentage"];
+            int stock = (int)reader["stock"];
+            bool onMenu = (bool)reader["onMenu"];
+
+            // Retrieves the STRINGS from the database
+            string productTypeString = (string)reader["productType"];
+            string menuTypeString = (string)reader["menuType"];
+            // Parses to ENUMS and sends that along as the actual values
+            ProductType productType = Enum.Parse<ProductType>(productTypeString, true);
+            MenuType menuType = Enum.Parse<MenuType>(menuTypeString, true);
+
+            return new Product(productId, name, price, vatPercentage, stock, productType, menuType, onMenu);
         }
     }
 }

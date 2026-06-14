@@ -21,6 +21,7 @@ namespace shappo0.Controllers
             _visitService = visitService;
         }
 
+        //De tafels overzicht pagina
         [HttpGet]
         public IActionResult Index()
         {
@@ -35,6 +36,7 @@ namespace shappo0.Controllers
             return View(tableViewModels);
         }
 
+        //Detail pagina van een tafel
         [HttpGet]
         public IActionResult Table(int tableNumber)
         {
@@ -50,6 +52,7 @@ namespace shappo0.Controllers
             return View(viewModel);
         }
 
+        //Bestelling serveren
         [HttpPost]
         public ActionResult UpdateOrderLineStatus(OrderLine orderLine, int tableNumber)
         {
@@ -58,6 +61,7 @@ namespace shappo0.Controllers
             return RedirectToAction("Table", new { tableNumber = tableNumber });
         }
 
+        //Veranderd de tafel status, TRUE = bezet, FALSE = vrij
         [HttpPost]
         public ActionResult UpdateTableStatus(Table table)
         {
@@ -77,6 +81,7 @@ namespace shappo0.Controllers
             return RedirectToAction("Index", "Table");
         }
 
+        //Maakt het view model voor 1 tafel in het overzicht
         private TableViewModel BuildTableOverviewModel(Table table)
         {
             Visit? visit = _visitService.GetActiveVisitForTable(table.TableNumber);
@@ -88,6 +93,7 @@ namespace shappo0.Controllers
             return new(table, drinkStatus, foodStatus);
         }
 
+        //Maakt het viewmodel voor een tafel detail pagina
         private TableViewModel BuildTableDetailModel(Table table)
         {
             Visit? visit = _visitService.GetActiveVisitForTable(table.TableNumber);
@@ -100,7 +106,9 @@ namespace shappo0.Controllers
                     order.OrderLines = _orderService.GetOrderLinesByOrderNumber(order.OrderNumber);
                 }
             }
-            return new(table, orders);
+
+            bool canPay = _tableService.CanTablePay(orders);
+            return new(table, orders, canPay);
         }
     }
 }
