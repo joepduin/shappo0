@@ -12,7 +12,9 @@
 
 <h1 class="mb-4">Products</h1>
 
-<!-- Only displays the CRU(D) actions if the logged in user is a Manager -->
+<!-- Only displays the CRU(D) actions if the logged in user is a Manager
+Uses 'IsInRole()', which is a default Method from ASP.NET using the RolePrincipal
+-->
 @if (User.IsInRole("Manager"))
 {
 	<div class="d-flex justify-content-between align-items-center mb-3">
@@ -95,12 +97,13 @@
 							<td>@product.ProductId</td>
 							<td>@product.Name</td>
 							<td><strong>@product.Stock</strong></td>
-							<td>
-								@if (User.IsInRole("Manager"))
-								{
+							@if (User.IsInRole("Manager"))
+							{
+								<td>
 									<a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-sm btn-danger">Edit</a>
-								}
-							</td>
+								</td>
+							}
+
 						</tr>
 					}
 				}
@@ -138,14 +141,7 @@
 					<td>@product.Stock</td>
 					<td>@product.ProductType</td>
 					<td>@product.MenuType</td>
-					@if (product.OnMenu)
-					{
-						<td class="bg-success">True</td>
-					}
-					else
-					{
-						<td class="bg-danger">False</td>
-					}
+					<td class="@(product.OnMenu ? "bg-success" : "bg-danger")">@(product.OnMenu ? "True" : "False")</td>
 					@if (User.IsInRole("Manager"))
 					{
 						<td>

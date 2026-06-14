@@ -16,6 +16,7 @@ namespace shappo0.Repositories
         {
             List<Finance> finances = new List<Finance>();
 
+            // Sets the Start and End date, using a default min and max value if none are sent along
             DateTime startDate = range?.Start ?? DateTime.MinValue;
             DateTime endDate = DateTime.MaxValue;
             if (range?.End != null)
@@ -50,7 +51,6 @@ namespace shappo0.Repositories
                     }
                 }
             }
-
             return finances;
         }
 
@@ -59,6 +59,7 @@ namespace shappo0.Repositories
         {
             decimal totalTips = 0;
 
+            // Sets the Start and End date, using a default min and max value if none are sent along
             DateTime startDate = range?.Start ?? DateTime.MinValue;
             DateTime endDate = DateTime.MaxValue;
             if (range?.End != null)
@@ -67,6 +68,7 @@ namespace shappo0.Repositories
             }
 
             // ORDER is joined from VISIT to BILL, since the timeCreated column (ORDER) is required for the date filter and tips are located in BILL
+            // ISNULL(expression, value): will returns 0 (value) if the expression (SUM()) is null
             string query = @"SELECT ISNULL(SUM(b.totalTip), 0) AS total_tips " +
                 "FROM BILL AS b " +
                 "JOIN VISIT AS v ON b.visitId = v.visitId " +

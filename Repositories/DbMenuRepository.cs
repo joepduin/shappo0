@@ -84,7 +84,7 @@ namespace shappo0.Repositories
             {
                 conditions.Add("onMenu = @onMenu");
             }
-            // Uses the lowStock boolean to add a condition to the query if it is true
+            // Uses the lowStock boolean to add a condition to the query if it is true (used for the "Low Stock" overview)
             if (lowStock)
             {
                 conditions.Add("stock < 10");
@@ -249,13 +249,8 @@ namespace shappo0.Repositories
             decimal vatPercentage = (decimal)reader["vatPercentage"];
             int stock = (int)reader["stock"];
             bool onMenu = (bool)reader["onMenu"];
-
-            // Retrieves the STRINGS from the database
-            string productTypeString = (string)reader["productType"];
-            string menuTypeString = (string)reader["menuType"];
-            // Parses to ENUMS and sends that along as the actual values
-            ProductType productType = Enum.Parse<ProductType>(productTypeString, true);
-            MenuType menuType = Enum.Parse<MenuType>(menuTypeString, true);
+            ProductType productType = Enum.Parse<ProductType>((string)reader["productType"], true);
+            MenuType menuType = Enum.Parse<MenuType>((string)reader["menuType"], true);
 
             return new Product(productId, name, price, vatPercentage, stock, productType, menuType, onMenu);
         }

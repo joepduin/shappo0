@@ -76,6 +76,7 @@ namespace shappo0.Services
         }
         public void BatchAdjustStockForProducts(List<Product> adjustedProducts)
         {
+            // Checks if stock change is possible
             foreach (Product product in adjustedProducts)
             {
                 if (product.Stock < 0)
