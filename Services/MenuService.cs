@@ -1,6 +1,5 @@
 ﻿using shappo0.Models;
 using shappo0.Repositories;
-using shappo0.ViewModels;
 
 namespace shappo0.Services
 {
@@ -23,7 +22,7 @@ namespace shappo0.Services
             return _menuRepository.GetByProductId(id);
         }
 
-        public List<Product> GetFilteredProducts(FilterItemsViewModel? filters, bool lowStock)
+        public List<Product> GetFilteredProducts(FilterItems? filters, bool lowStock)
         {
             return _menuRepository.GetFilteredProducts(filters, lowStock);
         }
@@ -63,6 +62,8 @@ namespace shappo0.Services
             else 
                 _menuRepository.AdjustStock(productId, newStock);
         }
+
+        // Laurens
         public void BatchAdjustStockForOrders(List<OrderLine> orderLines)
         {
             foreach (OrderLine orderLine in orderLines)
@@ -74,6 +75,8 @@ namespace shappo0.Services
             }
             _menuRepository.BatchAdjustStockForOrders(orderLines);
         }
+
+        // Ylvi
         public void BatchAdjustStockForProducts(List<Product> adjustedProducts)
         {
             // Checks if stock change is possible

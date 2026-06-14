@@ -42,9 +42,11 @@
             <div class="col-md-6">
                 <label class="form-label d-block">Is employed?</label>
                 <div class="btn-group" role="group">
+                    <!-- Chekcs if Model is null: if not, uses the value of OnMenu, if yes defaults to true -->
                     <input type="radio" class="btn-check" name="IsEmployed" id="employedTrue" value="true" checked="@(Model?.IsEmployed ?? true)" autocomplete="off">
                     <label class="btn btn-outline-success" for="employedTrue">True</label>
 
+                    <!-- Returns false if the Model is not null and the OnMenu property is false -->
                     <input type="radio" class="btn-check" name="IsEmployed" id="employedFalse" value="false" checked="@(Model != null && !Model.IsEmployed)" autocomplete="off">
                     <label class="btn btn-outline-danger" for="employedFalse">False</label>
                 </div>

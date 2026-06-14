@@ -1,17 +1,17 @@
-﻿namespace shappo0.ViewModels
+﻿namespace shappo0.Models
 {
-    public class FilterItemsViewModel
+    public class FilterItems
     {
         public string? ProductType { get; set; }
         public string? MenuType { get; set; }
         public bool? OnMenu { get; set; }
 
-        public FilterItemsViewModel()
+        public FilterItems()
         {
 
         }
 
-        public FilterItemsViewModel(string? productType, string? menuType, bool? onMenu)
+        public FilterItems(string? productType, string? menuType, bool? onMenu)
         {
             ProductType = productType;
             MenuType = menuType;

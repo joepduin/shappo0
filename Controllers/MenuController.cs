@@ -17,7 +17,7 @@ namespace shappo0.Controllers
             _menuService = menuService;
         }
 
-        public IActionResult Index(FilterItemsViewModel? filters)
+        public IActionResult Index(FilterItems? filters)
         {
             // Adds the filters to ViewData. Used for displaying selected option in the View
             ViewData["ActiveFilter"] = filters;

@@ -1,5 +1,4 @@
 using shappo0.Models;
-using shappo0.ViewModels;
 using System.Collections.Generic;
 
 namespace shappo0.Repositories
@@ -10,7 +9,7 @@ namespace shappo0.Repositories
         Product? GetByProductId(int? id);
         void AddMenuItem(Product product);
         void EditMenuItem(Product product);
-        List<Product> GetFilteredProducts(FilterItemsViewModel? filters, bool lowStock);
+        List<Product> GetFilteredProducts(FilterItems? filters, bool lowStock);
 
         void AdjustStock(int productId, int newStock);
 
