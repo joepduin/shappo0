@@ -13,7 +13,7 @@
 	<a href="/Menu/Index" class="btn btn-secondary">Return to Menu</a>
 </div>
 
-@if (Model.Any(p => p.Stock = 10 && p.OnMenu))
+@if (Model.Any(p => p.Stock < 10 && p.OnMenu))
 {
 	<div class="alert alert-danger" role="alert">
 		<h3>⚠️ Low Stock Warning</h3>
