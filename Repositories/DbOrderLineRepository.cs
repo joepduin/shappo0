@@ -87,13 +87,15 @@ namespace shappo0.Repositories
 
         public List<OrderLine> GetOrderLinesByType(int orderNumber, ProductType type)
         {
+            //get orderlines(a list) of a specific order by using @orderNumber (also prevents sql injection)
+            //filters on product type --> drink(bar order), !='Drink' --> food(kitchen order)
             List<OrderLine> orderLines = new List<OrderLine>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 
                 string query = @"SELECT     
-                                    OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, OL.Note,
+                                    OL.orderLineId, OL.quantity, OL.[status] AS OrderLineStatus, OL.Note,
                                     O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
                                     P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu
                                FROM [ORDER_LINE] AS OL
@@ -210,7 +212,7 @@ namespace shappo0.Repositories
         }
 
         public void UpdateOrderLineStatus(int orderLineId, OrderStatus status)
-        {
+        { //Update specific orderline status (ordered - being prepared - ready to be served)
             using SqlConnection connection = new SqlConnection(_connectionString);
 
             string query =
@@ -228,7 +230,10 @@ namespace shappo0.Repositories
         }
 
         public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
-        {
+        { 
+            //kitchen exclusive method
+            //Change the status of a specific course within a food order (ordered - being prepared - ready to be served)
+            
             using SqlConnection connection = new SqlConnection(_connectionString);
 
             string query =
