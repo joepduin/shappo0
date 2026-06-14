@@ -44,8 +44,11 @@ namespace shappo0.Services
                     bool allOrdersServed = true;
                     foreach (Order order in orders)
                     {
-                        if (order.Status != OrderStatus.Served) allOrdersServed = false;
-                        break;
+                        if (order.Status != OrderStatus.Served)
+                        {
+                            allOrdersServed = false;
+                            break;
+                        }
                     }
 
                     if (allOrdersServed)
