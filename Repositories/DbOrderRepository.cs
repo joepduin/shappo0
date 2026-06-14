@@ -15,77 +15,6 @@ namespace shappo0.Repositories
             _connectionString = configuration.GetConnectionString("shappo0");
         }
 
-        public List<Order> GetAllOrders()
-        {
-            List<Order> orders = new List<Order>();
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"
-                    SELECT 
-                        O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
-                        V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
-                        OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
-                        VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
-                    FROM [Order] AS O
-                    JOIN [Visit] AS V ON O.visitId = V.visitId
-                    JOIN [Staff] AS OS ON O.staffId = OS.staffId
-                    JOIN [Staff] AS VS ON V.staffId = VS.staffId ";
-
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    Order order = ReadOrder(reader);
-                    orders.Add(order);
-                }
-                reader.Close();
-            }
-            return orders;
-        }
-
-        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
-        {
-            List<Order> orders = new List<Order>();
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"
-                    SELECT DISTINCT 
-                        O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
-                        V.visitId, V.tableNumber, V.isActive AS VisitIsActive,
-                        OS.staffId AS OrderStaffId, OS.name AS OrderStaffName, OS.[role] AS OrderStaffRole,
-                        VS.staffId AS VisitStaffId, VS.name AS VisitStaffName, VS.[role] AS VisitStaffRole
-                    FROM [Order] AS O
-                    JOIN [Visit] AS V ON O.visitId = V.visitId
-                    JOIN [Staff] AS OS ON O.staffId = OS.staffId
-                    JOIN [Staff] AS VS ON V.staffId = VS.staffId
-                    WHERE O.[status] ";
-
-                if (status2 != null) query += "in (@status, @status2)";
-                else query += "= @status";
-
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Parameters.AddWithValue("@status", status.ToString());
-                if (status2 != null) command.Parameters.AddWithValue("@status2", status2.ToString());
-
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    Order order = ReadOrder(reader);
-                    orders.Add(order);
-                }
-                reader.Close();
-            }
-            return orders;
-        }
-
         public List<Order> GetRunningOrdersByType(ProductType type)
         {
             List<Order> orders = new List<Order>();
@@ -104,7 +33,7 @@ namespace shappo0.Repositories
                     JOIN [Staff] AS VS ON V.staffId = VS.staffId " +
                     "INNER JOIN [Order_Line] AS OL ON O.orderNumber = OL.orderNumber " +
                     "INNER JOIN [Product] AS P ON OL.productId = P.productId " +
-                    "WHERE O.[status] IN(@Ordered, @BeingPrepared, @ReadyToBeServed) AND ";
+                    "WHERE O.[status] IN(@Ordered, @BeingPrepared) AND ";
 
                 if (type == ProductType.Drink)
                 {
@@ -119,7 +48,6 @@ namespace shappo0.Repositories
 
                 command.Parameters.AddWithValue("@Ordered", OrderStatus.Ordered.ToString());
                 command.Parameters.AddWithValue("@BeingPrepared", OrderStatus.BeingPrepared.ToString());
-                command.Parameters.AddWithValue("@ReadyToBeServed", OrderStatus.ReadyToBeServed.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
@@ -151,7 +79,7 @@ namespace shappo0.Repositories
                     JOIN [Staff] AS VS ON V.staffId = VS.staffId " +
                     "INNER JOIN [Order_Line] AS OL ON O.orderNumber = OL.orderNumber " +
                     "INNER JOIN [Product] AS P ON OL.productId = P.productId " +
-                    "WHERE O.[status] = 'Served' AND ";
+                    "WHERE O.[status] IN(@ReadyToBeServed, @Served) AND ";
 
                 if (type == ProductType.Drink)
                 {
@@ -162,7 +90,10 @@ namespace shappo0.Repositories
                     query += "P.ProductType != 'Drink'";
                 }
 
-                SqlCommand command = new SqlCommand(query, connection); 
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.AddWithValue("@ReadyToBeServed", OrderStatus.ReadyToBeServed.ToString());
+                command.Parameters.AddWithValue("@Served", OrderStatus.Served.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 

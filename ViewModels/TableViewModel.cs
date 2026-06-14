@@ -12,6 +12,8 @@ namespace shappo0.ViewModels
 
         public TableViewModel()
         {
+            Table = new Table();
+            Orders = new List<Order>();
         }
 
         public TableViewModel(Table table, OrderStatus drinkStatus, OrderStatus foodStatus)
@@ -25,7 +27,7 @@ namespace shappo0.ViewModels
         public TableViewModel(Table table, List<Order> orders)
         {
             Table = table;
-            Orders = orders ?? new List<Order>();
+            Orders = orders;
         }
     }
 }

@@ -18,9 +18,9 @@ namespace shappo0.Services
             _orderRepository = orderRepository;
         }
 
-        public Table GetTableByNumber(int tableNumber)
+        public Table? GetTableByNumber(int tableNumber)
         {
-            Table table = _tablesRepository.GetTableByNumber(tableNumber);
+            Table? table = _tablesRepository.GetTableByNumber(tableNumber);
             return table;
         }
 

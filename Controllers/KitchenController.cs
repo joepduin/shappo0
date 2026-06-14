@@ -8,7 +8,7 @@ using shappo0.ViewModels;
 
 namespace shappo0.Controllers
 {
-    //[Authorize(Roles = "Kitchen")]
+    [Authorize]
     public class KitchenController : Controller
     {
         private readonly IOrderService _orderService;

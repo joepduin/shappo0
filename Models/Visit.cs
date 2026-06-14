@@ -1,4 +1,6 @@
-﻿namespace shappo0.Models
+﻿using shappo0.ViewModels;
+
+namespace shappo0.Models
 {
     public class Visit
     {
@@ -14,7 +16,7 @@
             Table = table;
             Staff = staff;
             IsActive = isActive;
-            Orders = new List<Order>();
+            Orders = [];
         }
 
         public Visit()

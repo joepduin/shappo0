@@ -1,4 +1,5 @@
-﻿using shappo0.Models;
+﻿using shappo0.Enums;
+using shappo0.Models;
 using shappo0.Repositories;
 
 namespace shappo0.Services
@@ -38,7 +39,7 @@ namespace shappo0.Services
                     vatHigh += vatAmount;
                 }
             }
-            return new Bill(subTotal, total, vatLow, vatHigh, false, visit, orderLines);
+            return new Bill { SubTotal = subTotal, Total = total, VatLow = vatLow, VatHigh = vatHigh, IsPaid = false, Visit = visit, OrderLines = orderLines };
         }
 
         public Bill? GetBillById(int? billId)
@@ -61,16 +62,6 @@ namespace shappo0.Services
             return _paymentRepository.SavePayment(payment);
         }
 
-        public List<Payment> GetPaymentsByBillId(int billId)
-        {
-            return _paymentRepository.GetPaymentsByBillId(billId);
-        }
-
-        public decimal GetTotalPaidByBillId(int billId)
-        {
-            return _paymentRepository.GetTotalPaidByBillId(billId);
-        }
-
         public Bill? GetBillByVisitId(int visitId)
         {
             return _paymentRepository.GetBillByVisitId(visitId);
@@ -86,6 +77,52 @@ namespace shappo0.Services
             //Er kunnen afrondings problemen zijn daarom gebruiken we >=, bijvoorbeeld € 50,00 / 3
             if (_paymentRepository.GetTotalPaidByBillId(bill.BillId) >= bill.Total) return true;
             return false;
+        }
+
+        public Payment CalculatePaymentDetails(Bill bill)
+        {
+            Payment payment = new Payment();
+            payment.Bill.BillId = bill.BillId;
+            payment.Bill.Visit = bill.Visit;
+
+
+            if (bill.SplitChoice == SplitChoice.Equal && bill.NumberOfPeople != null)
+            {
+                payment.PaymentAmount = bill.Total / (int)bill.NumberOfPeople;
+                payment.PaymentTip = bill.TotalTip / (int)bill.NumberOfPeople;
+                payment.Bill.NumberOfPeople = bill.NumberOfPeople;
+            }
+            else
+            {
+                payment.PaymentAmount = bill.Total;
+                payment.PaymentTip = bill.TotalTip;
+                if (bill.SplitChoice == SplitChoice.Single) payment.Bill.NumberOfPeople = 1;
+                else payment.Bill.NumberOfPeople = 0; //Dit is voor de custom betalling, want er is geen idee hoeveel betallingen er nog zullen volgen.
+            }
+            return payment;
+        }
+
+        public int CalculateNumberOfPeoplePaid(Bill bill)
+        {
+            List<Payment> payments = GetPaymentsByBill(bill);
+            return payments.Count();
+        }
+
+        public decimal CalculateOutstandingAmount(Bill bill)
+        {
+            decimal paidAmount = _paymentRepository.GetTotalPaidByBillId(bill.BillId);
+            return bill.Total - paidAmount;
+        }
+
+        public decimal CalculateTotalTip(Bill bill)
+        {
+            List<Payment> payments = GetPaymentsByBill(bill);
+            return payments.Sum(p => p.PaymentTip); //linq
+        }
+
+        private List<Payment> GetPaymentsByBill(Bill bill)
+        {
+            return _paymentRepository.GetPaymentsByBillId(bill.BillId);
         }
     }
 }

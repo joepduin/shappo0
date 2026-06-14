@@ -1,4 +1,5 @@
 ﻿using shappo0.Enums;
+using shappo0.ViewModels;
 
 namespace shappo0.Models
 {

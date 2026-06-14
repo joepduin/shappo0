@@ -28,16 +28,6 @@ namespace shappo0.Services
             return _orderRepository.GetOrdersByVisitId(visitId);
         }
 
-        public List<Order> GetAllOrders()
-        {
-            return _orderRepository.GetAllOrders();
-        }
-
-        public List<Order> GetRunningOrders(OrderStatus status, OrderStatus? status2)
-        {
-            return _orderRepository.GetRunningOrders(status, status2);
-        }
-
         public List<Order> GetRunningOrdersByType(ProductType type)
         {
             return _orderRepository.GetRunningOrdersByType(type);
@@ -58,34 +48,9 @@ namespace shappo0.Services
             return _orderLineRepository.GetOrderLinesByOrderNumber(orderNumber);
         }
 
-        public List<OrderLine> GetActiveOrderLinesByTableNumber(int orderNumber)
-        {
-            return _orderLineRepository.GetActiveOrderLinesByTableNumber(orderNumber);
-        }
-
         public List<OrderLine> GetGroupedOrderLinesByVisitId(int visitId)
         {
-            List<OrderLine> groupedLines = new List<OrderLine>();
-            List<Order> orders = _orderRepository.GetOrdersByVisitId(visitId);
-            foreach (Order order in orders)
-            {
-                List<OrderLine> orderLines = _orderLineRepository.GetOrderLinesByOrderNumber(order.OrderNumber);
-                foreach (OrderLine orderLine in orderLines)
-                {
-                    bool itemExists = false;
-                    foreach (OrderLine groupLine in groupedLines)
-                    {
-                        if (groupLine.Product.ProductId == orderLine.Product.ProductId)
-                        {
-                            groupLine.Quantity += orderLine.Quantity;
-                            itemExists = true;
-                            break;
-                        }
-                    }
-                    if (itemExists == false) groupedLines.Add(new() { OrderLineId = orderLine.OrderLineId, Product = orderLine.Product, Quantity = orderLine.Quantity });
-                }
-            }
-            return groupedLines;
+            return _orderLineRepository.GetGroupedOrderLinesByVisitId(visitId);
         }
 
         public void CreateOrder(int tableNumber, int staffId, List<OrderLine> orderLines)
@@ -110,8 +75,7 @@ namespace shappo0.Services
   
             }
 
-            //Create the order and link it to the visit and staff member
-            Order newOrder = new Order
+            Order newOrder = new()
             {
                 TimeCreated = DateTime.Now,
                 Status = OrderStatus.Ordered,
@@ -144,7 +108,7 @@ namespace shappo0.Services
             //Otherwise it creates a new product and adds it to the cart
             else
             {
-                OrderLine newOrderLine = new OrderLine
+                OrderLine newOrderLine = new()
                 {
                     Product = selectedProduct,
                     Status = OrderStatus.Ordered,
@@ -236,6 +200,22 @@ namespace shappo0.Services
         public void UpdateCourseStatus(int orderNumber, ProductType productType, OrderStatus status)
         {
             _orderLineRepository.UpdateCourseStatus(orderNumber, productType, status);
+        }
+
+        public OrderStatus GetOrderStatusByVisit(Visit visit, ProductType productType)
+        {
+            List<Order> orders = _orderRepository.GetOrdersByVisitId(visit.VisitId);
+            List<OrderLine> orderLines = [];
+
+            foreach (Order order in orders)
+            {
+                orderLines.AddRange(_orderLineRepository.GetOrderLinesByType(order.OrderNumber, productType));
+            }
+
+            return orderLines
+                .Select(ol => ol.Status)
+                .DefaultIfEmpty(OrderStatus.Served)
+                .Max();
         }
     }
 }

@@ -17,7 +17,8 @@ namespace shappo0.Models
 
         public Bill()
         {
-
+            Visit = new();
+            OrderLines = [];
         }
 
         public Bill(decimal subTotal, decimal total, decimal vatLow, decimal vatHigh, bool isPaid, decimal totalTip, SplitChoice splitChoice, int? numberOfPeople, Visit visit, List<OrderLine> orderLines)
@@ -32,17 +33,6 @@ namespace shappo0.Models
             OrderLines = orderLines;
             SplitChoice = splitChoice;
             NumberOfPeople = numberOfPeople;
-        }
-
-        public Bill(decimal subTotal, decimal total, decimal vatLow, decimal vatHigh, bool isPaid, Visit visit, List<OrderLine> orderLines)
-        {
-            SubTotal = subTotal;
-            Total = total;
-            VatLow = vatLow;
-            VatHigh = vatHigh;
-            IsPaid = isPaid;
-            Visit = visit;
-            OrderLines = orderLines;
         }
     }
 }

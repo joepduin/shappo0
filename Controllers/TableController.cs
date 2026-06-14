@@ -7,6 +7,7 @@ using shappo0.Models;
 
 namespace shappo0.Controllers
 {
+    [Authorize]
     public class TableController : Controller
     {
         private readonly ITableService _tableService;
@@ -20,8 +21,6 @@ namespace shappo0.Controllers
             _visitService = visitService;
         }
 
-        //je moet ingelogd zijn. tafels woorden doorgegeven aan de view.
-        [Authorize]
         [HttpGet]
         public IActionResult Index()
         {
@@ -36,15 +35,14 @@ namespace shappo0.Controllers
             return View(tableViewModels);
         }
 
-        [Authorize]
         [HttpGet]
         public IActionResult Table(int tableNumber)
         {
-            Table table = _tableService.GetTableByNumber(tableNumber);
+            Table? table = _tableService.GetTableByNumber(tableNumber);
 
             if (table == null)
             {
-                TempData["ErrorMessage"] = "Tafel bestaat niet.";
+                TempData["ErrorMessage"] = "Table does not exist.";
                 return RedirectToAction("Index");
             }
 
@@ -52,50 +50,40 @@ namespace shappo0.Controllers
             return View(viewModel);
         }
 
-        [Authorize]
         [HttpPost]
         public ActionResult UpdateOrderLineStatus(OrderLine orderLine, int tableNumber)
         {
             _orderService.UpdateOrderLineStatus(orderLine, OrderStatus.Served);
 
-
-            return RedirectToAction("Table", "Table", new { tableNumber = tableNumber });
+            return RedirectToAction("Table", new { tableNumber = tableNumber });
         }
 
-        [Authorize]
         [HttpPost]
         public ActionResult UpdateTableStatus(Table table)
         {
-            if (_tableService.UpdateTableStatus(table))
+            if (!_tableService.UpdateTableStatus(table))
             {
-                TempData["ConfirmMessage"] = "Tafel is succesvol gewijzigd.";
-                if (table.Status == true)
-                {
-                    return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
-                }
-                return RedirectToAction("Index", "Table");
+                TempData["ErrorMessage"] = "Status cannot be changed, still has unserved orders.";
+                return RedirectToAction("Table", new { tableNumber = table.TableNumber });
             }
-            
 
-                TempData["ErrorMessage"] = "Status kan niet veranderd worden, heeft nog ongeserveerde orders.";
-            return RedirectToAction("Table", "Table", new { tableNumber = table.TableNumber });
+            TempData["ConfirmMessage"] = "Table has been changed successfully.";
+
+            if (table.Status)
+            {
+                return RedirectToAction("Table", new { tableNumber = table.TableNumber });
+            }
+
+            return RedirectToAction("Index", "Table");
         }
 
         private TableViewModel BuildTableOverviewModel(Table table)
         {
-            List<OrderLine> orderLines = _orderService.GetActiveOrderLinesByTableNumber(table.TableNumber);
+            Visit? visit = _visitService.GetActiveVisitForTable(table.TableNumber);
+            if (visit == null) return new() { Table = table };
 
-            OrderStatus drinkStatus = orderLines
-                .Where(ol => ol.Product.ProductType == ProductType.Drink)
-                .Select(ol => ol.Status)
-                .DefaultIfEmpty(OrderStatus.Served)
-                .Max();
-
-            OrderStatus foodStatus = orderLines
-                .Where(ol => ol.Product.ProductType != ProductType.Drink)
-                .Select(ol => ol.Status)
-                .DefaultIfEmpty(OrderStatus.Served)
-                .Max();
+            OrderStatus drinkStatus = _orderService.GetOrderStatusByVisit(visit, ProductType.Drink);
+            OrderStatus foodStatus = _orderService.GetOrderStatusByVisit(visit, ProductType.Main); //Alles anders dan drink is food
 
             return new(table, drinkStatus, foodStatus);
         }

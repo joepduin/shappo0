@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using shappo0.Enums;
+﻿using shappo0.Enums;
 
 namespace shappo0.Models
 {
@@ -7,13 +6,16 @@ namespace shappo0.Models
     {
         public int OrderNumber { get; set; }
         public DateTime TimeCreated { get; set; }
-        public int WaitingTimeMinutes { get 
+        public int WaitingTimeMinutes
+        {
+            get
             {
                 TimeSpan span = DateTime.Now.Subtract(TimeCreated);
                 int waitingTime = (int)span.TotalMinutes;
                 return waitingTime;
             }
-            set { } }
+            set { }
+        }
         public OrderStatus Status { get; set; }
         public Visit Visit { get; set; }
         public Staff Staff { get; set; }
@@ -34,8 +36,7 @@ namespace shappo0.Models
             Status = status;
             Visit = visit;
             Staff = staff;
-            OrderLines = new List<OrderLine>();
+            OrderLines = [];
         }
     }
-
 }
