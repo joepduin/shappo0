@@ -138,7 +138,6 @@ namespace shappo0.Controllers
                 TempData["ConfirmMessage"] = "The stock was succesfully changed!";
 
                 return RedirectToAction("Index");
-
             }
             catch
             {
