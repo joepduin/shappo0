@@ -1,5 +1,5 @@
-﻿using shappo0.Models;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
+using shappo0.Models;
 using shappo0.Repositories.Interfaces;
 
 namespace shappo0.Repositories
@@ -24,9 +24,9 @@ namespace shappo0.Repositories
                 endDate = range.End.Value.AddDays(1);
             }
 
-            // Query selects by group based on 1. menutype, 2. sums the amount of items ordered within that group and 3. calculates the revenue per group
-            // The SUM of the price works, because the price * VAT is calculated for each item individually first, then gets put into the sum of each group
-            string query = @"SELECT p.menuType, SUM(ol.quantity) AS total_items_ordered, ROUND((SUM(ol.quantity * (p.price * (p.VATPercentage + 100.0) / 100.0))), 2) AS total_revenue " +
+            // Query selects by group based on menutype, sums the amount of items ordered within that group and calculates the revenue per group
+            // Also includes the filter option if date is selected, otherwise uses the default
+            string query = @"SELECT p.menuType, SUM(ol.quantity) AS total_items_ordered, ROUND((SUM(ol.quantity * (p.price * (p.VATPercentage + 100) / 100))), 2) AS total_revenue " +
                 "FROM ORDER_LINE AS ol " +
                 "JOIN PRODUCT AS p ON ol.productId = p.productId " +
                 "JOIN [ORDER] AS o ON ol.orderNumber = o.orderNumber " +

@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.Endpoints;
+﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
-using Microsoft.Data.SqlClient;
 using shappo0.ViewModels;
 
 namespace shappo0.Repositories
@@ -167,8 +166,8 @@ namespace shappo0.Repositories
                 command.Parameters.AddWithValue("@price", product.Price);
                 command.Parameters.AddWithValue("@vatPercentage", product.VATPercentage);
                 command.Parameters.AddWithValue("@stock", product.Stock);
-                command.Parameters.AddWithValue("@productType", product.ProductType);
-                command.Parameters.AddWithValue("@menuType", product.MenuType);
+                command.Parameters.AddWithValue("@productType", product.ProductType.ToString());
+                command.Parameters.AddWithValue("@menuType", product.MenuType.ToString());
                 command.Parameters.AddWithValue("@onMenu", product.OnMenu);
 
                 command.Connection.Open();
