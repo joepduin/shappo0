@@ -84,6 +84,7 @@ namespace shappo0.Services
             Payment payment = new Payment();
             payment.Bill.BillId = bill.BillId;
             payment.Bill.Visit = bill.Visit;
+            payment.Bill.SplitChoice = bill.SplitChoice;
 
 
             if (bill.SplitChoice == SplitChoice.Equal && bill.NumberOfPeople != null)
