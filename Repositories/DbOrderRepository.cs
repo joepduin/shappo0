@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Data.SqlClient;
 using shappo0.Enums;
 using shappo0.Models;
 
@@ -145,7 +143,7 @@ namespace shappo0.Repositories
 
 
 
-        private Order ReadOrder(SqlDataReader reader)
+        private static Order ReadOrder(SqlDataReader reader)
         {
             Staff orderStaff = new Staff
             {
