@@ -45,8 +45,6 @@ namespace shappo0.Repositories
                 }
                 query += " ORDER BY O.timeCreated";
 
-                query += " ORDER BY O.timeCreated;";
-
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Parameters.AddWithValue("@Ordered", OrderStatus.Ordered.ToString());
