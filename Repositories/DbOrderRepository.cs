@@ -43,6 +43,7 @@ namespace shappo0.Repositories
                 {
                     query += "P.ProductType != 'Drink'";
                 }
+                query += " ORDER BY O.timeCreated";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
