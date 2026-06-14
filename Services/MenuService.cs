@@ -32,6 +32,10 @@ namespace shappo0.Services
         {
             if (CheckValidStock(product))
             {
+                // Price is calculated: the VAT % is calculated into a 1.09 or 1.21 value, which the Price is then divided by
+                decimal priceExcludingVAT = product.Price / (1 + (product.VATPercentage / 100));
+                product.Price = priceExcludingVAT;
+
                 _menuRepository.AddMenuItem(product);
             }
             else
@@ -42,7 +46,13 @@ namespace shappo0.Services
         public void EditMenuItem(Product product)
         {
             if (CheckValidStock(product))
+            {
+                // Re-applies the logic from the Add method in order to save the correct price, while still displaying the price including VAT in the edit View
+                decimal priceExcludingVAT = product.Price / (1 + (product.VATPercentage / 100));
+                product.Price = priceExcludingVAT;
+
                 _menuRepository.EditMenuItem(product);
+            }
             else
                 throw new ArgumentException("Stock cannot be negative.");
         }

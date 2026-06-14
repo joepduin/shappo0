@@ -65,10 +65,6 @@ namespace shappo0.Controllers
         {
             try
             {
-                // Price is calculated: the VAT % is calculated into a 1.09 or 1.21 value, which the Price is then divided by
-                decimal priceExcludingVAT = product.Price / (1 + (product.VATPercentage / 100));
-                product.Price = priceExcludingVAT;
-
                 _menuService.AddMenuItem(product);
 
                 TempData["ConfirmMessage"] = "Product has been succesfully created";
@@ -103,10 +99,6 @@ namespace shappo0.Controllers
         {
             try
             {
-                // Re-applies the logic from the Add method in order to save the correct price, while still displaying the price including VAT in the edit View
-                decimal priceExcludingVAT = product.Price / (1 + (product.VATPercentage / 100));
-                product.Price = priceExcludingVAT;
-
                 _menuService.EditMenuItem(product);
 
                 TempData["ConfirmMessage"] = "Product has been successfully edited";
