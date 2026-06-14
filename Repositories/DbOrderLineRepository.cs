@@ -93,7 +93,7 @@ namespace shappo0.Repositories
             {
                 
                 string query = @"SELECT     
-                                    OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, 
+                                    OL.orderLineId, OL.note, OL.quantity, OL.[status] AS OrderLineStatus, OL.Note,
                                     O.orderNumber, O.timeCreated, O.[status] AS OrderStatus, 
                                     P.productId, P.[name], P.[price], P.VATPercentage, P.Stock, P.menuType, P.ProductType, P.OnMenu
                                FROM [ORDER_LINE] AS OL
