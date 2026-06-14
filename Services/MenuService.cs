@@ -23,26 +23,93 @@ namespace shappo0.Services
             return _menuRepository.GetByProductId(id);
         }
 
-        public List<Product> GetFilteredProducts(FilterItemsViewModel? filters)
+        public List<Product> GetFilteredProducts(FilterItemsViewModel? filters, bool lowStock)
         {
-            return _menuRepository.GetFilteredProducts(filters);
+            return _menuRepository.GetFilteredProducts(filters, lowStock);
         }
 
         public void AddMenuItem(Product product)
         {
-            _menuRepository.AddMenuItem(product);
+            if (CheckValidStock(product))
+            {
+                _menuRepository.AddMenuItem(product);
+            }
+            else
+            {
+                throw new ArgumentException("Stock cannot be negative.");
+            }
         }
         public void EditMenuItem(Product product)
         {
-            _menuRepository.EditMenuItem(product);
+            if (CheckValidStock(product))
+                _menuRepository.EditMenuItem(product);
+            else
+                throw new ArgumentException("Stock cannot be negative.");
         }
         public void AdjustStock(int productId, int newStock)
         {
-            _menuRepository.AdjustStock(productId, newStock);
+            if (newStock < 0)
+                throw new ArgumentException("Stock cannot be negative.");
+            else 
+                _menuRepository.AdjustStock(productId, newStock);
         }
-        public void BatchAdjustStock(List<OrderLine> orderLines)
+        public void BatchAdjustStockForOrders(List<OrderLine> orderLines)
         {
-            _menuRepository.BatchAdjustStock(orderLines);
+            foreach (OrderLine orderLine in orderLines)
+            {
+                if (orderLine.Product.Stock - orderLine.Quantity < 0)
+                {
+                    throw new InvalidOperationException($"Insufficient stock for product {orderLine.Product.Name}. Cannot adjust stock.");
+                }
+            }
+            _menuRepository.BatchAdjustStockForOrders(orderLines);
+        }
+        public void BatchAdjustStockForProducts(List<Product> adjustedProducts)
+        {
+            foreach (Product product in adjustedProducts)
+            {
+                if (product.Stock < 0)
+                {
+                    throw new ArgumentException($"Stock for product {product.Name} cannot be negative.");
+                }
+            }
+            _menuRepository.BatchAdjustStockForProducts(adjustedProducts);
+        }
+
+        // Compares a List with incoming products to the current database products, checking for ANY stock mismatch
+        public bool CompareStock(List<Product> incomingProducts)
+        {
+            List<Product> currentDbProducts = _menuRepository.GetProducts();
+
+            // Loops through each Product in incoming list
+            foreach (Product incomingProduct in incomingProducts)
+            {
+                // Looks through each Product in the database list, looking for a matching ProductId
+                foreach (var dbProduct in currentDbProducts)
+                {
+                    if (dbProduct.ProductId == incomingProduct.ProductId)
+                    {
+                        // Checks if the stock values are different
+                        if (incomingProduct.Stock != dbProduct.Stock)
+                        {
+                            return false;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Returns true, meaning no Stock was changed
+            return true;
+        }
+
+        private bool CheckValidStock(Product product)
+        {
+            if (product.Stock < 0)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

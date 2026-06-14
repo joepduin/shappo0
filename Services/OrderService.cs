@@ -92,7 +92,7 @@ namespace shappo0.Services
             }
 
             _orderLineRepository.CreateOrderLines(orderLines);
-            _menuService.BatchAdjustStock(orderLines);
+            _menuService.BatchAdjustStockForOrders(orderLines);
         }
 
         public void AddProductToCart(List<OrderLine> cart, Product selectedProduct)

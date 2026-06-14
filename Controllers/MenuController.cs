@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using shappo0.Models;
 using shappo0.Services;
 using shappo0.ViewModels;
@@ -16,11 +17,18 @@ namespace shappo0.Controllers
             _menuService = menuService;
         }
 
-        // QUESTION: All these filtering options belong to the same Model, but are separate parameters. Would it be better to create an instance of the Model?
         public IActionResult Index(FilterItemsViewModel? filters)
         {
-            List<Product> products = _menuService.GetFilteredProducts(filters);
-            return View(products);
+            // Adds the filters to ViewData. Used for displaying selected option in the View
+            ViewData["ActiveFilter"] = filters;
+
+            // Creates a view model with 2 Lists, 1 for all products, 1 for low stock products
+            List<Product> products = _menuService.GetFilteredProducts(filters, false);
+            List<Product> lowStockProducts = _menuService.GetFilteredProducts(filters, true);
+
+            ProductsViewModel productsViewModel = new ProductsViewModel(products, lowStockProducts);
+
+            return View(productsViewModel);
         }
 
         // The add methods for both food and drink items are separated, but both call the same AddItem method
@@ -52,13 +60,14 @@ namespace shappo0.Controllers
             return AddItem(product);
         }
 
-        // Overarching helper method for adding an item (either drink or food), preventing double code
+        // Helper method for adding an item (either drink or food), preventing double code
         private ActionResult AddItem(Product product)
         {
             try
             {
-                // The price is divided by 1 + VAT percentage to get the price without VAT, which is what is stored in the database
-                product.PriceIncludingTax = product.Price;
+                // Price is calculated: the VAT % is calculated into a 1.09 or 1.21 value, which the Price is then divided by
+                decimal priceExcludingVAT = product.Price / (1 + (product.VATPercentage / 100));
+                product.Price = priceExcludingVAT;
 
                 _menuService.AddMenuItem(product);
 
@@ -71,6 +80,7 @@ namespace shappo0.Controllers
                 return View(product);
             }
         }
+
 
         // Editing an item is done through the same view for both food and drink items. This gives the user full freedom to edit properties, including illegal combinations
         [Authorize(Roles = "Manager")]
@@ -93,6 +103,10 @@ namespace shappo0.Controllers
         {
             try
             {
+                // Re-applies the logic from the Add method in order to save the correct price, while still displaying the price including VAT in the edit View
+                decimal priceExcludingVAT = product.Price / (1 + (product.VATPercentage / 100));
+                product.Price = priceExcludingVAT;
+
                 _menuService.EditMenuItem(product);
 
                 TempData["ConfirmMessage"] = "Product has been successfully edited";
@@ -106,6 +120,7 @@ namespace shappo0.Controllers
             }
         }
 
+
         [Authorize(Roles = "Manager")]
         [HttpGet]
         public IActionResult AdjustStock()
@@ -118,30 +133,33 @@ namespace shappo0.Controllers
         [HttpPost]
         public ActionResult AdjustStock(List<Product> adjustedProducts)
         {
-            // First checks if there were any products selected, if not, it returns an error message
-            if (adjustedProducts == null)
+            // First checks if any stock was edited. If not, it returns an error message
+            if (_menuService.CompareStock(adjustedProducts))
             {
-                List<Product> products = _menuService.GetProducts();
-                ViewBag.ErrorMessage = @"Exception occured: no products were selected.";
-                return View(products);
+                return AdjustStockError();
             }
             try
             {
-                foreach (Product product in adjustedProducts)
-                {
-                    _menuService.AdjustStock(product.ProductId, product.Stock);
-                }
+                // Updates the stock of each Product
+                _menuService.BatchAdjustStockForProducts(adjustedProducts);
+
+                TempData["ConfirmMessage"] = "The stock was succesfully changed!";
+
                 return RedirectToAction("Index");
 
             }
             catch
             {
-                // Annoyingly some double code, but catch method
-                List<Product> products = _menuService.GetProducts();
-                ViewBag.ErrorMessage = @"Exception occured: no products were selected.";
-                return View(products);
-
+                return AdjustStockError();
             }
+        }
+
+        // Helper method to prevent double code (since there can be errors in 2 places when posting)
+        private ActionResult AdjustStockError()
+        {
+            List<Product> products = _menuService.GetProducts();
+            ViewBag.ErrorMessage = @"Exception occured: no products were selected.";
+            return View(products);
         }
     }
 }
