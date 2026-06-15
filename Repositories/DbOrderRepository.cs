@@ -14,6 +14,11 @@ namespace shappo0.Repositories
         }
 
         public List<Order> GetRunningOrdersByType(ProductType type)
+        // Returns a list of running orders.
+        //Distinct prevents duplicate rows (when an order contains drink orders and food orders)
+        //Ordered by the time created
+        //filters on product type --> drink(bar order), !='Drink' --> food(kitchen order)
+        //protected against sql injection with the command.Parameters.AddWithValue and shows only the 'running' orders (ordered, being prepared)
         {
             List<Order> orders = new List<Order>();
 
@@ -62,6 +67,12 @@ namespace shappo0.Repositories
 
         public List<Order> GetFinishedOrdersByType(ProductType type)
         {
+            // Returns a list of finished orders.
+            //Distinct prevents duplicate rows (when an order contains drink orders and food orders)
+            //Ordered by the time created Descending (not an requirement, but it better so personnel doesn't have to scroll down to see the latest
+            //finished order
+            //filters on product type --> drink(bar order), !='Drink' --> food(kitchen order)
+            //protected against sql injection with the command.Parameters.AddWithValue and shows only the 'finished' orders (served, ready to be served)
             List<Order> orders = new List<Order>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -88,7 +99,7 @@ namespace shappo0.Repositories
                 {
                     query += "P.ProductType != 'Drink'";
                 }
-
+                query += " ORDER BY O.timeCreated DESC";
                 SqlCommand command = new SqlCommand(query, connection);
 
                 command.Parameters.AddWithValue("@ReadyToBeServed", OrderStatus.ReadyToBeServed.ToString());
@@ -204,7 +215,7 @@ namespace shappo0.Repositories
         }
 
         public void UpdateOrderStatus(int orderNumber, OrderStatus status)
-        {
+        {//Update the whole order status (ordered - being prepared - ready to be served)
             using SqlConnection connection = new SqlConnection(_connectionString);
 
             string query =
