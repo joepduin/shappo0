@@ -111,32 +111,6 @@ namespace shappo0.Repositories
             }
         }
 
-        public Bill? GetBillByVisitId(int? visitId)
-        {
-            Bill? bill = null;
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @"SELECT billId, subTotal, total, VATLow, VATHigh, totalTip, isPaid, visitId, splitChoice, numberOfPeople
-                                 FROM BILL 
-                                 WHERE visitId = @visitId";
-
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@visitId", visitId);
-
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            bill = ReadBill(reader);
-                        }
-                    }
-                }
-            }
-            return bill;
-        }
-
         public Bill? GetBillByVisitId(int visitId)
         {
             Bill? bill = null;

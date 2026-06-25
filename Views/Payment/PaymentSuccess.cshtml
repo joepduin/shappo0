@@ -7,4 +7,35 @@
     <p>Order for table @ViewBag.TableId has been successfully completed and the table is set to free.</p>
 </div>
 
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Quantity</th>
+            <th>Product</th>
+            <th>Price per piece</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var line in Model.OrderLines)
+        {
+            <tr>
+                <td>@line.Quantity x</td>
+                <td>@line.Product.Name</td>
+                <td>&euro; @line.Product.PriceIncludingTax.ToString("0.00")</td>
+                <td>&euro; @((line.Product.PriceIncludingTax * line.Quantity).ToString("0.00"))</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="mb-4">
+    <p><strong>Subtotal:</strong> &euro; @Model.SubTotal.ToString("0.00")</p>
+    <p><strong>VAT Low (9%):</strong> &euro; @Model.VatLow.ToString("0.00")</p>
+    <p><strong>VAT High (21%):</strong> &euro; @Model.VatHigh.ToString("0.00")</p>
+    <p><strong>Tip Amount:</strong> &euro; @Model.TotalTip.ToString("0.00")</p>
+    <p><strong>Split Type:</strong> @Model.SplitChoice</p>
+    <h3><strong>Total Paid:</strong> &euro; @Model.Total.ToString("0.00")</h3>
+</div>
+
 <a href="/Table" class="btn btn-secondary">Back to dashboard</a>

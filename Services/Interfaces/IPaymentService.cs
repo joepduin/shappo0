@@ -18,5 +18,6 @@ namespace shappo0.Services
         public int CalculateNumberOfPeoplePaid(Bill bill);
         public decimal CalculateOutstandingAmount(Bill bill);
         public decimal CalculateTotalTip(Bill bill);
+        public Bill? GetPaidBill(int visitId);
     }
 }
