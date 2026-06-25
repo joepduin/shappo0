@@ -118,8 +118,8 @@ namespace shappo0.Services
             Bill? bill = _paymentRepository.GetBillByVisitId(visitId);
             List<OrderLine>? OrderLines = _orderService.GetGroupedOrderLinesByVisitId(visitId);
 
-            if (OrderLines != null || bill != null) bill.OrderLines = OrderLines;
-
+            if (OrderLines == null || bill == null) return bill;
+            bill.OrderLines = OrderLines;
             return bill;
         }
 
