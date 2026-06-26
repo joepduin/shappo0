@@ -113,7 +113,7 @@ namespace shappo0.Controllers
         [HttpGet]
         public IActionResult PaymentSuccess(int visitId)
         {
-            Bill? bill = _paymentService.GetBillByVisitId(visitId);
+            Bill? bill = _paymentService.GetPaidBill(visitId);
             if (bill == null)
             {
                 TempData["Error"] = "The bill associated with this visit could not be found.";
@@ -137,7 +137,7 @@ namespace shappo0.Controllers
             _tableService.UpdateTableStatus(table);
             bill.TotalTip = _paymentService.CalculateTotalTip(bill);
             _paymentService.UpdateBillPaid(bill);
-            return View();
+            return View(bill);
         }
 
         private PaymentViewModel CreatePaymentViewModel(Bill bill)

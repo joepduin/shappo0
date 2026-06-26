@@ -81,27 +81,48 @@ namespace shappo0.Services
 
         public Payment CalculatePaymentDetails(Bill bill)
         {
-            Payment payment = new Payment();
-            payment.Bill.BillId = bill.BillId;
-            payment.Bill.Visit = bill.Visit;
-            payment.Bill.SplitChoice = bill.SplitChoice;
-
+            Payment payment = new Payment
+            {
+                Bill = new Bill
+                {
+                    BillId = bill.BillId,
+                    Visit = bill.Visit,
+                    SplitChoice = bill.SplitChoice,
+                    NumberOfPeople = GetTotalPeople(bill)
+                }
+            };
 
             if (bill.SplitChoice == SplitChoice.Equal && bill.NumberOfPeople != null)
             {
-                payment.PaymentAmount = bill.Total / (int)bill.NumberOfPeople;
-                payment.PaymentTip = bill.TotalTip / (int)bill.NumberOfPeople;
-                payment.Bill.NumberOfPeople = bill.NumberOfPeople;
+                payment.PaymentAmount = bill.Total / bill.NumberOfPeople.Value;
+                payment.PaymentTip = bill.TotalTip / bill.NumberOfPeople.Value;
             }
             else
             {
                 payment.PaymentAmount = bill.Total;
                 payment.PaymentTip = bill.TotalTip;
-                if (bill.SplitChoice == SplitChoice.Single) payment.Bill.NumberOfPeople = 1;
-                else payment.Bill.NumberOfPeople = 0; //Dit is voor de custom betalling, want er is geen idee hoeveel betallingen er nog zullen volgen.
             }
+
             return payment;
         }
+
+        private int GetTotalPeople(Bill bill)
+        {
+            if (bill.SplitChoice == SplitChoice.Equal && bill.NumberOfPeople != null) return bill.NumberOfPeople.Value;
+            else if (bill.SplitChoice == SplitChoice.Single) return 1;
+            else return 0;
+        }
+
+        public Bill? GetPaidBill(int visitId)
+        {
+            Bill? bill = _paymentRepository.GetBillByVisitId(visitId);
+            List<OrderLine>? OrderLines = _orderService.GetGroupedOrderLinesByVisitId(visitId);
+
+            if (OrderLines == null || bill == null) return bill;
+            bill.OrderLines = OrderLines;
+            return bill;
+        }
+
 
         public int CalculateNumberOfPeoplePaid(Bill bill)
         {
